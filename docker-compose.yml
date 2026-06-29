@@ -1,0 +1,38 @@
+services:
+
+  web:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: agenda_web
+    
+    command: tail -f /dev/null
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - ./backend:/app
+
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16
+
+    container_name: agenda_db
+
+    environment:
+      POSTGRES_DB: agenda_clinica
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
