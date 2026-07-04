@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.core.exceptions import ValidationError
 
 from .managers import AccountManager
 
@@ -31,6 +32,25 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
+
+
+    def clean(self):
+        if not self.pk:
+            return
+
+        old_account = Account.objects.get(pk=self.pk)
+
+        if old_account.role != self.role:
+            if hasattr(self, "patient_profile"):
+                raise ValidationError({
+                    "role": "No puedes cambiar el rol porque esta cuenta ya tiene un perfil de paciente."
+                })
+
+            if hasattr(self, "psychologist_profile"):
+                raise ValidationError({
+                    "role": "No puedes cambiar el rol porque esta cuenta ya tiene un perfil de psicólogo."
+                })
+
 
     def __str__(self):
         return self.email

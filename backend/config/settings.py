@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'apps.accounts',
-    'apps.patients'
+    'apps.patients',
+    'apps.psychologists',
+    'apps.appointments'
 ]
 
 AUTH_USER_MODEL = "accounts.Account"

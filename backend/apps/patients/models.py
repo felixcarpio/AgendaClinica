@@ -1,6 +1,7 @@
 # Create your models here.
 from django.db import models
 from apps.accounts.models import Account
+from django.core.exceptions import ValidationError
 
 
 class Patient(models.Model):
@@ -29,6 +30,12 @@ class Patient(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        if self.account and self.account.role != Account.Role.PATIENT:
+            raise ValidationError({
+                "account": "La cuenta seleccionada debe tener rol de paciente."
+            })
 
     def __str__(self):
         return f"{self.account.first_name} {self.account.last_name}"
