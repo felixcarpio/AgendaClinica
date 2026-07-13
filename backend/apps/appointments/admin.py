@@ -1,5 +1,29 @@
 from django.contrib import admin
 from .models import AvailabilitySlot, Appointment
+from django import forms
+from django.db.models import Q
+
+
+class AppointmentAdminForm(forms.ModelForm):
+    class Meta:
+        model = Appointment
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        queryset = AvailabilitySlot.objects.filter(
+            status=AvailabilitySlot.Status.AVAILABLE
+        )
+
+        if self.instance and self.instance.pk:
+            queryset = AvailabilitySlot.objects.filter(
+                Q(status=AvailabilitySlot.Status.AVAILABLE) |
+                Q(pk=self.instance.availability_slot.pk)
+            )
+
+        self.fields["availability_slot"].queryset = queryset
+
 
 
 @admin.register(AvailabilitySlot)
@@ -20,6 +44,7 @@ class AvailabilitySlotAdmin(admin.ModelAdmin):
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
+    form = AppointmentAdminForm
     list_display = (
         "patient",
         "psychologist",
