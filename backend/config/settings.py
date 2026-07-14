@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'apps.accounts',
     'apps.patients',
     'apps.psychologists',
-    'apps.appointments'
+    'apps.appointments',
+    "apps.clinical_records",
 ]
 
 AUTH_USER_MODEL = "accounts.Account"
@@ -119,7 +120,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "America/El_Salvador"
+USE_TZ = True
 
 USE_I18N = True
 

@@ -95,18 +95,13 @@ class AvailabilitySlot(models.Model):
             })
 
     def __str__(self):
-        """
-        Devuelve una representación legible del cupo para el admin.
-        """
-
-        psychologist_name = (
-            f"{self.psychologist.account.first_name} "
-            f"{self.psychologist.account.last_name}"
-        )
+        local_start = timezone.localtime(self.start_time)
+        local_end = timezone.localtime(self.end_time)
 
         return (
-            f"{psychologist_name} | "
-            f"{self.start_time} - {self.end_time}"
+            f"{self.psychologist} - "
+            f"{local_start.strftime('%d/%m/%Y %I:%M %p')} "
+            f"a {local_end.strftime('%I:%M %p')}"
         )
 
 
@@ -394,10 +389,20 @@ class Appointment(models.Model):
 
     def __str__(self):
         """
-        Devuelve una representación legible de la cita para el admin.
+        Devuelve la cita con sus horas de inicio y finalización
+        convertidas a la zona horaria local.
         """
+
+        local_start_time = timezone.localtime(
+            self.availability_slot.start_time
+        )
+        local_end_time = timezone.localtime(
+            self.availability_slot.end_time
+        )
 
         return (
             f"{self.patient} con {self.psychologist} - "
-            f"{self.availability_slot.start_time}"
+            f"{local_start_time.strftime('%d/%m/%Y')} "
+            f"{local_start_time.strftime('%I:%M %p')} a "
+            f"{local_end_time.strftime('%I:%M %p')}"
         )
