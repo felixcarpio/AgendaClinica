@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'apps.psychologists',
     'apps.appointments',
     "apps.clinical_records",
+    "apps.assignments",
 ]
 
 AUTH_USER_MODEL = "accounts.Account"

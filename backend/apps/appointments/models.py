@@ -304,6 +304,31 @@ class Appointment(models.Model):
                         "que se cruza con este horario."
                     )
                 })
+                
+        # Una cita que ya posee notas clínicas no puede cancelarse,
+        # porque la sesión ya fue documentada en el expediente.
+        if self.pk and self.status == self.Status.CANCELLED:
+            previous_appointment = Appointment.objects.filter(
+                pk=self.pk
+            ).only(
+                "status"
+            ).first()
+
+            # Solo se valida cuando realmente se está intentando
+            # cambiar el estado hacia CANCELLED.
+            if (
+                previous_appointment
+                and previous_appointment.status != self.Status.CANCELLED
+                and self.session_notes.exists()
+            ):
+                raise ValidationError(
+                    {
+                        "status": (
+                            "No es posible cancelar una cita que ya tiene "
+                            "notas clínicas registradas."
+                        )
+                    }
+                )
 
     def save(self, *args, **kwargs):
         """
