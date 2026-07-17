@@ -1,7 +1,15 @@
 {% extends "layouts/dashboard.html" %}
+{% load static %}
 
 {% block title %}
     Mis citas | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/appointment_list.css' %}"
+    >
 {% endblock %}
 
 {% block content %}
@@ -18,9 +26,9 @@
 
         <a
             href="{% url 'patient-appointment-booking' %}"
-            class="btn btn--primary"
+            class="btn btn--primary btn--lg appointment-list__create-button"
         >
-            Agendar cita
+            Agendar Cita
         </a>
     </section>
 
@@ -38,9 +46,9 @@
         </div>
 
         {% if upcoming_appointments %}
-            <div class="content-grid content-grid--two-columns">
+            <div class="appointment-list-grid">
                 {% for appointment in upcoming_appointments %}
-                    <article class="card">
+                    <article class="card appointment-card">
                         <div class="card__header">
                             <div>
                                 <h3 class="card__title">
@@ -50,7 +58,7 @@
                                 <p class="card__subtitle">
                                     {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
                                     a las
-                                    {{ appointment.availability_slot.start_time|time:"H:i" }}
+                                    {{ appointment.availability_slot.start_time|time:"h:i A" }}
                                 </p>
                             </div>
 
@@ -87,9 +95,9 @@
 
                             <p>
                                 <strong>Horario:</strong>
-                                {{ appointment.availability_slot.start_time|time:"H:i" }}
+                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
                                 -
-                                {{ appointment.availability_slot.end_time|time:"H:i" }}
+                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
                             </p>
                         </div>
 
@@ -105,7 +113,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <article class="card card--soft">
+            <article class="card card--soft appointment-card">
                 <div class="card__header">
                     <div>
                         <h3 class="card__title">
@@ -155,9 +163,9 @@
         </div>
 
         {% if appointment_history %}
-            <div class="content-grid content-grid--two-columns">
+            <div class="appointment-list-grid">
                 {% for appointment in appointment_history %}
-                    <article class="card card--soft">
+                    <article class="card card--soft appointment-card">
                         <div class="card__header">
                             <div>
                                 <h3 class="card__title">
@@ -167,7 +175,7 @@
                                 <p class="card__subtitle">
                                     {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
                                     a las
-                                    {{ appointment.availability_slot.start_time|time:"H:i" }}
+                                    {{ appointment.availability_slot.start_time|time:"h:i A" }}
                                 </p>
                             </div>
 
@@ -199,9 +207,9 @@
 
                             <p>
                                 <strong>Horario:</strong>
-                                {{ appointment.availability_slot.start_time|time:"H:i" }}
+                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
                                 -
-                                {{ appointment.availability_slot.end_time|time:"H:i" }}
+                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
                             </p>
 
                             {% if appointment.status == "CANCELLED" and appointment.cancelled_reason %}
@@ -224,7 +232,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <article class="card card--soft">
+            <article class="card card--soft appointment-card">
                 <div class="card__body">
                     <p>
                         Todavía no tienes citas registradas en el historial.

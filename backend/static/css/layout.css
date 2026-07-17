@@ -95,6 +95,13 @@
     color: var(--color-text-secondary);
 }
 
+.page-heading__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+}
+
 /* ==============================
    Footer
    ============================== */
@@ -172,4 +179,12 @@
     .app-footer {
         padding: var(--spacing-4) var(--spacing-5);
     }
+
+    .page-heading__actions {
+        width: 100%;
+    }
+
+    .page-heading__actions .btn {
+        width: 100%;
+}
 }

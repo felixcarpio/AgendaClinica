@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 
 from apps.appointments.forms import (
+    PatientAppointmentCancellationForm,
     PatientAppointmentConfirmationForm,
 )
 from apps.patients.models import Patient
@@ -378,5 +379,76 @@ def patient_appointment_confirm(request, public_id):
     return render(
         request,
         "appointments/patient_appointment_confirm.html",
+        context,
+    )
+    
+@login_required
+def patient_appointment_cancel(request, public_id):
+    """
+    Permite al paciente cancelar una cita propia
+    que todavía esté pendiente o confirmada.
+    """
+
+    if request.user.role != "PATIENT":
+        return redirect("dashboard-redirect")
+
+    appointment = get_object_or_404(
+        Appointment.objects.select_related(
+            "patient",
+            "psychologist",
+            "availability_slot",
+        ),
+        public_id=public_id,
+        patient__account=request.user,
+    )
+
+    allowed_statuses = {
+        Appointment.Status.PENDING,
+        Appointment.Status.CONFIRMED,
+    }
+
+    if appointment.status not in allowed_statuses:
+        messages.error(
+            request,
+            "Esta cita ya no puede ser cancelada.",
+        )
+        return redirect(
+            "patient-appointment-detail",
+            public_id=appointment.public_id,
+        )
+
+    if request.method == "POST":
+        form = PatientAppointmentCancellationForm(
+            request.POST
+        )
+
+        if form.is_valid():
+            appointment.status = Appointment.Status.CANCELLED
+            appointment.cancelled_reason = (
+                form.cleaned_data["cancelled_reason"]
+            )
+
+            appointment.full_clean()
+            appointment.save()
+
+            messages.success(
+                request,
+                "La cita fue cancelada correctamente.",
+            )
+
+            return redirect("patient-appointment-list")
+
+    else:
+        form = PatientAppointmentCancellationForm()
+
+    context = {
+        "page_title": "Cancelar cita",
+        "appointment": appointment,
+        "form": form,
+    }
+
+    return render(
+        request,
+        "appointments/patient_appointment_cancel.html",
         context,
     )

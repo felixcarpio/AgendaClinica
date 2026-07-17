@@ -1,0 +1,78 @@
+/* ==============================
+   Contenedor de citas
+   ============================== */
+
+.appointment-list-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(300px, 380px)
+    );
+    gap: var(--spacing-4);
+    justify-content: start;
+}
+
+/* ==============================
+   Tarjeta compacta de cita
+   ============================== */
+
+.appointment-card {
+    gap: var(--spacing-2);
+    width: 100%;
+    min-height: auto;
+    padding: var(--spacing-5);
+    border-radius: var(--radius-md);
+}
+
+.appointment-card .card__header {
+    gap: var(--spacing-3);
+}
+
+.appointment-card .card__title {
+    font-size: var(--font-size-base);
+}
+
+.appointment-card .card__subtitle {
+    font-size: var(--font-size-xs);
+}
+
+.appointment-card .card__body {
+    font-size: var(--font-size-sm);
+}
+
+.appointment-card .card__body p {
+    margin-bottom: var(--spacing-2);
+}
+
+.appointment-card .card__body p:last-child {
+    margin-bottom: 0;
+}
+
+.appointment-card .card__footer {
+    padding-top: var(--spacing-3);
+}
+
+.appointment-card .badge {
+    flex-shrink: 0;
+}
+
+.appointment-list__create-button {
+    min-width: 170px;
+    padding-inline: var(--spacing-6);
+    box-shadow: var(--shadow-md);
+}
+
+/* ==============================
+   Diseño adaptable
+   ============================== */
+
+@media (max-width: 768px) {
+    .appointment-list-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .appointment-list__create-button {
+        width: 100%;
+        min-width: 0;
+    }
+}

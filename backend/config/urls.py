@@ -27,6 +27,7 @@ from apps.accounts.views import (
 )
 from apps.appointments.views import (
     patient_appointment_booking,
+    patient_appointment_cancel,
     patient_appointment_confirm,
     patient_appointment_detail,
     patient_appointment_list,
@@ -86,5 +87,10 @@ urlpatterns = [
         "mis-citas/agendar/<uuid:public_id>/confirmar/",
         patient_appointment_confirm,
         name="patient-appointment-confirm",
+    ),
+    path(
+        "mis-citas/<uuid:public_id>/cancelar/",
+        patient_appointment_cancel,
+        name="patient-appointment-cancel",
     ),
 ]

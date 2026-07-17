@@ -36,3 +36,42 @@ class PatientAppointmentConfirmationForm(forms.Form):
             )
 
         return reason
+    
+    
+class PatientAppointmentCancellationForm(forms.Form):
+    """
+    Formulario utilizado por el paciente para cancelar
+    una cita pendiente o confirmada.
+    """
+
+    cancelled_reason = forms.CharField(
+        label="Motivo de cancelación",
+        max_length=500,
+        required=True,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 5,
+                "placeholder": (
+                    "Describe brevemente el motivo de la cancelación."
+                ),
+            }
+        ),
+    )
+
+    def clean_cancelled_reason(self):
+        """
+        Limpia el motivo y evita textos vacíos
+        formados únicamente por espacios.
+        """
+
+        cancelled_reason = self.cleaned_data[
+            "cancelled_reason"
+        ].strip()
+
+        if not cancelled_reason:
+            raise forms.ValidationError(
+                "Debes indicar el motivo de la cancelación."
+            )
+
+        return cancelled_reason

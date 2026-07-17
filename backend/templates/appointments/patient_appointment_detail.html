@@ -16,12 +16,23 @@
             </p>
         </div>
 
-        <a
-            href="{% url 'patient-appointment-list' %}"
-            class="btn btn--secondary"
-        >
-            Volver a mis citas
-        </a>
+        <div class="page-heading__actions">
+            <a
+                href="{% url 'patient-appointment-list' %}"
+                class="btn btn--secondary"
+            >
+                Volver a mis citas
+            </a>
+
+            {% if appointment.status == "PENDING" or appointment.status == "CONFIRMED" %}
+                <a
+                    href="{% url 'patient-appointment-cancel' appointment.public_id %}"
+                    class="btn btn--danger"
+                >
+                    Cancelar cita
+                </a>
+            {% endif %}
+        </div>
     </section>
 
     <section class="content-section">
@@ -90,7 +101,7 @@
                             </span>
 
                             <span class="profile-data__value">
-                                {{ appointment.availability_slot.start_time|time:"H:i" }}
+                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
                             </span>
                         </div>
 
@@ -100,7 +111,7 @@
                             </span>
 
                             <span class="profile-data__value">
-                                {{ appointment.availability_slot.end_time|time:"H:i" }}
+                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
                             </span>
                         </div>
 
