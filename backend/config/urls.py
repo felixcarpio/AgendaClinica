@@ -31,6 +31,8 @@ from apps.appointments.views import (
     patient_appointment_confirm,
     patient_appointment_detail,
     patient_appointment_list,
+    patient_appointment_reschedule,
+    patient_appointment_reschedule_confirm,
 )
 
 urlpatterns = [
@@ -92,5 +94,18 @@ urlpatterns = [
         "mis-citas/<uuid:public_id>/cancelar/",
         patient_appointment_cancel,
         name="patient-appointment-cancel",
+    ),
+    path(
+        "mis-citas/<uuid:public_id>/reprogramar/",
+        patient_appointment_reschedule,
+        name="patient-appointment-reschedule",
+    ),
+    path(
+        (
+            "mis-citas/<uuid:public_id>/reprogramar/"
+            "<uuid:slot_public_id>/confirmar/"
+        ),
+        patient_appointment_reschedule_confirm,
+        name="patient-appointment-reschedule-confirm",
     ),
 ]

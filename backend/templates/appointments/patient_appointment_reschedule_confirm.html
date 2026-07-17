@@ -1,0 +1,194 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Confirmar reprogramación | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/appointment_confirm.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Confirmar reprogramación
+            </h2>
+
+            <p class="page-heading__description">
+                Revisa el cambio de horario antes de confirmarlo.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'patient-appointment-reschedule' appointment.public_id %}"
+            class="btn btn--secondary"
+        >
+            Volver al calendario
+        </a>
+    </section>
+
+    <section class="content-section">
+        <div class="appointment-confirm-layout">
+
+            <article class="card card--soft">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Horario actual
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Este horario será liberado al confirmar el cambio.
+                        </p>
+                    </div>
+
+                    <span class="badge badge--warning">
+                        {{ appointment.get_status_display }}
+                    </span>
+                </div>
+
+                <div class="card__body">
+                    <div class="appointment-summary">
+                        <div class="appointment-summary__psychologist">
+                            <span class="appointment-summary__avatar">
+                                {% if appointment.psychologist.account.first_name %}
+                                    {{ appointment.psychologist.account.first_name|first|upper }}
+                                {% else %}
+                                    P
+                                {% endif %}
+                            </span>
+
+                            <div>
+                                <h4 class="appointment-summary__name">
+                                    {{ appointment.psychologist }}
+                                </h4>
+
+                                <p class="appointment-summary__role">
+                                    Profesional de psicología
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="appointment-summary__grid">
+                            <div class="appointment-summary__item">
+                                <span class="appointment-summary__label">
+                                    Fecha
+                                </span>
+
+                                <strong class="appointment-summary__value">
+                                    {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                </strong>
+                            </div>
+
+                            <div class="appointment-summary__item">
+                                <span class="appointment-summary__label">
+                                    Horario
+                                </span>
+
+                                <strong class="appointment-summary__value">
+                                    {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                    -
+                                    {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Nuevo horario
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Este será el nuevo horario asignado a la cita.
+                        </p>
+                    </div>
+
+                    <span class="badge badge--success">
+                        Disponible
+                    </span>
+                </div>
+
+                <div class="card__body">
+                    <div class="appointment-summary">
+                        <div class="appointment-summary__psychologist">
+                            <span class="appointment-summary__avatar">
+                                {% if new_slot.psychologist.account.first_name %}
+                                    {{ new_slot.psychologist.account.first_name|first|upper }}
+                                {% else %}
+                                    P
+                                {% endif %}
+                            </span>
+
+                            <div>
+                                <h4 class="appointment-summary__name">
+                                    {{ new_slot.psychologist }}
+                                </h4>
+
+                                <p class="appointment-summary__role">
+                                    Profesional de psicología
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="appointment-summary__grid">
+                            <div class="appointment-summary__item">
+                                <span class="appointment-summary__label">
+                                    Fecha
+                                </span>
+
+                                <strong class="appointment-summary__value">
+                                    {{ new_slot.start_time|date:"d/m/Y" }}
+                                </strong>
+                            </div>
+
+                            <div class="appointment-summary__item">
+                                <span class="appointment-summary__label">
+                                    Horario
+                                </span>
+
+                                <strong class="appointment-summary__value">
+                                    {{ new_slot.start_time|time:"h:i A" }}
+                                    -
+                                    {{ new_slot.end_time|time:"h:i A" }}
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card__footer">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="form-actions">
+                            <a
+                                href="{% url 'patient-appointment-reschedule' appointment.public_id %}"
+                                class="btn btn--secondary"
+                            >
+                                Elegir otro horario
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn--primary"
+                            >
+                                Confirmar reprogramación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+
+        </div>
+    </section>
+{% endblock %}

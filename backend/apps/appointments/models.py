@@ -152,12 +152,11 @@ class Appointment(models.Model):
     # Cada cupo solamente puede utilizarse para una cita.
     #
     # PROTECT evita eliminar un cupo que ya esté asociado a una cita.
-    availability_slot = models.OneToOneField(
+    availability_slot = models.ForeignKey(
         AvailabilitySlot,
         on_delete=models.PROTECT,
-        related_name="appointment",
+        related_name="appointments",
     )
-
     # Estado actual de la cita.
     status = models.CharField(
         max_length=20,
@@ -189,6 +188,20 @@ class Appointment(models.Model):
     class Meta:
         # Las citas se mostrarán ordenadas por la fecha del cupo.
         ordering = ["availability_slot__start_time"]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["availability_slot"],
+                condition=models.Q(
+                    status__in=[
+                        "PENDING",
+                        "CONFIRMED",
+                        "COMPLETED",
+                    ]
+                ),
+                name="unique_non_cancelled_appointment_per_slot",
+            ),
+        ]
 
     def clean(self):
         """

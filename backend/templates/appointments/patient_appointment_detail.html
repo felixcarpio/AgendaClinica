@@ -25,7 +25,13 @@
             </a>
 
             {% if appointment.status == "PENDING" or appointment.status == "CONFIRMED" %}
-                <a
+            <a
+                href="{% url 'patient-appointment-reschedule' appointment.public_id %}"
+                class="btn btn--primary"
+            >
+                Reprogramar cita
+            </a>    
+            <a
                     href="{% url 'patient-appointment-cancel' appointment.public_id %}"
                     class="btn btn--danger"
                 >
