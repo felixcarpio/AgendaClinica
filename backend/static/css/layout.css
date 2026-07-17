@@ -1,0 +1,175 @@
+/* ==============================
+   Contenedor general
+   ============================== */
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--color-background);
+}
+
+/* ==============================
+   Sidebar
+   ============================== */
+
+.app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--z-index-sidebar);
+
+    width: var(--sidebar-width);
+    height: 100vh;
+
+    background-color: var(--color-sidebar);
+    border-right: 1px solid var(--color-border);
+}
+
+/* ==============================
+   Área principal
+   ============================== */
+
+.app-main {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+    margin-left: var(--sidebar-width);
+}
+
+/* ==============================
+   Header
+   ============================== */
+
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-index-header);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: var(--header-height);
+    padding: 0 var(--spacing-6);
+
+    background-color: var(--color-header);
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* ==============================
+   Contenido principal
+   ============================== */
+
+.page-content {
+    flex: 1;
+    width: 100%;
+    padding: var(--spacing-8);
+}
+
+.page-content__inner {
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+}
+
+/* ==============================
+   Encabezado de página
+   ============================== */
+
+.page-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+}
+
+.page-heading__title {
+    margin-bottom: var(--spacing-2);
+    font-size: var(--font-size-xl);
+}
+
+.page-heading__description {
+    margin-bottom: 0;
+    color: var(--color-text-secondary);
+}
+
+/* ==============================
+   Footer
+   ============================== */
+
+.app-footer {
+    padding: var(--spacing-4) var(--spacing-8);
+    color: var(--color-text-muted);
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+}
+
+/* ==============================
+   Contenedores reutilizables
+   ============================== */
+
+.content-section {
+    margin-bottom: var(--spacing-8);
+}
+
+.content-grid {
+    display: grid;
+    gap: var(--spacing-6);
+}
+
+.content-grid--two-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.content-grid--three-columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* ==============================
+   Diseño adaptable
+   ============================== */
+
+@media (max-width: 1024px) {
+    .content-grid--three-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .app-sidebar {
+        transform: translateX(-100%);
+        transition: transform var(--transition-normal);
+    }
+
+    .app-sidebar.is-open {
+        transform: translateX(0);
+    }
+
+    .app-main {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .app-header {
+        padding: 0 var(--spacing-4);
+    }
+
+    .page-content {
+        padding: var(--spacing-5);
+    }
+
+    .page-heading {
+        flex-direction: column;
+    }
+
+    .content-grid--two-columns,
+    .content-grid--three-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .app-footer {
+        padding: var(--spacing-4) var(--spacing-5);
+    }
+}

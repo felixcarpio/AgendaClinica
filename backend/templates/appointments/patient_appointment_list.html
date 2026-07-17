@@ -1,0 +1,236 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}
+    Mis citas | Agenda Clínica
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Mis citas
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta tus próximas citas y el historial de sesiones.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'patient-appointment-booking' %}"
+            class="btn btn--primary"
+        >
+            Agendar cita
+        </a>
+    </section>
+
+    <section class="content-section">
+        <div class="page-heading">
+            <div>
+                <h3 class="page-heading__title">
+                    Próximas citas
+                </h3>
+
+                <p class="page-heading__description">
+                    Citas pendientes o confirmadas que todavía no han ocurrido.
+                </p>
+            </div>
+        </div>
+
+        {% if upcoming_appointments %}
+            <div class="content-grid content-grid--two-columns">
+                {% for appointment in upcoming_appointments %}
+                    <article class="card">
+                        <div class="card__header">
+                            <div>
+                                <h3 class="card__title">
+                                    Cita con {{ appointment.psychologist }}
+                                </h3>
+
+                                <p class="card__subtitle">
+                                    {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                    a las
+                                    {{ appointment.availability_slot.start_time|time:"H:i" }}
+                                </p>
+                            </div>
+
+                            {% if appointment.status == "CONFIRMED" %}
+                                <span class="badge badge--success">
+                                    <span
+                                        class="badge__dot"
+                                        aria-hidden="true"
+                                    ></span>
+
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            {% elif appointment.status == "PENDING" %}
+                                <span class="badge badge--warning">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            {% else %}
+                                <span class="badge badge--neutral">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card__body">
+                            <p>
+                                <strong>Psicólogo:</strong>
+                                {{ appointment.psychologist }}
+                            </p>
+
+                            <p>
+                                <strong>Fecha:</strong>
+                                {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                            </p>
+
+                            <p>
+                                <strong>Horario:</strong>
+                                {{ appointment.availability_slot.start_time|time:"H:i" }}
+                                -
+                                {{ appointment.availability_slot.end_time|time:"H:i" }}
+                            </p>
+                        </div>
+
+                        <div class="card__footer">
+                            <a
+                                href="{% url 'patient-appointment-detail' appointment.public_id %}"
+                                class="btn btn--secondary btn--sm"
+                            >
+                                Ver detalles
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <article class="card card--soft">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            No tienes próximas citas
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Cuando agendes una nueva cita, aparecerá aquí.
+                        </p>
+                    </div>
+
+                    <span class="badge badge--neutral">
+                        Sin próximas citas
+                    </span>
+                </div>
+
+                <div class="card__body">
+                    <p>
+                        Consulta los horarios disponibles de los psicólogos
+                        y selecciona el que mejor se adapte a ti.
+                    </p>
+                </div>
+
+                <div class="card__footer">
+                    <a
+                        href="{% url 'patient-appointment-booking' %}"
+                        class="btn btn--primary btn--sm"
+                    >
+                        Agendar cita
+                    </a>
+                </div>
+            </article>
+        {% endif %}
+    </section>
+
+    <section class="content-section">
+        <div class="page-heading">
+            <div>
+                <h3 class="page-heading__title">
+                    Historial de citas
+                </h3>
+
+                <p class="page-heading__description">
+                    Citas completadas, canceladas o que ya han pasado.
+                </p>
+            </div>
+        </div>
+
+        {% if appointment_history %}
+            <div class="content-grid content-grid--two-columns">
+                {% for appointment in appointment_history %}
+                    <article class="card card--soft">
+                        <div class="card__header">
+                            <div>
+                                <h3 class="card__title">
+                                    Cita con {{ appointment.psychologist }}
+                                </h3>
+
+                                <p class="card__subtitle">
+                                    {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                    a las
+                                    {{ appointment.availability_slot.start_time|time:"H:i" }}
+                                </p>
+                            </div>
+
+                            {% if appointment.status == "COMPLETED" %}
+                                <span class="badge badge--success">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            {% elif appointment.status == "CANCELLED" %}
+                                <span class="badge badge--danger">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            {% else %}
+                                <span class="badge badge--neutral">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card__body">
+                            <p>
+                                <strong>Psicólogo:</strong>
+                                {{ appointment.psychologist }}
+                            </p>
+
+                            <p>
+                                <strong>Fecha:</strong>
+                                {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                            </p>
+
+                            <p>
+                                <strong>Horario:</strong>
+                                {{ appointment.availability_slot.start_time|time:"H:i" }}
+                                -
+                                {{ appointment.availability_slot.end_time|time:"H:i" }}
+                            </p>
+
+                            {% if appointment.status == "CANCELLED" and appointment.cancelled_reason %}
+                                <p>
+                                    <strong>Motivo de cancelación:</strong>
+                                    {{ appointment.cancelled_reason }}
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <div class="card__footer">
+                            <a
+                                href="{% url 'patient-appointment-detail' appointment.public_id %}"
+                                class="btn btn--secondary btn--sm"
+                            >
+                                Ver detalles
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <article class="card card--soft">
+                <div class="card__body">
+                    <p>
+                        Todavía no tienes citas registradas en el historial.
+                    </p>
+                </div>
+            </article>
+        {% endif %}
+    </section>
+{% endblock %}

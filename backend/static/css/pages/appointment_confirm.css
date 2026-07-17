@@ -1,0 +1,94 @@
+.appointment-confirm-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr);
+    gap: var(--spacing-6);
+    align-items: start;
+}
+
+.appointment-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-6);
+}
+
+.appointment-summary__psychologist {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+
+    padding: var(--spacing-5);
+
+    background-color: var(--color-primary-soft);
+    border: 1px solid var(--color-primary-light);
+    border-radius: var(--radius-md);
+}
+
+.appointment-summary__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 54px;
+    height: 54px;
+
+    color: var(--color-text-on-primary);
+    font-weight: var(--font-weight-bold);
+
+    background-color: var(--color-secondary);
+    border-radius: 50%;
+}
+
+.appointment-summary__name {
+    margin-bottom: var(--spacing-1);
+    font-size: var(--font-size-md);
+}
+
+.appointment-summary__role {
+    margin-bottom: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+.appointment-summary__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-4);
+}
+
+.appointment-summary__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+
+    padding: var(--spacing-4);
+
+    background-color: var(--color-surface-soft);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.appointment-summary__label {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.appointment-summary__value {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+}
+
+@media (max-width: 1024px) {
+    .appointment-confirm-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .appointment-summary__grid {
+        grid-template-columns: 1fr;
+    }
+}

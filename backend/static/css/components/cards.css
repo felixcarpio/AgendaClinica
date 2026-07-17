@@ -1,0 +1,100 @@
+/* ==============================
+   Tarjeta base
+   ============================== */
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+
+    min-height: 100%;
+    padding: var(--spacing-6);
+
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        border-color var(--transition-fast);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-md);
+}
+
+/* ==============================
+   Encabezado
+   ============================== */
+
+.card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+}
+
+.card__title {
+    margin-bottom: 0;
+
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+}
+
+.card__subtitle {
+    margin-top: var(--spacing-1);
+    margin-bottom: 0;
+
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+/* ==============================
+   Contenido
+   ============================== */
+
+.card__body {
+    flex: 1;
+}
+
+.card__body p:last-child {
+    margin-bottom: 0;
+}
+
+/* ==============================
+   Footer
+   ============================== */
+
+.card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+
+    padding-top: var(--spacing-4);
+    margin-top: auto;
+
+    border-top: 1px solid var(--color-border);
+}
+
+/* ==============================
+   Variantes
+   ============================== */
+
+.card--soft {
+    background-color: var(--color-surface-soft);
+}
+
+.card--primary {
+    background-color: var(--color-primary-soft);
+    border-color: var(--color-primary-light);
+}
+
+.card--no-hover:hover {
+    transform: none;
+    box-shadow: var(--shadow-sm);
+}

@@ -1,0 +1,190 @@
+{% load static %}
+
+<aside class="app-sidebar" id="app-sidebar">
+    <div class="sidebar">
+
+        <div class="sidebar__brand">
+            <a href="{% url 'dashboard-redirect' %}" class="sidebar__brand-link">
+                <img
+                    src="{% static 'img/logo.png' %}"
+                    alt="Logo de Agenda Clínica"
+                    class="sidebar__logo"
+                >
+
+                <div class="sidebar__brand-text">
+                    <span class="sidebar__brand-name">
+                        MindCare
+                    </span>
+
+                    <span class="sidebar__brand-subtitle">
+                        Agenda clínica
+                    </span>
+                </div>
+            </a>
+        </div>
+
+        <nav
+            class="sidebar__navigation"
+            aria-label="Navegación principal"
+        >
+            <p class="sidebar__section-title">
+                Menú principal
+            </p>
+
+            <ul class="sidebar__menu">
+                <li class="sidebar__menu-item">
+                    <a
+                        href="{% url 'dashboard-redirect' %}"
+                        class="sidebar__menu-link
+                            {% if request.resolver_match.url_name == 'admin-dashboard' or request.resolver_match.url_name == 'psychologist-dashboard' or request.resolver_match.url_name == 'patient-dashboard' %}
+                                sidebar__menu-link--active
+                            {% endif %}
+                        "
+                    >
+                        <span
+                            class="sidebar__menu-icon"
+                            aria-hidden="true"
+                        >
+                            🏠
+                        </span>
+
+                        <span>Inicio</span>
+                    </a>
+                </li>
+
+                {% if request.user.role == "PATIENT" %}
+                    <li class="sidebar__menu-item">
+                        <a
+                            href="{% url 'patient-appointment-list' %}"
+                            class="sidebar__menu-link
+                                {% if request.resolver_match.url_name == 'patient-appointment-list' %}
+                                    sidebar__menu-link--active
+                                {% endif %}
+                            "
+                        >
+                            <span
+                                class="sidebar__menu-icon"
+                                aria-hidden="true"
+                            >
+                                📅
+                            </span>
+
+                            <span>Mis citas</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar__menu-item">
+                        <a href="#" class="sidebar__menu-link">
+                            <span class="sidebar__menu-icon" aria-hidden="true">
+                                ✅
+                            </span>
+
+                            <span>Mis asignaciones</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar__menu-item">
+                        <a href="#" class="sidebar__menu-link">
+                            <span class="sidebar__menu-icon" aria-hidden="true">
+                                👤
+                            </span>
+
+                            <span>Mi perfil</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% if request.user.role == "PSYCHOLOGIST" %}
+                    <li class="sidebar__menu-item">
+                        <a href="#" class="sidebar__menu-link">
+                            <span class="sidebar__menu-icon" aria-hidden="true">
+                                📅
+                            </span>
+
+                            <span>Mi agenda</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar__menu-item">
+                        <a href="#" class="sidebar__menu-link">
+                            <span class="sidebar__menu-icon" aria-hidden="true">
+                                👥
+                            </span>
+
+                            <span>Pacientes</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar__menu-item">
+                        <a href="#" class="sidebar__menu-link">
+                            <span class="sidebar__menu-icon" aria-hidden="true">
+                                📝
+                            </span>
+
+                            <span>Notas de sesión</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar__menu-item">
+                        <a href="#" class="sidebar__menu-link">
+                            <span class="sidebar__menu-icon" aria-hidden="true">
+                                📌
+                            </span>
+
+                            <span>Asignaciones</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% if request.user.role == "ADMIN" %}
+                    <li class="sidebar__menu-item">
+                        <a href="#" class="sidebar__menu-link">
+                            <span class="sidebar__menu-icon" aria-hidden="true">
+                                👥
+                            </span>
+
+                            <span>Usuarios</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar__menu-item">
+                        <a href="#" class="sidebar__menu-link">
+                            <span class="sidebar__menu-icon" aria-hidden="true">
+                                🧠
+                            </span>
+
+                            <span>Psicólogos</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar__menu-item">
+                        <a href="#" class="sidebar__menu-link">
+                            <span class="sidebar__menu-icon" aria-hidden="true">
+                                🩺
+                            </span>
+
+                            <span>Pacientes</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar__menu-item">
+                        <a href="#" class="sidebar__menu-link">
+                            <span class="sidebar__menu-icon" aria-hidden="true">
+                                📊
+                            </span>
+
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <div class="sidebar__footer">
+            <p class="sidebar__footer-text">
+                Sistema de gestión clínica
+            </p>
+        </div>
+
+    </div>
+</aside>

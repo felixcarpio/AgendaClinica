@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+import uuid
 
 from apps.patients.models import Patient
 from apps.psychologists.models import Psychologist
@@ -13,12 +14,18 @@ class AvailabilitySlot(models.Model):
     Un cupo define un rango de fecha y hora que posteriormente puede
     utilizarse para crear una cita.
     """
-
     class Status(models.TextChoices):
         AVAILABLE = "AVAILABLE", "Disponible"
         BOOKED = "BOOKED", "Reservado"
         BLOCKED = "BLOCKED", "Bloqueado"
         CANCELLED = "CANCELLED", "Cancelado"
+
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
+
 
     # Psicólogo propietario del cupo.
     psychologist = models.ForeignKey(
@@ -111,6 +118,12 @@ class Appointment(models.Model):
 
     La cita está asociada a un único cupo de disponibilidad.
     """
+    
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
 
     class Status(models.TextChoices):
         PENDING = "PENDING", "Pendiente"

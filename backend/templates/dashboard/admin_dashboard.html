@@ -1,0 +1,89 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}
+    Administración | Agenda Clínica
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Panel de administración
+            </h2>
+
+            <p class="page-heading__description">
+                Gestiona los usuarios y la información general del sistema.
+            </p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="content-grid content-grid--three-columns">
+
+            <article class="card">
+                <div class="card__header">
+                    <h3 class="card__title">
+                        Usuarios
+                    </h3>
+
+                    <span class="badge badge--primary">
+                        Administración
+                    </span>
+                </div>
+
+                <div class="card__body">
+                    <p>
+                        Consulta y administra las cuentas registradas.
+                    </p>
+                </div>
+
+                <div class="card__footer">
+                    <a href="#" class="btn btn--primary btn--sm">
+                        Ver usuarios
+                    </a>
+                </div>
+            </article>
+
+            <article class="card card--soft">
+                <div class="card__header">
+                    <h3 class="card__title">
+                        Psicólogos
+                    </h3>
+                </div>
+
+                <div class="card__body">
+                    <p>
+                        Gestiona los profesionales registrados en la clínica.
+                    </p>
+                </div>
+
+                <div class="card__footer">
+                    <a href="#" class="btn btn--secondary btn--sm">
+                        Ver psicólogos
+                    </a>
+                </div>
+            </article>
+
+            <article class="card card--primary">
+                <div class="card__header">
+                    <h3 class="card__title">
+                        Pacientes
+                    </h3>
+                </div>
+
+                <div class="card__body">
+                    <p>
+                        Consulta y administra los pacientes del sistema.
+                    </p>
+                </div>
+
+                <div class="card__footer">
+                    <a href="#" class="btn btn--outline btn--sm">
+                        Ver pacientes
+                    </a>
+                </div>
+            </article>
+
+        </div>
+    </section>
+{% endblock %}

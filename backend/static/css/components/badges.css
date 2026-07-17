@@ -1,0 +1,73 @@
+/* ==============================
+   Badge base
+   ============================== */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+
+    width: fit-content;
+    min-height: 28px;
+    padding: var(--spacing-1) var(--spacing-3);
+
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+}
+
+/* ==============================
+   Variantes por estado
+   ============================== */
+
+.badge--success {
+    color: var(--color-success);
+    background-color: var(--color-success-light);
+    border-color: var(--color-success);
+}
+
+.badge--warning {
+    color: var(--color-warning);
+    background-color: var(--color-warning-light);
+    border-color: var(--color-warning);
+}
+
+.badge--danger {
+    color: var(--color-danger);
+    background-color: var(--color-danger-light);
+    border-color: var(--color-danger);
+}
+
+.badge--info {
+    color: var(--color-info);
+    background-color: var(--color-info-light);
+    border-color: var(--color-info);
+}
+
+.badge--primary {
+    color: var(--color-primary-dark);
+    background-color: var(--color-primary-soft);
+    border-color: var(--color-primary-light);
+}
+
+.badge--neutral {
+    color: var(--color-text-secondary);
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-border);
+}
+
+/* ==============================
+   Indicador circular opcional
+   ============================== */
+
+.badge__dot {
+    width: 8px;
+    height: 8px;
+
+    background-color: currentColor;
+    border-radius: 50%;
+}

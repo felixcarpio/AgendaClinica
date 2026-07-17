@@ -1,0 +1,171 @@
+/* ==============================
+   Grupo de formulario
+   ============================== */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-5);
+}
+
+/* ==============================
+   Etiquetas
+   ============================== */
+
+.form-label {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
+.form-label--required::after {
+    margin-left: var(--spacing-1);
+    color: var(--color-danger);
+    content: "*";
+}
+
+/* ==============================
+   Campos
+   ============================== */
+
+.form-control {
+    width: 100%;
+    min-height: 44px;
+    padding: var(--spacing-3) var(--spacing-4);
+
+    color: var(--color-text-primary);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background-color var(--transition-fast);
+}
+
+.form-control::placeholder {
+    color: var(--color-text-muted);
+}
+
+.form-control:hover {
+    border-color: var(--color-primary-light);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+textarea.form-control {
+    min-height: 120px;
+}
+
+/* ==============================
+   Select
+   ============================== */
+
+select.form-control {
+    cursor: pointer;
+}
+
+/* ==============================
+   Texto de ayuda
+   ============================== */
+
+.form-help {
+    margin-bottom: 0;
+
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+}
+
+/* ==============================
+   Errores
+   ============================== */
+
+.form-error {
+    margin-bottom: 0;
+
+    color: var(--color-danger);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+}
+
+.form-control.is-invalid {
+    border-color: var(--color-danger);
+    background-color: var(--color-danger-light);
+}
+
+.form-control.is-invalid:focus {
+    box-shadow: 0 0 0 3px var(--color-danger-light);
+}
+
+/* ==============================
+   Estados deshabilitados
+   ============================== */
+
+.form-control:disabled,
+.form-control[readonly] {
+    color: var(--color-text-muted);
+    background-color: var(--color-surface-soft);
+    cursor: not-allowed;
+}
+
+/* ==============================
+   Checkbox y radio
+   ============================== */
+
+.form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+}
+
+.form-check__input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+
+    accent-color: var(--color-primary);
+    cursor: pointer;
+}
+
+.form-check__label {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+}
+
+/* ==============================
+   Acciones del formulario
+   ============================== */
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+
+    padding-top: var(--spacing-5);
+    margin-top: var(--spacing-6);
+
+    border-top: 1px solid var(--color-border);
+}
+
+/* ==============================
+   Diseño adaptable
+   ============================== */
+
+@media (max-width: 600px) {
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}

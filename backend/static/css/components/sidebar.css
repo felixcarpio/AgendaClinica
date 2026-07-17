@@ -1,0 +1,193 @@
+/* ==============================
+   Estructura interna
+   ============================== */
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: var(--spacing-5);
+}
+
+/* ==============================
+   Marca y logo
+   ============================== */
+
+.sidebar__brand {
+    padding-bottom: var(--spacing-5);
+    margin-bottom: var(--spacing-5);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar__brand-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+
+    color: var(--color-text-primary);
+}
+
+.sidebar__brand-link:hover {
+    color: var(--color-text-primary);
+}
+
+.sidebar__logo {
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.sidebar__brand-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.sidebar__brand-name {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.2;
+}
+
+.sidebar__brand-subtitle {
+    margin-top: var(--spacing-1);
+
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+}
+
+/* ==============================
+   Navegación
+   ============================== */
+
+.sidebar__navigation {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar__section-title {
+    margin-bottom: var(--spacing-3);
+
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.sidebar__menu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+
+    padding: 0;
+    margin: 0;
+
+    list-style: none;
+}
+
+.sidebar__menu-item {
+    width: 100%;
+}
+
+.sidebar__menu-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+
+    width: 100%;
+    min-height: 46px;
+    padding: var(--spacing-3) var(--spacing-4);
+
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+
+    border-radius: var(--radius-md);
+
+    transition:
+        color var(--transition-fast),
+        background-color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.sidebar__menu-link:hover {
+    color: var(--color-primary-dark);
+    background-color: var(--color-primary-soft);
+    transform: translateX(2px);
+}
+
+.sidebar__menu-link--active {
+    color: var(--color-text-on-primary);
+    background-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.sidebar__menu-link--active:hover {
+    color: var(--color-text-on-primary);
+    background-color: var(--color-primary-dark);
+}
+
+.sidebar__menu-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 24px;
+    min-width: 24px;
+
+    font-size: 1rem;
+}
+
+/* ==============================
+   Footer del sidebar
+   ============================== */
+
+.sidebar__footer {
+    padding-top: var(--spacing-4);
+    margin-top: var(--spacing-5);
+    border-top: 1px solid var(--color-border);
+}
+
+.sidebar__footer-text {
+    margin-bottom: 0;
+
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+/* ==============================
+   Barra de desplazamiento
+   ============================== */
+
+.sidebar__navigation {
+    scrollbar-width: thin;
+    scrollbar-color:
+        var(--color-primary-light)
+        transparent;
+}
+
+.sidebar__navigation::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar__navigation::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar__navigation::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary-light);
+    border-radius: var(--radius-pill);
+}
+
+/* ==============================
+   Diseño adaptable
+   ============================== */
+
+@media (max-width: 768px) {
+    .sidebar {
+        padding: var(--spacing-4);
+    }
+}

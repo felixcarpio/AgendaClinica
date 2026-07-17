@@ -1,0 +1,22 @@
+{% if messages %}
+    <div class="messages" aria-live="polite">
+        {% for message in messages %}
+            <div
+                class="message message--{{ message.tags|default:'info' }}"
+                role="alert"
+            >
+                <span class="message__text">
+                    {{ message }}
+                </span>
+
+                <button
+                    type="button"
+                    class="message__close"
+                    aria-label="Cerrar mensaje"
+                >
+                    ×
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

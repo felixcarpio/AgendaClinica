@@ -1,0 +1,129 @@
+:root {
+    /* ==============================
+       Colores principales de marca
+       ============================== */
+
+    --color-primary: #a45c78;
+    --color-primary-dark: #87465f;
+    --color-primary-light: #d7b4c3;
+    --color-primary-soft: #f2e2e9;
+
+    --color-secondary: #aa7db5;
+    --color-secondary-dark: #8f659a;
+    --color-secondary-light: #ddc9e4;
+
+    /* ==============================
+       Fondos
+       ============================== */
+
+    --color-background: #f8f3f5;
+    --color-surface: #ffffff;
+    --color-surface-soft: #fcf7f9;
+    --color-sidebar: #fbf0f4;
+    --color-header: #ffffff;
+
+    /* ==============================
+       Textos
+       ============================== */
+
+    --color-text-primary: #30272d;
+    --color-text-secondary: #6f626a;
+    --color-text-muted: #9b8d95;
+    --color-text-on-primary: #ffffff;
+
+    /* ==============================
+       Bordes
+       ============================== */
+
+    --color-border: #eadde3;
+    --color-border-strong: #d6c1cc;
+
+    /* ==============================
+       Estados
+       ============================== */
+
+    --color-success: #6f9f7a;
+    --color-success-light: #e8f3eb;
+
+    --color-warning: #d2a03d;
+    --color-warning-light: #fff4d9;
+
+    --color-danger: #c94f5f;
+    --color-danger-light: #fdebed;
+
+    --color-info: #6888b4;
+    --color-info-light: #eaf0f8;
+
+    /* ==============================
+       Tipografía
+       ============================== */
+
+    --font-family-base: "Manrope", "Segoe UI", Arial, sans-serif;
+
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-md: 1.125rem;
+    --font-size-lg: 1.5rem;
+    --font-size-xl: 2rem;
+
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* ==============================
+       Espaciados
+       ============================== */
+
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.25rem;
+    --spacing-6: 1.5rem;
+    --spacing-8: 2rem;
+    --spacing-10: 2.5rem;
+    --spacing-12: 3rem;
+
+    /* ==============================
+       Bordes redondeados
+       ============================== */
+
+    --radius-sm: 0.5rem;
+    --radius-md: 0.875rem;
+    --radius-lg: 1.25rem;
+    --radius-pill: 999px;
+
+    /* ==============================
+       Sombras
+       ============================== */
+
+    --shadow-sm: 0 2px 8px rgba(70, 45, 57, 0.05);
+    --shadow-md: 0 8px 24px rgba(70, 45, 57, 0.08);
+    --shadow-lg: 0 14px 36px rgba(70, 45, 57, 0.12);
+
+    /* ==============================
+       Layout
+       ============================== */
+
+    --sidebar-width: 250px;
+    --header-height: 72px;
+    --content-max-width: 1400px;
+
+    /* ==============================
+       Transiciones
+       ============================== */
+
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+
+    /* ==============================
+       Capas
+       ============================== */
+
+    --z-index-sidebar: 100;
+    --z-index-header: 200;
+    --z-index-dropdown: 300;
+    --z-index-modal: 500;
+}

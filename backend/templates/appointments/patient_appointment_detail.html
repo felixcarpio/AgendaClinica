@@ -1,0 +1,186 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}
+    Detalle de cita | Agenda Clínica
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Detalle de la cita
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta la información completa de tu cita.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'patient-appointment-list' %}"
+            class="btn btn--secondary"
+        >
+            Volver a mis citas
+        </a>
+    </section>
+
+    <section class="content-section">
+        <div class="content-grid content-grid--two-columns">
+
+            <article class="card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Información de la cita
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Datos principales de la sesión
+                        </p>
+                    </div>
+
+                    {% if appointment.status == "CONFIRMED" %}
+                        <span class="badge badge--success">
+                            <span
+                                class="badge__dot"
+                                aria-hidden="true"
+                            ></span>
+                            {{ appointment.get_status_display }}
+                        </span>
+                    {% elif appointment.status == "PENDING" %}
+                        <span class="badge badge--warning">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    {% elif appointment.status == "CANCELLED" %}
+                        <span class="badge badge--danger">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    {% else %}
+                        <span class="badge badge--neutral">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="card__body">
+                    <div class="profile-data">
+                        <div class="profile-data__item">
+                            <span class="profile-data__label">
+                                Psicólogo
+                            </span>
+
+                            <span class="profile-data__value">
+                                {{ appointment.psychologist }}
+                            </span>
+                        </div>
+
+                        <div class="profile-data__item">
+                            <span class="profile-data__label">
+                                Fecha
+                            </span>
+
+                            <span class="profile-data__value">
+                                {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                            </span>
+                        </div>
+
+                        <div class="profile-data__item">
+                            <span class="profile-data__label">
+                                Hora de inicio
+                            </span>
+
+                            <span class="profile-data__value">
+                                {{ appointment.availability_slot.start_time|time:"H:i" }}
+                            </span>
+                        </div>
+
+                        <div class="profile-data__item">
+                            <span class="profile-data__label">
+                                Hora de finalización
+                            </span>
+
+                            <span class="profile-data__value">
+                                {{ appointment.availability_slot.end_time|time:"H:i" }}
+                            </span>
+                        </div>
+
+                        <div class="profile-data__item">
+                            <span class="profile-data__label">
+                                Estado:
+                            </span>
+
+                            <span class="profile-data__value">
+                                {{ appointment.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card card--soft">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Información adicional
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Detalles administrativos de la cita
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    {% if appointment.status == "CANCELLED" and appointment.cancelled_reason %}
+                        <div class="appointment-cancellation">
+                            <p>
+                                <strong>Motivo de cancelación:</strong>
+                            </p>
+
+                            <p>
+                                {{ appointment.cancelled_reason }}
+                            </p>
+                        </div>
+                    {% endif %}
+
+                    {% if appointment.reason %}
+                        <p>
+                            <strong>Motivo de consulta:</strong>
+                        </p>
+
+                        <p>
+                            {{ appointment.reason }}
+                        </p>
+                    {% endif %}
+
+                    {% if appointment.patient_notes %}
+                        <p>
+                            <strong>Notas del paciente:</strong>
+                        </p>
+
+                        <p>
+                            {{ appointment.patient_notes }}
+                        </p>
+                    {% endif %}
+
+                    {% if appointment.administrative_notes %}
+                        <p>
+                            <strong>Notas administrativas:</strong>
+                        </p>
+
+                        <p>
+                            {{ appointment.administrative_notes }}
+                        </p>
+                    {% endif %}
+
+                    {% if not appointment.cancellation_reason and not appointment.reason and not appointment.patient_notes and not appointment.administrative_notes %}
+                        <p>
+                            No hay información adicional registrada para esta cita.
+                        </p>
+                    {% endif %}
+                </div>
+            </article>
+
+        </div>
+    </section>
+{% endblock %}

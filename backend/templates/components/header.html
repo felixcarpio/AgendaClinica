@@ -1,0 +1,124 @@
+<header class="app-header">
+    <div class="app-header__left">
+        <button
+            type="button"
+            class="app-header__menu-button"
+            id="sidebar-toggle"
+            aria-label="Abrir menú de navegación"
+            aria-controls="app-sidebar"
+            aria-expanded="false"
+        >
+            ☰
+        </button>
+
+        <div class="app-header__page-info">
+            <p class="app-header__eyebrow">
+                Agenda clínica
+            </p>
+
+            <h1 class="app-header__title">
+                {% if page_title %}
+                    {{ page_title }}
+                {% elif request.resolver_match.url_name == "password_change" %}
+                    Cambiar contraseña
+                {% elif request.resolver_match.url_name == "password_change_done" %}
+                    Contraseña actualizada
+                {% else %}
+                    Panel principal
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+
+    <div class="app-header__right">
+        <div class="app-header__user-menu">
+            <button
+                type="button"
+                class="app-header__user-trigger"
+                id="user-menu-toggle"
+                aria-label="Abrir menú de usuario"
+                aria-controls="user-menu-dropdown"
+                aria-expanded="false"
+            >
+                <span class="app-header__user-text">
+                    <span class="app-header__user-name">
+                        {% if request.user.first_name or request.user.last_name %}
+                            {{ request.user.first_name }} {{ request.user.last_name }}
+                        {% else %}
+                            {{ request.user.email }}
+                        {% endif %}
+                    </span>
+
+                    <span class="app-header__user-role">
+                        {% if request.user.role == "ADMIN" %}
+                            Administrador
+                        {% elif request.user.role == "PSYCHOLOGIST" %}
+                            Psicólogo
+                        {% elif request.user.role == "PATIENT" %}
+                            Paciente
+                        {% else %}
+                            Usuario
+                        {% endif %}
+                    </span>
+                </span>
+
+                <span
+                    class="app-header__avatar"
+                    aria-hidden="true"
+                >
+                    {% if request.user.first_name %}
+                        {{ request.user.first_name|first|upper }}
+                    {% elif request.user.email %}
+                        {{ request.user.email|first|upper }}
+                    {% else %}
+                        U
+                    {% endif %}
+                </span>
+
+                
+            </button>
+
+            <div
+                class="app-header__dropdown"
+                id="user-menu-dropdown"
+                hidden
+            >
+                <div class="app-header__dropdown-header">
+                    <strong>
+                        {% if request.user.first_name or request.user.last_name %}
+                            {{ request.user.first_name }} {{ request.user.last_name }}
+                        {% else %}
+                            {{ request.user.email }}
+                        {% endif %}
+                    </strong>
+
+                    <span>
+                        {{ request.user.email }}
+                    </span>
+                </div>
+
+                <a
+                    href="{% url 'profile' %}"
+                    class="app-header__dropdown-link"
+                >
+                    Mi perfil
+                </a>
+
+                <form
+                    method="post"
+                    action="{% url 'logout' %}"
+                    class="app-header__dropdown-form"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="app-header__dropdown-link app-header__dropdown-link--danger"
+                    >
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,34 @@
+/* ==============================
+   Contenido del footer
+   ============================== */
+
+.app-footer__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+}
+
+.app-footer__text,
+.app-footer__version {
+    margin-bottom: 0;
+
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+}
+
+/* ==============================
+   Diseño adaptable
+   ============================== */
+
+@media (max-width: 768px) {
+    .app-footer__content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-2);
+    }
+}

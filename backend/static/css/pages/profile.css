@@ -1,0 +1,63 @@
+.profile-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-data__item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-5);
+
+    padding: var(--spacing-4) 0;
+
+    border-bottom: 1px solid var(--color-border);
+}
+
+.profile-data__item:first-child {
+    padding-top: 0;
+}
+
+.profile-data__item:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.profile-data__label {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.profile-data__value {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+    .profile-data__item {
+        flex-direction: column;
+        gap: var(--spacing-2);
+    }
+
+    .profile-data__value {
+        text-align: left;
+    }
+}
+
+.appointment-cancellation {
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-5);
+
+    color: var(--color-danger);
+    background-color: var(--color-danger-light);
+    border: 1px solid var(--color-danger);
+    border-radius: var(--radius-md);
+}
+
+.appointment-cancellation p:last-child {
+    margin-bottom: 0;
+}

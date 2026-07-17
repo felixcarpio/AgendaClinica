@@ -1,0 +1,186 @@
+/* ==============================
+   Layout general de autenticación
+   ============================== */
+
+.auth-layout {
+    display: grid;
+    grid-template-columns: minmax(320px, 42%) 1fr;
+    min-height: 100vh;
+    background-color: var(--color-background);
+}
+
+/* ==============================
+   Panel de identidad
+   ============================== */
+
+.auth-layout__brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: var(--spacing-10);
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--color-primary-soft),
+            var(--color-secondary-light)
+        );
+}
+
+.auth-layout__brand-content {
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+}
+
+.auth-layout__logo {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto var(--spacing-6);
+
+    object-fit: contain;
+
+    background-color: rgba(255, 255, 255, 0.72);
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    box-shadow: var(--shadow-md);
+}
+
+.auth-layout__brand-name {
+    margin-bottom: var(--spacing-3);
+
+    color: var(--color-primary-dark);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: var(--font-weight-bold);
+}
+
+.auth-layout__brand-description {
+    max-width: 340px;
+    margin: 0 auto;
+
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-md);
+}
+
+/* ==============================
+   Área del formulario
+   ============================== */
+
+.auth-layout__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: var(--spacing-8);
+}
+
+.auth-layout__card {
+    width: 100%;
+    max-width: 460px;
+    padding: var(--spacing-8);
+
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ==============================
+   Encabezado del formulario
+   ============================== */
+
+.auth-heading {
+    margin-bottom: var(--spacing-8);
+}
+
+.auth-heading__title {
+    margin-bottom: var(--spacing-2);
+
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.auth-heading__description {
+    margin-bottom: 0;
+    color: var(--color-text-secondary);
+}
+
+/* ==============================
+   Enlaces de autenticación
+   ============================== */
+
+.auth-link-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+
+    margin-top: var(--spacing-4);
+}
+
+.auth-link {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+/* ==============================
+   Texto inferior
+   ============================== */
+
+.auth-footer-text {
+    margin-top: var(--spacing-6);
+    margin-bottom: 0;
+
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    text-align: center;
+}
+
+/* ==============================
+   Diseño adaptable
+   ============================== */
+
+@media (max-width: 900px) {
+    .auth-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-layout__brand {
+        min-height: 280px;
+        padding: var(--spacing-8) var(--spacing-5);
+    }
+
+    .auth-layout__logo {
+        width: 100px;
+        height: 100px;
+        margin-bottom: var(--spacing-4);
+    }
+
+    .auth-layout__brand-name {
+        font-size: 2rem;
+    }
+
+    .auth-layout__brand-description {
+        font-size: var(--font-size-base);
+    }
+
+    .auth-layout__content {
+        padding: var(--spacing-6) var(--spacing-4);
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-layout__brand {
+        min-height: 230px;
+    }
+
+    .auth-layout__card {
+        padding: var(--spacing-6);
+    }
+
+    .auth-link-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

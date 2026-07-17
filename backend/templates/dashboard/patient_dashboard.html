@@ -1,0 +1,99 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}
+    Inicio | Agenda Clínica
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Bienvenido a Agenda Clínica
+            </h2>
+
+            <p class="page-heading__description">
+                Esta es la primera prueba de la estructura reutilizable.
+            </p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="content-grid content-grid--three-columns">
+
+            <article class="card">
+                <div class="card__header">
+                    <h3 class="card__title">
+                        Próxima cita
+                    </h3>
+                </div>
+
+                <span class="badge badge--success">
+                    <span class="badge__dot" aria-hidden="true"></span>
+                    Confirmada
+                </span>
+
+                <div class="card__body">
+                    <p>
+                        Aquí se mostrará la próxima cita del paciente.
+                    </p>
+                </div>
+
+                <div class="card__footer">
+                    <a
+                        href="#"
+                        class="btn btn--primary btn--sm"
+                    >
+                        Ver detalles
+                    </a>
+                </div>
+            </article>
+
+            <article class="card card--soft">
+                <div class="card__header">
+                    <h3 class="card__title">
+                        Asignaciones
+                    </h3>
+                </div>
+
+                <div class="card__body">
+                    <p>
+                        Aquí se mostrarán las tareas terapéuticas pendientes.
+                    </p>
+                </div>
+
+                <div class="card__footer">
+                    <a
+                        href="#"
+                        class="btn btn--secondary btn--sm"
+                    >
+                        Ver asignaciones
+                    </a>
+                </div>
+            </article>
+
+            <article class="card card--primary">
+                <div class="card__header">
+                    <h3 class="card__title">
+                        Mi perfil
+                    </h3>
+                </div>
+
+                <div class="card__body">
+                    <p>
+                        Aquí se mostrará un resumen de la información personal.
+                    </p>
+                </div>
+
+                <div class="card__footer">
+                    <a
+                        href="#"
+                        class="btn btn--outline btn--sm"
+                    >
+                        Ver perfil
+                    </a>
+                </div>
+            </article>
+
+        </div>
+    </section>
+{% endblock %}

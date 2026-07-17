@@ -1,0 +1,179 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Agendar nueva cita | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/appointment_booking.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Agendar nueva cita
+            </h2>
+
+            <p class="page-heading__description">
+                Selecciona una fecha, un psicólogo y uno de sus horarios disponibles.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'patient-appointment-list' %}"
+            class="btn btn--secondary"
+        >
+            Volver a mis citas
+        </a>
+    </section>
+
+    <section class="content-section">
+        <div class="booking-layout">
+
+            <aside class="booking-panel">
+                <h3 class="booking-panel__title">
+                    Psicólogos
+                </h3>
+
+                <div class="psychologist-list">
+                    {% for psychologist in psychologists %}
+                        <article
+                            class="psychologist-card
+                                {% if selected_psychologist_id == psychologist.id|stringformat:'s' %}
+                                    psychologist-card--active
+                                {% endif %}
+                            "
+                        >
+                            <h4 class="psychologist-card__name">
+                                {{ psychologist }}
+                            </h4>
+
+                            <p class="psychologist-card__specialty">
+                                Psicólogo disponible para consulta.
+                            </p>
+
+                            <a
+                                href="?date={{ selected_date|date:'Y-m-d' }}&year={{ displayed_year }}&month={{ displayed_month }}&psychologist={{ psychologist.id }}"
+                                class="btn btn--secondary btn--block btn--sm"
+                            >
+                                Ver disponibilidad
+                            </a>
+                        </article>
+                    {% empty %}
+                        <div class="booking-empty">
+                            No hay psicólogos registrados.
+                        </div>
+                    {% endfor %}
+                </div>
+            </aside>
+
+            <div class="booking-main">
+
+                <section class="calendar-card">
+                    <div class="calendar-header">
+                        <h3 class="calendar-header__title">
+                            {{ displayed_month_name }} {{ displayed_year }}
+                        </h3>
+
+                        <div class="calendar-nav">
+                            <a
+                                href="?year={{ previous_year }}&month={{ previous_month }}&date={{ selected_date|date:'Y-m-d' }}{% if selected_psychologist_id %}&psychologist={{ selected_psychologist_id }}{% endif %}"
+                                class="calendar-nav__link"
+                                aria-label="Mes anterior"
+                            >
+                                ‹
+                            </a>
+
+                            <a
+                                href="?year={{ next_year }}&month={{ next_month }}&date={{ selected_date|date:'Y-m-d' }}{% if selected_psychologist_id %}&psychologist={{ selected_psychologist_id }}{% endif %}"
+                                class="calendar-nav__link"
+                                aria-label="Mes siguiente"
+                            >
+                                ›
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid">
+                        <div class="calendar-weekday">Lun</div>
+                        <div class="calendar-weekday">Mar</div>
+                        <div class="calendar-weekday">Mié</div>
+                        <div class="calendar-weekday">Jue</div>
+                        <div class="calendar-weekday">Vie</div>
+                        <div class="calendar-weekday">Sáb</div>
+                        <div class="calendar-weekday">Dom</div>
+
+                        {% for week in calendar_weeks %}
+                            {% for day in week %}
+                                <div class="calendar-day">
+                                    {% if day.month == displayed_month %}
+                                        <a
+                                            href="?date={{ day|date:'Y-m-d' }}&year={{ displayed_year }}&month={{ displayed_month }}{% if selected_psychologist_id %}&psychologist={{ selected_psychologist_id }}{% endif %}"
+                                            class="calendar-day__link
+                                                {% if day == selected_date %}
+                                                    calendar-day__link--selected
+                                                {% endif %}
+                                                {% if day == today %}
+                                                    calendar-day__link--today
+                                                {% endif %}
+                                            "
+                                        >
+                                            {{ day.day }}
+                                        </a>
+                                    {% else %}
+                                        <span class="calendar-day__disabled">
+                                            {{ day.day }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="slots-card">
+                    <div class="slots-header">
+                        <h3 class="slots-header__title">
+                            Horarios disponibles
+                        </h3>
+
+                        <span class="slots-date">
+                            {{ selected_date|date:"d/m/Y" }}
+                        </span>
+                    </div>
+
+                    {% if slots %}
+                        <div class="slot-grid">
+                            {% for slot in slots %}
+                                <a
+                                    href="{% url 'patient-appointment-confirm' slot.public_id %}"
+                                    class="slot-button"
+                                >
+                                    <span class="slot-button__time">
+                                        {{ slot.start_time|time:"H:i" }}
+                                        -
+                                        {{ slot.end_time|time:"H:i" }}
+                                    </span>
+
+                                    <span class="slot-button__psychologist">
+                                        {{ slot.psychologist }}
+                                    </span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="booking-empty">
+                            No hay horarios disponibles para la fecha seleccionada.
+                        </div>
+                    {% endif %}
+                </section>
+
+            </div>
+        </div>
+    </section>
+{% endblock %}

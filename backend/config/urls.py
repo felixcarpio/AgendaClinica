@@ -16,7 +16,75 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import include
+from django.views.generic import TemplateView
+from apps.accounts.views import (
+    admin_dashboard,
+    dashboard_redirect,
+    patient_dashboard,
+    profile_view,
+    psychologist_dashboard,
+)
+from apps.appointments.views import (
+    patient_appointment_booking,
+    patient_appointment_confirm,
+    patient_appointment_detail,
+    patient_appointment_list,
+)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+
+    path(
+        "accounts/",
+        include("django.contrib.auth.urls"),
+    ),
+    path(
+        "dashboard/",
+        dashboard_redirect,
+        name="dashboard-redirect",
+    ),
+
+    path(
+        "dashboard/administracion/",
+        admin_dashboard,
+        name="admin-dashboard",
+    ),
+
+    path(
+        "dashboard/psicologo/",
+        psychologist_dashboard,
+        name="psychologist-dashboard",
+    ),
+
+    path(
+        "dashboard/paciente/",
+        patient_dashboard,
+        name="patient-dashboard",
+    ),
+    path(
+        "perfil/",
+        profile_view,
+        name="profile",
+    ),
+    path(
+        "mis-citas/",
+        patient_appointment_list,
+        name="patient-appointment-list",
+    ),
+    path(
+        "mis-citas/<uuid:public_id>/detalle/",
+        patient_appointment_detail,
+        name="patient-appointment-detail",
+    ),
+    path(
+        "mis-citas/agendar/",
+        patient_appointment_booking,
+        name="patient-appointment-booking",
+    ),
+    path(
+        "mis-citas/agendar/<uuid:public_id>/confirmar/",
+        patient_appointment_confirm,
+        name="patient-appointment-confirm",
+    ),
 ]
