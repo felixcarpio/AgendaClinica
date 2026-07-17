@@ -138,3 +138,98 @@ class AssignmentPatientForm(forms.ModelForm):
             )
 
         return new_status
+    
+class PatientAssignmentResponseForm(forms.ModelForm):
+    """
+    Permite al paciente responder una asignación
+    y actualizar su progreso.
+    """
+
+    class Meta:
+        model = Assignment
+        fields = [
+            "patient_response",
+            "status",
+        ]
+
+        widgets = {
+            "patient_response": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 6,
+                    "placeholder": (
+                        "Escribe aquí tu respuesta, reflexión "
+                        "o resultado de la actividad."
+                    ),
+                }
+            ),
+            "status": forms.Select(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+        }
+
+        labels = {
+            "patient_response": "Mi respuesta",
+            "status": "Estado de la actividad",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # El paciente únicamente puede manejar estos estados.
+        self.fields["status"].choices = [
+            (
+                Assignment.Status.PENDING,
+                Assignment.Status.PENDING.label,
+            ),
+            (
+                Assignment.Status.IN_PROGRESS,
+                Assignment.Status.IN_PROGRESS.label,
+            ),
+            (
+                Assignment.Status.COMPLETED,
+                Assignment.Status.COMPLETED.label,
+            ),
+        ]
+
+    def clean_patient_response(self):
+        """
+        Limpia espacios innecesarios de la respuesta.
+        """
+
+        response = self.cleaned_data.get(
+            "patient_response",
+            ""
+        ).strip()
+
+        return response
+
+    def clean(self):
+        """
+        Una asignación completada debe incluir
+        una respuesta del paciente.
+        """
+
+        cleaned_data = super().clean()
+
+        status = cleaned_data.get("status")
+        response = cleaned_data.get(
+            "patient_response",
+            ""
+        )
+
+        if (
+            status == Assignment.Status.COMPLETED
+            and not response
+        ):
+            self.add_error(
+                "patient_response",
+                (
+                    "Debes escribir una respuesta antes "
+                    "de marcar la asignación como completada."
+                ),
+            )
+
+        return cleaned_data

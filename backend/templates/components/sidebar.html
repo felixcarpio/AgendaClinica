@@ -74,22 +74,46 @@
                     </li>
 
                     <li class="sidebar__menu-item">
-                        <a href="#" class="sidebar__menu-link">
-                            <span class="sidebar__menu-icon" aria-hidden="true">
+                        <a
+                            href="{% url 'patient-assignment-list' %}"
+                            class="sidebar__menu-link
+                                {% if request.resolver_match.url_name == 'patient-assignment-list' %}
+                                    sidebar__menu-link--active
+                                {% endif %}
+                            "
+                        >
+                            <span
+                                class="sidebar__menu-icon"
+                                aria-hidden="true"
+                            >
                                 ✅
                             </span>
 
-                            <span>Mis asignaciones</span>
+                            <span class="sidebar__menu-text">
+                                Mis asignaciones
+                            </span>
                         </a>
                     </li>
 
                     <li class="sidebar__menu-item">
-                        <a href="#" class="sidebar__menu-link">
-                            <span class="sidebar__menu-icon" aria-hidden="true">
+                        <a
+                            href="{% url 'profile' %}"
+                            class="sidebar__menu-link
+                                {% if request.resolver_match.url_name == 'profile' %}
+                                    sidebar__menu-link--active
+                                {% endif %}
+                            "
+                        >
+                            <span
+                                class="sidebar__menu-icon"
+                                aria-hidden="true"
+                            >
                                 👤
                             </span>
 
-                            <span>Mi perfil</span>
+                            <span class="sidebar__menu-text">
+                                Mi perfil
+                            </span>
                         </a>
                     </li>
                 {% endif %}

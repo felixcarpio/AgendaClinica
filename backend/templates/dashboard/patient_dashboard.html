@@ -8,13 +8,21 @@
     <section class="page-heading">
         <div>
             <h2 class="page-heading__title">
-                Bienvenido a Agenda Clínica
+                {{ welcome_text }},
+                {{ request.user.first_name }}
             </h2>
 
             <p class="page-heading__description">
-                Esta es la primera prueba de la estructura reutilizable.
+                Consulta tu próxima cita y el resumen de tu actividad.
             </p>
         </div>
+
+        <a
+            href="{% url 'patient-appointment-booking' %}"
+            class="btn btn--primary"
+        >
+            Agendar cita
+        </a>
     </section>
 
     <section class="content-section">
@@ -22,71 +30,173 @@
 
             <article class="card">
                 <div class="card__header">
-                    <h3 class="card__title">
-                        Próxima cita
-                    </h3>
+                    <div>
+                        <h3 class="card__title">
+                            Próxima cita
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Tu siguiente sesión programada.
+                        </p>
+                    </div>
+
+                    {% if next_appointment %}
+                        {% if next_appointment.status == "CONFIRMED" %}
+                            <span class="badge badge--success">
+                                <span
+                                    class="badge__dot"
+                                    aria-hidden="true"
+                                ></span>
+
+                                {{ next_appointment.get_status_display }}
+                            </span>
+                        {% else %}
+                            <span class="badge badge--warning">
+                                <span
+                                    class="badge__dot"
+                                    aria-hidden="true"
+                                ></span>
+
+                                {{ next_appointment.get_status_display }}
+                            </span>
+                        {% endif %}
+                    {% endif %}
                 </div>
 
-                <span class="badge badge--success">
-                    <span class="badge__dot" aria-hidden="true"></span>
-                    Confirmada
-                </span>
-
                 <div class="card__body">
-                    <p>
-                        Aquí se mostrará la próxima cita del paciente.
-                    </p>
+                    {% if next_appointment %}
+                        <p>
+                            <strong>Psicólogo:</strong><br>
+                            {{ next_appointment.psychologist }}
+                        </p>
+
+                        <p>
+                            <strong>Fecha:</strong><br>
+                            {{ next_appointment.availability_slot.start_time|date:"d/m/Y" }}
+                        </p>
+
+                        <p>
+                            <strong>Horario:</strong><br>
+                            {{ next_appointment.availability_slot.start_time|time:"h:i A" }}
+                            -
+                            {{ next_appointment.availability_slot.end_time|time:"h:i A" }}
+                        </p>
+                    {% else %}
+                        <p>
+                            No tienes citas próximas programadas.
+                        </p>
+                    {% endif %}
                 </div>
 
                 <div class="card__footer">
-                    <a
-                        href="#"
-                        class="btn btn--primary btn--sm"
-                    >
-                        Ver detalles
-                    </a>
+                    {% if next_appointment %}
+                        <a
+                            href="{% url 'patient-appointment-detail' next_appointment.public_id %}"
+                            class="btn btn--primary btn--sm"
+                        >
+                            Ver detalles
+                        </a>
+                    {% else %}
+                        <a
+                            href="{% url 'patient-appointment-booking' %}"
+                            class="btn btn--primary btn--sm"
+                        >
+                            Agendar una cita
+                        </a>
+                    {% endif %}
                 </div>
             </article>
 
             <article class="card card--soft">
                 <div class="card__header">
-                    <h3 class="card__title">
-                        Asignaciones
-                    </h3>
+                    <div>
+                        <h3 class="card__title">
+                            Asignaciones activas
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Actividades pendientes o en progreso.
+                        </p>
+                    </div>
+
+                    {% if active_assignments_count %}
+                        <span class="badge badge--warning">
+                            {{ active_assignments_count }}
+                        </span>
+                    {% endif %}
                 </div>
 
                 <div class="card__body">
-                    <p>
-                        Aquí se mostrarán las tareas terapéuticas pendientes.
-                    </p>
+                    {% if latest_active_assignment %}
+                        <p>
+                            <strong>
+                                {{ latest_active_assignment.title }}
+                            </strong>
+                        </p>
+
+                        <p>
+                            {{ latest_active_assignment.description|truncatechars:120 }}
+                        </p>
+
+                        <p>
+                            <strong>Estado:</strong>
+                            {{ latest_active_assignment.get_status_display }}
+                        </p>
+                    {% else %}
+                        <p>
+                            No tienes asignaciones activas.
+                        </p>
+                    {% endif %}
                 </div>
 
                 <div class="card__footer">
-                    <a
-                        href="#"
-                        class="btn btn--secondary btn--sm"
-                    >
-                        Ver asignaciones
-                    </a>
+                    {% if latest_active_assignment %}
+                        <a
+                            href="{% url 'patient-assignment-detail' latest_active_assignment.public_id %}"
+                            class="btn btn--secondary btn--sm"
+                        >
+                            Ver asignación
+                        </a>
+                    {% else %}
+                        <a
+                            href="{% url 'patient-assignment-list' %}"
+                            class="btn btn--secondary btn--sm"
+                        >
+                            Ver mis asignaciones
+                        </a>
+                    {% endif %}
                 </div>
             </article>
 
             <article class="card card--primary">
                 <div class="card__header">
-                    <h3 class="card__title">
-                        Mi perfil
-                    </h3>
+                    <div>
+                        <h3 class="card__title">
+                            Mi perfil
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Información de tu cuenta.
+                        </p>
+                    </div>
                 </div>
 
                 <div class="card__body">
                     <p>
-                        Aquí se mostrará un resumen de la información personal.
+                        <strong>Nombre:</strong><br>
+                        {{ request.user.first_name }}
+                        {{ request.user.last_name }}
+                    </p>
+
+                    <p>
+                        <strong>Correo:</strong><br>
+                        {{ request.user.email }}
                     </p>
                 </div>
 
                 <div class="card__footer">
                     <a
-                        href="#"
+                        href="{% url 'profile' %}"
                         class="btn btn--outline btn--sm"
                     >
                         Ver perfil

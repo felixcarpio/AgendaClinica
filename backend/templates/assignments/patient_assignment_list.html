@@ -1,0 +1,187 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Mis asignaciones | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/assignment_list.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Mis asignaciones
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta las actividades asignadas por tu psicólogo
+                y revisa tu progreso.
+            </p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <div>
+                <h3 class="section-heading__title">
+                    Asignaciones activas
+                </h3>
+
+                <p class="section-heading__description">
+                    Actividades pendientes o que ya comenzaste.
+                </p>
+            </div>
+        </div>
+
+        {% if active_assignments %}
+            <div class="assignment-grid">
+                {% for assignment in active_assignments %}
+                    <article class="card assignment-card">
+                        <div class="card__header">
+                            <div>
+                                <h4 class="card__title">
+                                    {{ assignment.title }}
+                                </h4>
+
+                                <p class="card__subtitle">
+                                    Asignada el
+                                    {{ assignment.created_at|date:"d/m/Y" }}
+                                </p>
+                            </div>
+
+                            {% if assignment.status == "IN_PROGRESS" %}
+                                <span class="badge badge--warning">
+                                    {{ assignment.get_status_display }}
+                                </span>
+                            {% else %}
+                                <span class="badge badge--neutral">
+                                    {{ assignment.get_status_display }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card__body">
+                            <p class="assignment-card__description">
+                                {{ assignment.description|truncatechars:180 }}
+                            </p>
+
+                            <div class="assignment-card__meta">
+                                <p>
+                                    <strong>Psicólogo:</strong>
+                                    {{ assignment.session_note.appointment.psychologist }}
+                                </p>
+
+                                <p>
+                                    <strong>Sesión:</strong>
+                                    {{ assignment.session_note.appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="card__footer">
+                            <a
+                                href="{% url 'patient-assignment-detail' assignment.public_id %}"
+                                class="btn btn--primary btn--sm"
+                            >
+                                Ver asignación
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h4 class="empty-state__title">
+                    No tienes asignaciones activas
+                </h4>
+
+                <p class="empty-state__description">
+                    Las nuevas actividades aparecerán aquí cuando
+                    tu psicólogo las asigne.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <div>
+                <h3 class="section-heading__title">
+                    Asignaciones completadas
+                </h3>
+
+                <p class="section-heading__description">
+                    Actividades que ya finalizaste.
+                </p>
+            </div>
+        </div>
+
+        {% if completed_assignments %}
+            <div class="assignment-grid">
+                {% for assignment in completed_assignments %}
+                    <article class="card card--soft assignment-card">
+                        <div class="card__header">
+                            <div>
+                                <h4 class="card__title">
+                                    {{ assignment.title }}
+                                </h4>
+
+                                <p class="card__subtitle">
+                                    Completada el
+                                    {{ assignment.completed_at|date:"d/m/Y" }}
+                                </p>
+                            </div>
+
+                            <span class="badge badge--success">
+                                {{ assignment.get_status_display }}
+                            </span>
+                        </div>
+
+                        <div class="card__body">
+                            <p class="assignment-card__description">
+                                {{ assignment.description|truncatechars:180 }}
+                            </p>
+
+                            <div class="assignment-card__meta">
+                                <p>
+                                    <strong>Psicólogo:</strong>
+                                    {{ assignment.session_note.appointment.psychologist }}
+                                </p>
+
+                                <p>
+                                    <strong>Sesión:</strong>
+                                    {{ assignment.session_note.appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="card__footer">
+                            <a
+                                href="{% url 'patient-assignment-detail' assignment.public_id %}"
+                                class="btn btn--secondary btn--sm"
+                            >
+                                Ver asignación
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h4 class="empty-state__title">
+                    Todavía no hay asignaciones completadas
+                </h4>
+
+                <p class="empty-state__description">
+                    Cuando completes una actividad aparecerá en esta sección.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

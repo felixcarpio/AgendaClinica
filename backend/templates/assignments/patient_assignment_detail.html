@@ -1,0 +1,245 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Detalle de la asignación | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/assignment_detail.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Detalle de la asignación
+            </h2>
+
+            <p class="page-heading__description">
+                Revisa las indicaciones, comentarios y archivos relacionados.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'patient-assignment-list' %}"
+            class="btn btn--secondary"
+        >
+            Volver a mis asignaciones
+        </a>
+    </section>
+
+    <section class="content-section">
+        <div class="assignment-detail-layout">
+
+            <article class="card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            {{ assignment.title }}
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Asignada el
+                            {{ assignment.created_at|date:"d/m/Y" }}
+                        </p>
+                    </div>
+
+                    {% if assignment.status == "COMPLETED" %}
+                        <span class="badge badge--success">
+                            {{ assignment.get_status_display }}
+                        </span>
+                    {% elif assignment.status == "IN_PROGRESS" %}
+                        <span class="badge badge--warning">
+                            {{ assignment.get_status_display }}
+                        </span>
+                    {% else %}
+                        <span class="badge badge--neutral">
+                            {{ assignment.get_status_display }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="card__body">
+                    <section class="assignment-detail__section">
+                        <h4 class="assignment-detail__section-title">
+                            Descripción
+                        </h4>
+
+                        <div class="assignment-detail__text">
+                            {{ assignment.description|linebreaks }}
+                        </div>
+                    </section>
+
+                    {% if assignment.psychologist_comments %}
+                        <section class="assignment-detail__section">
+                            <h4 class="assignment-detail__section-title">
+                                Comentarios del psicólogo
+                            </h4>
+
+                            <div class="assignment-detail__highlight">
+                                {{ assignment.psychologist_comments|linebreaks }}
+                            </div>
+                        </section>
+                    {% endif %}
+
+                    <section class="assignment-detail__section">
+                        <h4 class="assignment-detail__section-title">
+                            Mi respuesta
+                        </h4>
+
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+
+                            {% if form.non_field_errors %}
+                                <div
+                                    class="message message--danger"
+                                    role="alert"
+                                >
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+
+                            <div class="form-group">
+                                {{ form.patient_response }}
+
+                                {% for error in form.patient_response.errors %}
+                                    <p class="form-error">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group">
+                                <label
+                                    for="{{ form.status.id_for_label }}"
+                                    class="form-label"
+                                >
+                                    {{ form.status.label }}
+                                </label>
+
+                                {{ form.status }}
+
+                                {% for error in form.status.errors %}
+                                    <p class="form-error">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-actions">
+                                <button
+                                    type="submit"
+                                    class="btn btn--primary"
+                                >
+                                    Guardar respuesta
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </article>
+
+            <aside class="assignment-detail__sidebar">
+                <article class="card card--soft">
+                    <div class="card__header">
+                        <h3 class="card__title">
+                            Información de la sesión
+                        </h3>
+                    </div>
+
+                    <div class="card__body">
+                        <div class="assignment-detail__meta">
+                            <p>
+                                <span>Psicólogo</span>
+
+                                <strong>
+                                    {{ assignment.session_note.appointment.psychologist }}
+                                </strong>
+                            </p>
+
+                            <p>
+                                <span>Fecha de sesión</span>
+
+                                <strong>
+                                    {{ assignment.session_note.appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                </strong>
+                            </p>
+
+                            <p>
+                                <span>Estado</span>
+
+                                <strong>
+                                    {{ assignment.get_status_display }}
+                                </strong>
+                            </p>
+
+                            {% if assignment.completed_at %}
+                                <p>
+                                    <span>Completada el</span>
+
+                                    <strong>
+                                        {{ assignment.completed_at|date:"d/m/Y" }}
+                                    </strong>
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="card__header">
+                        <h3 class="card__title">
+                            Archivos adjuntos
+                        </h3>
+                    </div>
+
+                    <div class="card__body">
+                        {% if assignment.attachments.exists %}
+                            <div class="assignment-attachment-list">
+                                {% for attachment in assignment.attachments.all %}
+                                    <a
+                                        href="{{ attachment.file.url }}"
+                                        class="assignment-attachment"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <span
+                                            class="assignment-attachment__icon"
+                                            aria-hidden="true"
+                                        >
+                                            📎
+                                        </span>
+
+                                        <span class="assignment-attachment__content">
+                                            <strong>
+                                                {% if attachment.original_name %}
+                                                    {{ attachment.original_name }}
+                                                {% else %}
+                                                    {{ attachment.file.name }}
+                                                {% endif %}
+                                            </strong>
+
+                                            <small>
+                                                Subido por
+                                                {{ attachment.get_uploaded_by_display }}
+                                            </small>
+                                        </span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="assignment-detail__empty">
+                                No hay archivos adjuntos.
+                            </p>
+                        {% endif %}
+                    </div>
+                </article>
+            </aside>
+
+        </div>
+    </section>
+{% endblock %}

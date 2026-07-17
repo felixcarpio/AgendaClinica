@@ -3,7 +3,7 @@ from django.utils import timezone
 from apps.appointments.models import Appointment
 from pathlib import Path
 from django.core.exceptions import ValidationError
-
+import uuid
 from apps.clinical_records.models import SessionNote
 
 
@@ -23,6 +23,12 @@ class Assignment(models.Model):
         IN_PROGRESS = "IN_PROGRESS", "En progreso"
         COMPLETED = "COMPLETED", "Completada"
         CANCELLED = "CANCELLED", "Cancelada"
+
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
 
     session_note = models.ForeignKey(
         SessionNote,

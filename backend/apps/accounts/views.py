@@ -1,6 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-
+from django.utils import timezone
+from apps.appointments.models import Appointment
+from apps.assignments.models import Assignment
+from apps.patients.models import Patient
 
 @login_required
 def dashboard_redirect(request):
@@ -68,14 +71,91 @@ def psychologist_dashboard(request):
 @login_required
 def patient_dashboard(request):
     """
-    Muestra el dashboard exclusivo para pacientes.
+    Muestra el dashboard exclusivo para pacientes
+    utilizando información real de sus citas.
     """
 
     if request.user.role != "PATIENT":
         return redirect("dashboard-redirect")
 
+    patient = Patient.objects.select_related(
+        "account"
+    ).get(
+        account=request.user
+    )
+    
+    if patient.gender == Patient.Gender.FEMALE:
+        welcome_text = "Bienvenida"
+    else:
+        welcome_text = "Bienvenido"
+        
+    now = timezone.now()
+
+    appointments = (
+        Appointment.objects
+        .filter(patient__account=request.user)
+        .select_related(
+            "psychologist",
+            "psychologist__account",
+            "availability_slot",
+        )
+    )
+
+    # Próxima cita pendiente o confirmada cuya fecha
+    # todavía no ha pasado.
+    next_appointment = (
+        appointments
+        .filter(
+            status__in=[
+                Appointment.Status.PENDING,
+                Appointment.Status.CONFIRMED,
+            ],
+            availability_slot__start_time__gte=now,
+        )
+        .order_by("availability_slot__start_time")
+        .first()
+    )
+
+    # Total de sesiones que ya fueron completadas.
+    completed_appointments_count = (
+        appointments
+        .filter(
+            status=Appointment.Status.COMPLETED,
+        )
+        .count()
+    )
+    
+    active_assignments = (
+        Assignment.objects
+        .filter(
+            session_note__clinical_record__patient__account=request.user,
+            is_visible=True,
+            status__in=[
+                Assignment.Status.PENDING,
+                Assignment.Status.IN_PROGRESS,
+            ],
+        )
+        .select_related(
+            "session_note",
+            "session_note__appointment",
+            "session_note__appointment__psychologist",
+            "session_note__appointment__psychologist__account",
+        )
+        .order_by("-created_at")
+    )
+
+    active_assignments_count = active_assignments.count()
+    latest_active_assignment = active_assignments.first()
+
     context = {
         "page_title": "Panel del paciente",
+        "welcome_text": welcome_text,
+        "next_appointment": next_appointment,
+        "completed_appointments_count": (
+            completed_appointments_count
+        ),
+        "active_assignments_count": active_assignments_count,
+        "latest_active_assignment": latest_active_assignment,
     }
 
     return render(

@@ -34,6 +34,10 @@ from apps.appointments.views import (
     patient_appointment_reschedule,
     patient_appointment_reschedule_confirm,
 )
+from apps.assignments.views import (
+    patient_assignment_detail,
+    patient_assignment_list,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -107,5 +111,15 @@ urlpatterns = [
         ),
         patient_appointment_reschedule_confirm,
         name="patient-appointment-reschedule-confirm",
+    ),
+    path(
+        "mis-asignaciones/",
+        patient_assignment_list,
+        name="patient-assignment-list",
+    ),
+    path(
+        "mis-asignaciones/<uuid:public_id>/detalle/",
+        patient_assignment_detail,
+        name="patient-assignment-detail",
     ),
 ]
