@@ -31,6 +31,7 @@ from apps.assignments.views import (
     psychologist_assignment_create,
     psychologist_assignment_edit,
     psychologist_assignment_list,
+    psychologist_assignment_general_list,
     psychologist_assignment_attachment_upload,
     psychologist_assignment_attachment_delete,
     patient_assignment_attachment_upload,
@@ -43,6 +44,7 @@ from apps.patients.views import (
 from apps.clinical_records.views import (
     psychologist_clinical_record_detail,
     psychologist_clinical_record_edit,
+    psychologist_session_note_list,
     psychologist_session_note_manage,
 )
 
@@ -189,6 +191,11 @@ urlpatterns = [
         psychologist_assignment_attachment_delete,
         name="psychologist-assignment-attachment-delete",
     ),
+    path(
+        "asignaciones/",
+        psychologist_assignment_general_list,
+        name="psychologist-assignment-general-list",
+    ),
     
     # Pacientes
         path(
@@ -213,6 +220,12 @@ urlpatterns = [
     ),
     
     # Notas de sesiones
+    # Notas de sesión del psicólogo.
+    path(
+        "notas-de-sesion/",
+        psychologist_session_note_list,
+        name="psychologist-session-note-list",
+    ),
     path(
         "agenda/<uuid:appointment_public_id>/nota/",
         psychologist_session_note_manage,

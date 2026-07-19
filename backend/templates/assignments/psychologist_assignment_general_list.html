@@ -1,0 +1,194 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Asignaciones | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_assignment_general_list.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Asignaciones
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta las actividades terapéuticas asignadas a tus pacientes.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'psychologist-session-note-list' %}"
+            class="btn btn--secondary"
+        >
+            Ver notas de sesión
+        </a>
+    </section>
+
+    <section class="content-section">
+        <div class="assignment-summary-grid">
+            <article class="card card--soft">
+                <div class="card__body">
+                    <span class="assignment-summary-card__label">
+                        Activas
+                    </span>
+
+                    <strong class="assignment-summary-card__value">
+                        {{ active_assignments_count }}
+                    </strong>
+
+                    <p class="assignment-summary-card__description">
+                        Pendientes o en progreso.
+                    </p>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card__body">
+                    <span class="assignment-summary-card__label">
+                        Completadas
+                    </span>
+
+                    <strong class="assignment-summary-card__value">
+                        {{ completed_assignments_count }}
+                    </strong>
+
+                    <p class="assignment-summary-card__description">
+                        Actividades finalizadas.
+                    </p>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card__body">
+                    <span class="assignment-summary-card__label">
+                        Canceladas
+                    </span>
+
+                    <strong class="assignment-summary-card__value">
+                        {{ cancelled_assignments_count }}
+                    </strong>
+
+                    <p class="assignment-summary-card__description">
+                        Actividades ocultas al paciente.
+                    </p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <article class="card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Asignaciones activas
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Actividades pendientes o en progreso.
+                    </p>
+                </div>
+
+                {% if active_assignments_count %}
+                    <span class="badge badge--warning">
+                        {{ active_assignments_count }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="card__body">
+                {% if active_assignments %}
+                    <div class="assignment-general-list">
+                        {% for assignment in active_assignments %}
+                            {% include "assignments/components/psychologist_assignment_general_item.html" %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="assignment-general-empty">
+                        No tienes asignaciones activas.
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+
+    <section class="content-section">
+        <article class="card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Asignaciones completadas
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Actividades finalizadas por los pacientes.
+                    </p>
+                </div>
+
+                {% if completed_assignments_count %}
+                    <span class="badge badge--success">
+                        {{ completed_assignments_count }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="card__body">
+                {% if completed_assignments %}
+                    <div class="assignment-general-list">
+                        {% for assignment in completed_assignments %}
+                            {% include "assignments/components/psychologist_assignment_general_item.html" %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="assignment-general-empty">
+                        No tienes asignaciones completadas.
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+
+    <section class="content-section">
+        <article class="card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Asignaciones canceladas
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Actividades canceladas y ocultas al paciente.
+                    </p>
+                </div>
+
+                {% if cancelled_assignments_count %}
+                    <span class="badge badge--neutral">
+                        {{ cancelled_assignments_count }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="card__body">
+                {% if cancelled_assignments %}
+                    <div class="assignment-general-list">
+                        {% for assignment in cancelled_assignments %}
+                            {% include "assignments/components/psychologist_assignment_general_item.html" %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="assignment-general-empty">
+                        No tienes asignaciones canceladas.
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+{% endblock %}

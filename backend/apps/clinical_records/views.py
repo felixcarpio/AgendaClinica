@@ -11,6 +11,52 @@ from apps.clinical_records.forms import (
 )
 from apps.clinical_records.models import ClinicalRecord, SessionNote
 
+@login_required
+def psychologist_session_note_list(request):
+    """
+    Muestra todas las notas de sesión pertenecientes
+    al psicólogo autenticado.
+
+    Las notas se ordenan desde la sesión más reciente
+    hasta la más antigua.
+    """
+
+    if request.user.role != "PSYCHOLOGIST":
+        return redirect("dashboard-redirect")
+
+    session_notes = (
+        SessionNote.objects
+        .filter(
+            appointment__psychologist__account=request.user,
+        )
+        .select_related(
+            "appointment",
+            "appointment__availability_slot",
+            "appointment__patient",
+            "appointment__patient__account",
+            "clinical_record",
+            "clinical_record__patient",
+            "clinical_record__patient__account",
+        )
+        .prefetch_related(
+            "assignments",
+        )
+        .order_by(
+            "-appointment__availability_slot__start_time",
+        )
+    )
+
+    context = {
+        "page_title": "Notas de sesión",
+        "session_notes": session_notes,
+        "session_notes_count": session_notes.count(),
+    }
+
+    return render(
+        request,
+        "clinical_records/psychologist_session_note_list.html",
+        context,
+    )
 
 @login_required
 def psychologist_session_note_manage(request, appointment_public_id):

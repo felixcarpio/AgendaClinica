@@ -1,0 +1,107 @@
+.session-note-list {
+    display: grid;
+    gap: var(--spacing-4);
+}
+
+.session-note-item {
+    padding: var(--spacing-5);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--surface-color);
+}
+
+.session-note-item__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding-bottom: var(--spacing-4);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.session-note-item__title {
+    margin: 0;
+    font-size: var(--font-size-lg);
+}
+
+.session-note-item__date {
+    margin: var(--spacing-2) 0 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.session-note-item__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+    gap: var(--spacing-5);
+    padding-block: var(--spacing-4);
+}
+
+.session-note-item__summary {
+    min-width: 0;
+}
+
+.session-note-item__summary span,
+.session-note-item__meta span {
+    display: block;
+    margin-bottom: var(--spacing-2);
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.session-note-item__summary p {
+    margin: 0;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}
+
+.session-note-item__meta {
+    display: grid;
+    gap: var(--spacing-3);
+}
+
+.session-note-item__meta p {
+    margin: 0;
+}
+
+.session-note-item__meta strong {
+    display: block;
+    overflow-wrap: anywhere;
+}
+
+.session-note-item__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 900px) {
+    .session-note-item__body {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .session-note-item {
+        padding: var(--spacing-4);
+    }
+
+    .session-note-item__header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .session-note-item__actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .session-note-item__actions .btn {
+        width: 100%;
+    }
+}

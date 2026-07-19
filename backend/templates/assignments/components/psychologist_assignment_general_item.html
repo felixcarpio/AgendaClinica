@@ -1,0 +1,79 @@
+<article class="assignment-general-item">
+    <div class="assignment-general-item__header">
+        <div>
+            <h4 class="assignment-general-item__title">
+                {{ assignment.title }}
+            </h4>
+
+            <p class="assignment-general-item__patient">
+                {{ assignment.session_note.clinical_record.patient }}
+            </p>
+        </div>
+
+        {% if assignment.status == "COMPLETED" %}
+            <span class="badge badge--success">
+                {{ assignment.get_status_display }}
+            </span>
+        {% elif assignment.status == "IN_PROGRESS" %}
+            <span class="badge badge--warning">
+                {{ assignment.get_status_display }}
+            </span>
+        {% else %}
+            <span class="badge badge--neutral">
+                {{ assignment.get_status_display }}
+            </span>
+        {% endif %}
+    </div>
+
+    <div class="assignment-general-item__body">
+        <div>
+            <span>Descripción</span>
+
+            <p>
+                {{ assignment.description|truncatechars:180 }}
+            </p>
+        </div>
+
+        <div class="assignment-general-item__meta">
+            <p>
+                <span>Sesión</span>
+
+                <strong>
+                    {{ assignment.session_note.appointment.availability_slot.start_time|date:"d/m/Y" }}
+                </strong>
+            </p>
+
+            <p>
+                <span>Archivos</span>
+
+                <strong>
+                    {{ assignment.attachments.count }}
+                </strong>
+            </p>
+
+            <p>
+                <span>Actualizada</span>
+
+                <strong>
+                    {{ assignment.updated_at|date:"d/m/Y h:i A" }}
+                </strong>
+            </p>
+        </div>
+    </div>
+
+    <div class="assignment-general-item__actions">
+        <a
+            href="{% url 'psychologist-assignment-list' assignment.session_note.public_id %}"
+            class="btn btn--secondary btn--sm"
+        >
+            Ver asignaciones de la sesión
+        </a>
+
+        <a
+            href="{% url 'psychologist-assignment-edit' assignment.public_id %}"
+            class="btn btn--primary btn--sm"
+        >
+            Editar asignación
+        </a>
+    </div>
+</article>

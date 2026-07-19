@@ -197,6 +197,72 @@
                 </div>
             </article>
 
+            <article class="card card--soft">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Asignaciones activas
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Actividades pendientes o en progreso.
+                        </p>
+                    </div>
+
+                    {% if active_assignments_count %}
+                        <span class="badge badge--warning">
+                            {{ active_assignments_count }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="card__body">
+                    {% if latest_active_assignment %}
+                        <p>
+                            Tienes
+                            <strong>
+                                {{ active_assignments_count }}
+                            </strong>
+
+                            {% if active_assignments_count == 1 %}
+                                asignación activa.
+                            {% else %}
+                                asignaciones activas.
+                            {% endif %}
+                        </p>
+
+                        <p>
+                            <strong>Última actividad:</strong><br>
+                            {{ latest_active_assignment.title }}
+                        </p>
+
+                        <p>
+                            <strong>Paciente:</strong><br>
+                            {{ latest_active_assignment.session_note.clinical_record.patient }}
+                        </p>
+                    {% else %}
+                        <p>
+                            No tienes asignaciones activas.
+                        </p>
+                    {% endif %}
+                </div>
+
+                <div class="card__footer">
+                    {% if latest_active_assignment %}
+                        <a
+                            href="{% url 'psychologist-assignment-list' latest_active_assignment.session_note.public_id %}"
+                            class="btn btn--secondary btn--sm"
+                        >
+                            Ver asignaciones
+                        </a>
+                    {% else %}
+                        <span class="text-muted">
+                            Sin actividades pendientes
+                        </span>
+                    {% endif %}
+                </div>
+            </article>
+
         </div>
     </section>
 {% endblock %}

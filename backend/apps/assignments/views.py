@@ -133,6 +133,80 @@ def patient_assignment_detail(request, public_id):
     )
     
 @login_required
+def psychologist_assignment_general_list(request):
+    """
+    Muestra todas las asignaciones pertenecientes
+    al psicólogo autenticado.
+
+    Las asignaciones se separan según su estado:
+    activas, completadas y canceladas.
+    """
+
+    if request.user.role != "PSYCHOLOGIST":
+        return redirect("dashboard-redirect")
+
+    assignments = (
+        Assignment.objects
+        .filter(
+            session_note__appointment__psychologist__account=request.user,
+        )
+        .select_related(
+            "session_note",
+            "session_note__appointment",
+            "session_note__appointment__availability_slot",
+            "session_note__clinical_record",
+            "session_note__clinical_record__patient",
+            "session_note__clinical_record__patient__account",
+        )
+        .prefetch_related(
+            "attachments",
+        )
+    )
+
+    active_assignments = (
+        assignments
+        .filter(
+            status__in=[
+                Assignment.Status.PENDING,
+                Assignment.Status.IN_PROGRESS,
+            ],
+        )
+        .order_by("-updated_at")
+    )
+
+    completed_assignments = (
+        assignments
+        .filter(
+            status=Assignment.Status.COMPLETED,
+        )
+        .order_by("-completed_at", "-updated_at")
+    )
+
+    cancelled_assignments = (
+        assignments
+        .filter(
+            status=Assignment.Status.CANCELLED,
+        )
+        .order_by("-updated_at")
+    )
+
+    context = {
+        "page_title": "Asignaciones",
+        "active_assignments": active_assignments,
+        "completed_assignments": completed_assignments,
+        "cancelled_assignments": cancelled_assignments,
+        "active_assignments_count": active_assignments.count(),
+        "completed_assignments_count": completed_assignments.count(),
+        "cancelled_assignments_count": cancelled_assignments.count(),
+    }
+
+    return render(
+        request,
+        "assignments/psychologist_assignment_general_list.html",
+        context,
+    )
+
+@login_required
 def psychologist_assignment_list(request, note_public_id):
     """
     Muestra las asignaciones asociadas a una nota de sesión.

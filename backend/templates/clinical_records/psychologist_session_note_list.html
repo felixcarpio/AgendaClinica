@@ -1,0 +1,165 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Notas de sesión | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_session_note_list.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Notas de sesión
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta las notas clínicas registradas
+                en las sesiones completadas.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'psychologist-appointment-list' %}"
+            class="btn btn--secondary"
+        >
+            Volver a mi agenda
+        </a>
+    </section>
+
+    <section class="content-section">
+        <article class="card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Historial de notas
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Notas registradas para tus pacientes.
+                    </p>
+                </div>
+
+                {% if session_notes_count %}
+                    <span class="badge badge--neutral">
+                        {{ session_notes_count }}
+
+                        {% if session_notes_count == 1 %}
+                            nota
+                        {% else %}
+                            notas
+                        {% endif %}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="card__body">
+                {% if session_notes %}
+                    <div class="session-note-list">
+                        {% for note in session_notes %}
+                            <article class="session-note-item">
+                                <div class="session-note-item__header">
+                                    <div>
+                                        <h4 class="session-note-item__title">
+                                            {{ note.clinical_record.patient }}
+                                        </h4>
+
+                                        <p class="session-note-item__date">
+                                            Sesión del
+                                            {{ note.appointment.availability_slot.start_time|date:"d/m/Y" }}
+
+                                            ·
+
+                                            {{ note.appointment.availability_slot.start_time|time:"h:i A" }}
+                                            -
+                                            {{ note.appointment.availability_slot.end_time|time:"h:i A" }}
+                                        </p>
+                                    </div>
+
+                                    <span class="badge badge--success">
+                                        Nota registrada
+                                    </span>
+                                </div>
+
+                                <div class="session-note-item__body">
+                                    <div class="session-note-item__summary">
+                                        <span>Resumen de la sesión</span>
+
+                                        <p>
+                                            {{ note.session_summary|truncatechars:220 }}
+                                        </p>
+                                    </div>
+
+                                    <div class="session-note-item__meta">
+                                        <p>
+                                            <span>Última actualización</span>
+
+                                            <strong>
+                                                {{ note.updated_at|date:"d/m/Y h:i A" }}
+                                            </strong>
+                                        </p>
+
+                                        <p>
+                                            <span>Asignaciones</span>
+
+                                            <strong>
+                                                {{ note.assignments.count }}
+                                            </strong>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="session-note-item__actions">
+                                    <a
+                                        href="{% url 'psychologist-appointment-detail' note.appointment.public_id %}"
+                                        class="btn btn--secondary btn--sm"
+                                    >
+                                        Ver cita
+                                    </a>
+
+                                    <a
+                                        href="{% url 'psychologist-assignment-list' note.public_id %}"
+                                        class="btn btn--secondary btn--sm"
+                                    >
+                                        Ver asignaciones
+                                    </a>
+
+                                    <a
+                                        href="{% url 'psychologist-session-note-manage' note.appointment.public_id %}"
+                                        class="btn btn--primary btn--sm"
+                                    >
+                                        Editar nota
+                                    </a>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <h3 class="empty-state__title">
+                            No hay notas de sesión
+                        </h3>
+
+                        <p class="empty-state__description">
+                            Las notas aparecerán aquí después de registrar
+                            información en una cita completada.
+                        </p>
+
+                        <a
+                            href="{% url 'psychologist-appointment-list' %}"
+                            class="btn btn--secondary"
+                        >
+                            Ver mi agenda
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+{% endblock %}

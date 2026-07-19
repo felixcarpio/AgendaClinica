@@ -119,6 +119,31 @@ def psychologist_dashboard(request):
         .distinct()
         .count()
     )
+    
+    # Asignaciones activas relacionadas con pacientes
+    # atendidos por el psicólogo autenticado.
+    active_assignments = (
+        Assignment.objects
+        .filter(
+            session_note__appointment__psychologist__account=request.user,
+            is_visible=True,
+            status__in=[
+                Assignment.Status.PENDING,
+                Assignment.Status.IN_PROGRESS,
+            ],
+        )
+        .select_related(
+            "session_note",
+            "session_note__appointment",
+            "session_note__clinical_record",
+            "session_note__clinical_record__patient",
+            "session_note__clinical_record__patient__account",
+        )
+        .order_by("-updated_at")
+    )
+
+    active_assignments_count = active_assignments.count()
+    latest_active_assignment = active_assignments.first()
 
     context = {
         "page_title": "Panel del psicólogo",
@@ -126,6 +151,8 @@ def psychologist_dashboard(request):
         "today_appointments": today_appointments,
         "today_appointments_count": today_appointments.count(),
         "attended_patients_count": attended_patients_count,
+        "active_assignments_count": active_assignments_count,
+        "latest_active_assignment": latest_active_assignment,
     }
 
     return render(
