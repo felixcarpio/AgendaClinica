@@ -96,8 +96,7 @@ class AvailabilitySlot(models.Model):
         if overlapping_slots.exists():
             raise ValidationError({
                 "start_time": (
-                    "Este psicólogo ya tiene un cupo que se cruza "
-                    "con el horario seleccionado."
+                    "Ya tienes un cupo que se cruza con el horario seleccionado."
                 )
             })
 

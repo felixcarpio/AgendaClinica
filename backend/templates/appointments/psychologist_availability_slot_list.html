@@ -1,0 +1,249 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Mis cupos | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_availability_slot_list.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Mis cupos
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta y administra tus horarios disponibles,
+                reservados, bloqueados y cancelados.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'psychologist-availability-slot-create' %}"
+            class="btn btn--primary"
+        >
+            Crear cupo
+        </a>
+    </section>
+
+    <section class="content-section">
+        <div class="availability-summary-grid">
+
+            <article class="card card--soft">
+                <div class="card__body">
+                    <span class="availability-summary__label">
+                        Disponibles
+                    </span>
+
+                    <strong class="availability-summary__value">
+                        {{ available_slots_count }}
+                    </strong>
+
+                    <p class="availability-summary__description">
+                        Cupos que pueden reservar los pacientes.
+                    </p>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card__body">
+                    <span class="availability-summary__label">
+                        Reservados
+                    </span>
+
+                    <strong class="availability-summary__value">
+                        {{ booked_slots_count }}
+                    </strong>
+
+                    <p class="availability-summary__description">
+                        Cupos asociados a una cita.
+                    </p>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card__body">
+                    <span class="availability-summary__label">
+                        Bloqueados
+                    </span>
+
+                    <strong class="availability-summary__value">
+                        {{ blocked_slots_count }}
+                    </strong>
+
+                    <p class="availability-summary__description">
+                        Horarios no disponibles temporalmente.
+                    </p>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card__body">
+                    <span class="availability-summary__label">
+                        Cancelados
+                    </span>
+
+                    <strong class="availability-summary__value">
+                        {{ cancelled_slots_count }}
+                    </strong>
+
+                    <p class="availability-summary__description">
+                        Cupos retirados de la agenda.
+                    </p>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <section class="content-section">
+        <article class="card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Cupos disponibles
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Horarios que pueden ser reservados por los pacientes.
+                    </p>
+                </div>
+
+                {% if available_slots_count %}
+                    <span class="badge badge--success">
+                        {{ available_slots_count }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="card__body">
+                {% if available_slots %}
+                    <div class="availability-slot-list">
+                        {% for slot in available_slots %}
+                            {% include "appointments/components/psychologist_availability_slot_item.html" %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="availability-slot-empty">
+                        No tienes cupos disponibles.
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+
+    <section class="content-section">
+        <article class="card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Cupos reservados
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Horarios que ya tienen una cita asociada.
+                    </p>
+                </div>
+
+                {% if booked_slots_count %}
+                    <span class="badge badge--warning">
+                        {{ booked_slots_count }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="card__body">
+                {% if booked_slots %}
+                    <div class="availability-slot-list">
+                        {% for slot in booked_slots %}
+                            {% include "appointments/components/psychologist_availability_slot_item.html" %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="availability-slot-empty">
+                        No tienes cupos reservados.
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+
+    <section class="content-section">
+        <article class="card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Cupos bloqueados
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Horarios deshabilitados temporalmente.
+                    </p>
+                </div>
+
+                {% if blocked_slots_count %}
+                    <span class="badge badge--neutral">
+                        {{ blocked_slots_count }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="card__body">
+                {% if blocked_slots %}
+                    <div class="availability-slot-list">
+                        {% for slot in blocked_slots %}
+                            {% include "appointments/components/psychologist_availability_slot_item.html" %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="availability-slot-empty">
+                        No tienes cupos bloqueados.
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+
+    <section class="content-section">
+        <article class="card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Cupos cancelados
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Horarios cancelados y no disponibles.
+                    </p>
+                </div>
+
+                {% if cancelled_slots_count %}
+                    <span class="badge badge--neutral">
+                        {{ cancelled_slots_count }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="card__body">
+                {% if cancelled_slots %}
+                    <div class="availability-slot-list">
+                        {% for slot in cancelled_slots %}
+                            {% include "appointments/components/psychologist_availability_slot_item.html" %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="availability-slot-empty">
+                        No tienes cupos cancelados.
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+{% endblock %}

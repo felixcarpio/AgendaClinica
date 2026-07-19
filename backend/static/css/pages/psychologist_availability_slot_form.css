@@ -1,0 +1,106 @@
+.availability-slot-form-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+    gap: var(--spacing-5);
+    align-items: start;
+}
+
+.availability-slot-form__summary {
+    position: sticky;
+    top: var(--spacing-5);
+}
+
+.availability-slot-form__notice {
+    padding: var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+}
+
+.availability-slot-form__notice + .availability-slot-form__notice {
+    margin-top: var(--spacing-3);
+}
+
+.availability-slot-form__notice strong {
+    display: block;
+    margin-bottom: var(--spacing-2);
+}
+
+.availability-slot-form__notice p {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.55;
+}
+
+.availability-slot-form__fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-4);
+}
+
+.availability-slot-form__card input,
+.availability-slot-form__card select {
+    width: 100%;
+}
+
+.availability-slot-form__card select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    padding-right: 2.75rem;
+    cursor: pointer;
+
+    background-image:
+        linear-gradient(
+            45deg,
+            transparent 50%,
+            currentColor 50%
+        ),
+        linear-gradient(
+            135deg,
+            currentColor 50%,
+            transparent 50%
+        );
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+    background-size:
+        5px 5px,
+        5px 5px;
+    background-repeat: no-repeat;
+}
+
+.availability-slot-form__card .form-actions {
+    justify-content: flex-end;
+    margin-top: var(--spacing-6);
+    padding-top: var(--spacing-5);
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 1000px) {
+    .availability-slot-form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .availability-slot-form__summary {
+        position: static;
+    }
+}
+
+@media (max-width: 700px) {
+    .availability-slot-form__fields {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .availability-slot-form__card .form-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .availability-slot-form__card .form-actions .btn {
+        width: 100%;
+    }
+}

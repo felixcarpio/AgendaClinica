@@ -1,6 +1,6 @@
 from django import forms
 
-from apps.appointments.models import Appointment
+from apps.appointments.models import Appointment, AvailabilitySlot
 
 
 class PatientAppointmentConfirmationForm(forms.Form):
@@ -149,3 +149,101 @@ class PsychologistAppointmentStatusForm(forms.ModelForm):
             )
 
         return new_status
+    
+class PsychologistAvailabilitySlotForm(forms.ModelForm):
+    """
+    Permite al psicólogo crear y editar sus propios
+    cupos de disponibilidad.
+
+    El psicólogo propietario se asigna desde la vista
+    y no puede seleccionarse desde el formulario.
+    """
+
+    class Meta:
+        model = AvailabilitySlot
+        fields = [
+            "start_time",
+            "end_time",
+            "status",
+        ]
+
+        widgets = {
+            "start_time": forms.DateTimeInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "datetime-local",
+                },
+                format="%Y-%m-%dT%H:%M",
+            ),
+            "end_time": forms.DateTimeInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "datetime-local",
+                },
+                format="%Y-%m-%dT%H:%M",
+            ),
+            "status": forms.Select(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+        }
+
+        labels = {
+            "start_time": "Fecha y hora de inicio",
+            "end_time": "Fecha y hora de finalización",
+            "status": "Estado del cupo",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["start_time"].input_formats = [
+            "%Y-%m-%dT%H:%M",
+        ]
+        self.fields["end_time"].input_formats = [
+            "%Y-%m-%dT%H:%M",
+        ]
+
+        # Al crear un cupo, solo puede registrarse como disponible
+        # o bloqueado. Un cupo no se crea como reservado.
+        if not self.instance.pk:
+            self.fields["status"].choices = [
+                (
+                    AvailabilitySlot.Status.AVAILABLE,
+                    AvailabilitySlot.Status.AVAILABLE.label,
+                ),
+                (
+                    AvailabilitySlot.Status.BLOCKED,
+                    AvailabilitySlot.Status.BLOCKED.label,
+                ),
+            ]
+            self.initial["status"] = (
+                AvailabilitySlot.Status.AVAILABLE
+            )
+
+        # Un cupo reservado no debe poder cambiarse manualmente
+        # desde este formulario.
+        elif (
+            self.instance.status
+            == AvailabilitySlot.Status.BOOKED
+        ):
+            self.fields["start_time"].disabled = True
+            self.fields["end_time"].disabled = True
+            self.fields["status"].disabled = True
+
+        else:
+            self.fields["status"].choices = [
+                (
+                    AvailabilitySlot.Status.AVAILABLE,
+                    AvailabilitySlot.Status.AVAILABLE.label,
+                ),
+                (
+                    AvailabilitySlot.Status.BLOCKED,
+                    AvailabilitySlot.Status.BLOCKED.label,
+                ),
+                (
+                    AvailabilitySlot.Status.CANCELLED,
+                    AvailabilitySlot.Status.CANCELLED.label,
+                ),
+            ]

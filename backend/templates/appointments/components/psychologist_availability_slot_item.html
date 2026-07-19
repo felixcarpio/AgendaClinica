@@ -1,0 +1,55 @@
+<article class="availability-slot-item">
+    <div class="availability-slot-item__main">
+        <div>
+            <span class="availability-slot-item__date">
+                {{ slot.start_time|date:"l, d \d\e F \d\e Y" }}
+            </span>
+
+            <strong class="availability-slot-item__time">
+                {{ slot.start_time|time:"h:i A" }}
+                -
+                {{ slot.end_time|time:"h:i A" }}
+            </strong>
+        </div>
+
+        {% if slot.status == "AVAILABLE" %}
+            <span class="badge badge--success">
+                {{ slot.get_status_display }}
+            </span>
+        {% elif slot.status == "BOOKED" %}
+            <span class="badge badge--warning">
+                {{ slot.get_status_display }}
+            </span>
+        {% else %}
+            <span class="badge badge--neutral">
+                {{ slot.get_status_display }}
+            </span>
+        {% endif %}
+    </div>
+
+    <div class="availability-slot-item__actions">
+        {% if slot.status == "BOOKED" %}
+            {% with appointment=slot.active_appointments.0 %}
+                {% if appointment %}
+                    <a
+                        href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                        class="btn btn--secondary btn--sm"
+                    >
+                        Ver cita
+                    </a>
+                {% else %}
+                    <span class="text-muted">
+                        Cita no disponible
+                    </span>
+                {% endif %}
+            {% endwith %}
+        {% else %}
+            <a
+                href="{% url 'psychologist-availability-slot-edit' slot.id %}"
+                class="btn btn--secondary btn--sm"
+            >
+                Editar cupo
+            </a>
+        {% endif %}
+    </div>
+</article>

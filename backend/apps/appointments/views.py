@@ -7,15 +7,16 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
+from django.db.models import Prefetch
 
 from apps.appointments.forms import (
     PatientAppointmentCancellationForm,
     PatientAppointmentConfirmationForm,
     PsychologistAppointmentStatusForm,
+    PsychologistAvailabilitySlotForm,
 )
 from apps.patients.models import Patient
-from apps.appointments.models import Appointment
-from apps.appointments.models import AvailabilitySlot
+from apps.appointments.models import Appointment, AvailabilitySlot
 from apps.psychologists.models import Psychologist
 
 
@@ -925,5 +926,188 @@ def psychologist_appointment_detail(request, public_id):
     return render(
         request,
         "appointments/psychologist_appointment_detail.html",
+        context,
+    )
+    
+@login_required
+def psychologist_availability_slot_list(request):
+    """
+    Muestra los cupos de disponibilidad pertenecientes
+    al psicólogo autenticado.
+
+    Los próximos cupos aparecen primero y se agrupan
+    según su estado.
+    """
+
+    if request.user.role != "PSYCHOLOGIST":
+        return redirect("dashboard-redirect")
+
+    now = timezone.now()
+
+    slots = (
+        AvailabilitySlot.objects
+        .filter(
+            psychologist__account=request.user,
+            end_time__gte=now,
+        )
+        .select_related(
+            "psychologist",
+            "psychologist__account",
+        )
+        .prefetch_related(
+            Prefetch(
+                "appointments",
+                queryset=(
+                    Appointment.objects
+                    .exclude(status=Appointment.Status.CANCELLED)
+                    .select_related(
+                        "patient",
+                        "patient__account",
+                    )
+                ),
+                to_attr="active_appointments",
+            ),
+        )
+        .order_by("start_time")
+    )
+
+    available_slots = slots.filter(
+        status=AvailabilitySlot.Status.AVAILABLE,
+    )
+
+    booked_slots = slots.filter(
+        status=AvailabilitySlot.Status.BOOKED,
+    )
+
+    blocked_slots = slots.filter(
+        status=AvailabilitySlot.Status.BLOCKED,
+    )
+
+    cancelled_slots = slots.filter(
+        status=AvailabilitySlot.Status.CANCELLED,
+    )
+
+    context = {
+        "page_title": "Administrar cupos",
+        "available_slots": available_slots,
+        "booked_slots": booked_slots,
+        "blocked_slots": blocked_slots,
+        "cancelled_slots": cancelled_slots,
+        "available_slots_count": available_slots.count(),
+        "booked_slots_count": booked_slots.count(),
+        "blocked_slots_count": blocked_slots.count(),
+        "cancelled_slots_count": cancelled_slots.count(),
+    }
+
+    return render(
+        request,
+        "appointments/psychologist_availability_slot_list.html",
+        context,
+    )
+    
+@login_required
+def psychologist_availability_slot_create(request):
+    """
+    Permite al psicólogo autenticado crear un nuevo
+    cupo de disponibilidad en su agenda.
+    """
+
+    if request.user.role != "PSYCHOLOGIST":
+        return redirect("dashboard-redirect")
+
+    psychologist = get_object_or_404(
+        Psychologist,
+        account=request.user,
+    )
+
+    if request.method == "POST":
+        form = PsychologistAvailabilitySlotForm(
+            request.POST,
+        )
+
+        # El modelo necesita conocer al psicólogo antes de ejecutar
+        # form.is_valid(), porque clean() valida cupos solapados.
+        form.instance.psychologist = psychologist
+
+        if form.is_valid():
+            slot = form.save()
+            
+            messages.success(
+                request,
+                "El cupo fue creado correctamente.",
+            )
+
+            return redirect(
+                "psychologist-availability-slot-list",
+            )
+    else:
+        form = PsychologistAvailabilitySlotForm()
+
+        # También dejamos preparada la instancia durante la carga inicial.
+        form.instance.psychologist = psychologist
+
+    context = {
+        "page_title": "Crear cupo",
+        "form": form,
+    }
+
+    return render(
+        request,
+        "appointments/psychologist_availability_slot_form.html",
+        context,
+    )
+    
+@login_required
+def psychologist_availability_slot_edit(request, slot_id):
+    """
+    Permite al psicólogo editar uno de sus propios cupos.
+
+    Los cupos reservados se muestran, pero sus campos
+    permanecen deshabilitados desde el formulario.
+    """
+
+    if request.user.role != "PSYCHOLOGIST":
+        return redirect("dashboard-redirect")
+
+    slot = get_object_or_404(
+        AvailabilitySlot.objects.select_related(
+            "psychologist",
+            "psychologist__account",
+        ),
+        id=slot_id,
+        psychologist__account=request.user,
+    )
+
+    if request.method == "POST":
+        form = PsychologistAvailabilitySlotForm(
+            request.POST,
+            instance=slot,
+        )
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "El cupo fue actualizado correctamente.",
+            )
+
+            return redirect(
+                "psychologist-availability-slot-list",
+            )
+    else:
+        form = PsychologistAvailabilitySlotForm(
+            instance=slot,
+        )
+
+    context = {
+        "page_title": "Editar cupo",
+        "form": form,
+        "slot": slot,
+    }
+
+    return render(
+        request,
+        "appointments/psychologist_availability_slot_form.html",
         context,
     )

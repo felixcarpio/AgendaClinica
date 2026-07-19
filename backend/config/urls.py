@@ -24,6 +24,9 @@ from apps.appointments.views import (
     patient_appointment_reschedule_confirm,
     psychologist_appointment_detail,
     psychologist_appointment_list,
+    psychologist_availability_slot_list,
+    psychologist_availability_slot_create,
+    psychologist_availability_slot_edit,
 )
 from apps.assignments.views import (
     patient_assignment_detail,
@@ -141,6 +144,21 @@ urlpatterns = [
         "agenda/<uuid:public_id>/detalle/",
         psychologist_appointment_detail,
         name="psychologist-appointment-detail",
+    ),
+    path(
+        "mis-cupos/",
+        psychologist_availability_slot_list,
+        name="psychologist-availability-slot-list",
+    ),
+    path(
+        "mis-cupos/nuevo/",
+        psychologist_availability_slot_create,
+        name="psychologist-availability-slot-create",
+    ),
+    path(
+        "mis-cupos/<int:slot_id>/editar/",
+        psychologist_availability_slot_edit,
+        name="psychologist-availability-slot-edit",
     ),
 
     # Asignaciones del paciente.

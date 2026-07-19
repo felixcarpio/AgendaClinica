@@ -154,6 +154,28 @@
 
                     <li class="sidebar__menu-item">
                         <a
+                            href="{% url 'psychologist-availability-slot-list' %}"
+                            class="sidebar__menu-link
+                                {% if request.resolver_match.url_name == 'psychologist-availability-slot-list' or request.resolver_match.url_name == 'psychologist-availability-slot-create' or request.resolver_match.url_name == 'psychologist-availability-slot-edit' %}
+                                    sidebar__menu-link--active
+                                {% endif %}
+                            "
+                        >
+                            <span
+                                class="sidebar__menu-icon"
+                                aria-hidden="true"
+                            >
+                                🕒
+                            </span>
+
+                            <span class="sidebar__menu-text">
+                                Mis cupos
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar__menu-item">
+                        <a
                             href="{% url 'psychologist-patient-list' %}"
                             class="sidebar__menu-link
                                 {% if request.resolver_match.url_name == 'psychologist-patient-list' or request.resolver_match.url_name == 'psychologist-patient-detail' or request.resolver_match.url_name == 'psychologist-clinical-record-detail' or request.resolver_match.url_name == 'psychologist-clinical-record-edit' %}
