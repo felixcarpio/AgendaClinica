@@ -1,0 +1,468 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Expediente clínico | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_clinical_record_detail.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Expediente clínico
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta la información clínica y el historial
+                de sesiones del paciente.
+            </p>
+        </div>
+
+        <div class="page-heading__actions">
+            <a
+                href="{% url 'psychologist-clinical-record-edit' patient.public_id %}"
+                class="btn btn--primary"
+            >
+                Editar expediente
+            </a>
+
+            <a
+                href="{% url 'psychologist-patient-detail' patient.public_id %}"
+                class="btn btn--secondary"
+            >
+                Volver al paciente
+            </a>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="psychologist-clinical-record">
+
+            <article class="card psychologist-clinical-record__patient-card">
+                <div class="card__header">
+                    <div class="psychologist-clinical-record__identity">
+                        <span
+                            class="psychologist-clinical-record__avatar"
+                            aria-hidden="true"
+                        >
+                            {% if patient.account.first_name %}
+                                {{ patient.account.first_name|first|upper }}
+                            {% else %}
+                                P
+                            {% endif %}
+                        </span>
+
+                        <div>
+                            <h3 class="card__title">
+                                {{ patient.account.first_name }}
+                                {{ patient.account.last_name }}
+                            </h3>
+
+                            <p class="card__subtitle">
+                                Información general del paciente.
+                            </p>
+                        </div>
+                    </div>
+
+                    <span class="badge badge--neutral">
+                        Expediente clínico
+                    </span>
+                </div>
+
+                <div class="card__body">
+                    <div class="psychologist-clinical-record__patient-grid">
+                        <div class="psychologist-clinical-record__info-item">
+                            <span class="psychologist-clinical-record__label">
+                                Correo
+                            </span>
+
+                            <strong class="psychologist-clinical-record__value">
+                                {{ patient.account.email }}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-clinical-record__info-item">
+                            <span class="psychologist-clinical-record__label">
+                                Teléfono
+                            </span>
+
+                            <strong class="psychologist-clinical-record__value">
+                                {% if patient.phone %}
+                                    {{ patient.phone }}
+                                {% else %}
+                                    No registrado
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-clinical-record__info-item">
+                            <span class="psychologist-clinical-record__label">
+                                Fecha de nacimiento
+                            </span>
+
+                            <strong class="psychologist-clinical-record__value">
+                                {% if patient.birth_date %}
+                                    {{ patient.birth_date|date:"d/m/Y" }}
+                                {% else %}
+                                    No registrada
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-clinical-record__info-item">
+                            <span class="psychologist-clinical-record__label">
+                                Género
+                            </span>
+
+                            <strong class="psychologist-clinical-record__value">
+                                {% if patient.gender %}
+                                    {{ patient.get_gender_display }}
+                                {% else %}
+                                    No registrado
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <section class="psychologist-clinical-record__record-grid">
+                <article class="card psychologist-clinical-record__section-card">
+                    <div class="card__header">
+                        <div>
+                            <h3 class="card__title">
+                                Información inicial
+                            </h3>
+
+                            <p class="card__subtitle">
+                                Motivo principal y evaluación del paciente.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card__body">
+                        <section class="clinical-record-field">
+                            <h4 class="clinical-record-field__title">
+                                Motivo de consulta
+                            </h4>
+
+                            <div class="clinical-record-field__content">
+                                {% if clinical_record.chief_complaint %}
+                                    {{ clinical_record.chief_complaint|linebreaks }}
+                                {% else %}
+                                    <p class="clinical-record-field__empty">
+                                        No se ha registrado información.
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="clinical-record-field">
+                            <h4 class="clinical-record-field__title">
+                                Evaluación inicial
+                            </h4>
+
+                            <div class="clinical-record-field__content">
+                                {% if clinical_record.initial_assessment %}
+                                    {{ clinical_record.initial_assessment|linebreaks }}
+                                {% else %}
+                                    <p class="clinical-record-field__empty">
+                                        No se ha registrado información.
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="clinical-record-field">
+                            <h4 class="clinical-record-field__title">
+                                Objetivos terapéuticos
+                            </h4>
+
+                            <div class="clinical-record-field__content">
+                                {% if clinical_record.therapeutic_objectives %}
+                                    {{ clinical_record.therapeutic_objectives|linebreaks }}
+                                {% else %}
+                                    <p class="clinical-record-field__empty">
+                                        No se ha registrado información.
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="card psychologist-clinical-record__section-card">
+                    <div class="card__header">
+                        <div>
+                            <h3 class="card__title">
+                                Antecedentes
+                            </h3>
+
+                            <p class="card__subtitle">
+                                Información relevante para el proceso terapéutico.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card__body">
+                        <section class="clinical-record-field">
+                            <h4 class="clinical-record-field__title">
+                                Antecedentes personales
+                            </h4>
+
+                            <div class="clinical-record-field__content">
+                                {% if clinical_record.personal_history %}
+                                    {{ clinical_record.personal_history|linebreaks }}
+                                {% else %}
+                                    <p class="clinical-record-field__empty">
+                                        No se ha registrado información.
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="clinical-record-field">
+                            <h4 class="clinical-record-field__title">
+                                Antecedentes familiares
+                            </h4>
+
+                            <div class="clinical-record-field__content">
+                                {% if clinical_record.family_history %}
+                                    {{ clinical_record.family_history|linebreaks }}
+                                {% else %}
+                                    <p class="clinical-record-field__empty">
+                                        No se ha registrado información.
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="clinical-record-field">
+                            <h4 class="clinical-record-field__title">
+                                Antecedentes médicos
+                            </h4>
+
+                            <div class="clinical-record-field__content">
+                                {% if clinical_record.medical_history %}
+                                    {{ clinical_record.medical_history|linebreaks }}
+                                {% else %}
+                                    <p class="clinical-record-field__empty">
+                                        No se ha registrado información.
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="clinical-record-field">
+                            <h4 class="clinical-record-field__title">
+                                Medicación actual
+                            </h4>
+
+                            <div class="clinical-record-field__content">
+                                {% if clinical_record.current_medication %}
+                                    {{ clinical_record.current_medication|linebreaks }}
+                                {% else %}
+                                    <p class="clinical-record-field__empty">
+                                        No se ha registrado información.
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </section>
+                    </div>
+                </article>
+            </section>
+
+            <article class="card psychologist-clinical-record__observations-card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Observaciones generales
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Información adicional del proceso terapéutico.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <div class="clinical-record-field__content">
+                        {% if clinical_record.general_observations %}
+                            {{ clinical_record.general_observations|linebreaks }}
+                        {% else %}
+                            <p class="clinical-record-field__empty">
+                                No se han registrado observaciones generales.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+
+            <article class="card psychologist-clinical-record__notes-card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Historial de notas de sesión
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Registro clínico de las sesiones completadas.
+                        </p>
+                    </div>
+
+                    <span class="badge badge--neutral">
+                        {{ session_notes|length }}
+                        {% if session_notes|length == 1 %}
+                            nota
+                        {% else %}
+                            notas
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="card__body">
+                    {% if session_notes %}
+                        <div class="clinical-record-note-list">
+                            {% for note in session_notes %}
+                                <article class="clinical-record-note">
+                                    <div class="clinical-record-note__header">
+                                        <div>
+                                            <h4 class="clinical-record-note__title">
+                                                Sesión del
+                                                {{ note.appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                            </h4>
+
+                                            <p class="clinical-record-note__time">
+                                                {{ note.appointment.availability_slot.start_time|time:"h:i A" }}
+                                                -
+                                                {{ note.appointment.availability_slot.end_time|time:"h:i A" }}
+                                            </p>
+                                        </div>
+
+                                        <span class="badge badge--success">
+                                            {{ note.appointment.get_status_display }}
+                                        </span>
+                                    </div>
+
+                                    <section class="clinical-record-note__section">
+                                        <h5 class="clinical-record-note__section-title">
+                                            Resumen de la sesión
+                                        </h5>
+
+                                        <div class="clinical-record-note__content">
+                                            {{ note.session_summary|linebreaks }}
+                                        </div>
+                                    </section>
+
+                                    {% if note.observations %}
+                                        <section class="clinical-record-note__section">
+                                            <h5 class="clinical-record-note__section-title">
+                                                Observaciones
+                                            </h5>
+
+                                            <div class="clinical-record-note__content">
+                                                {{ note.observations|linebreaks }}
+                                            </div>
+                                        </section>
+                                    {% endif %}
+
+                                    {% if note.interventions %}
+                                        <section class="clinical-record-note__section">
+                                            <h5 class="clinical-record-note__section-title">
+                                                Técnicas o intervenciones
+                                            </h5>
+
+                                            <div class="clinical-record-note__content">
+                                                {{ note.interventions|linebreaks }}
+                                            </div>
+                                        </section>
+                                    {% endif %}
+
+                                    {% if note.homework %}
+                                        <section class="clinical-record-note__section">
+                                            <h5 class="clinical-record-note__section-title">
+                                                Tareas asignadas
+                                            </h5>
+
+                                            <div class="clinical-record-note__content">
+                                                {{ note.homework|linebreaks }}
+                                            </div>
+                                        </section>
+                                    {% endif %}
+
+                                    {% if note.next_session_plan %}
+                                        <section class="clinical-record-note__section">
+                                            <h5 class="clinical-record-note__section-title">
+                                                Plan para la siguiente sesión
+                                            </h5>
+
+                                            <div class="clinical-record-note__content">
+                                                {{ note.next_session_plan|linebreaks }}
+                                            </div>
+                                        </section>
+                                    {% endif %}
+
+                                    <div class="clinical-record-note__footer">
+                                        <span>
+                                            Actualizada:
+                                            {{ note.updated_at|date:"d/m/Y h:i A" }}
+                                        </span>
+
+                                        <div class="clinical-record-note__actions">
+                                            <a
+                                                href="{% url 'psychologist-appointment-detail' note.appointment.public_id %}"
+                                                class="btn btn--secondary btn--sm"
+                                            >
+                                                Ver cita
+                                            </a>
+
+                                            <a
+                                                href="{% url 'psychologist-assignment-list' note.public_id %}"
+                                                class="btn btn--secondary btn--sm"
+                                            >
+                                                Ver asignaciones
+                                            </a>
+
+                                            <a
+                                                href="{% url 'psychologist-session-note-manage' note.appointment.public_id %}"
+                                                class="btn btn--primary btn--sm"
+                                            >
+                                                Editar nota
+                                            </a>
+                                        </div>
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <h4 class="empty-state__title">
+                                No hay notas de sesión
+                            </h4>
+
+                            <p class="empty-state__description">
+                                Las notas aparecerán cuando las citas
+                                completadas tengan una nota clínica registrada.
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+
+            <p class="psychologist-clinical-record__updated">
+                Expediente creado:
+                {{ clinical_record.created_at|date:"d/m/Y h:i A" }}
+                · Última actualización:
+                {{ clinical_record.updated_at|date:"d/m/Y h:i A" }}
+            </p>
+
+        </div>
+    </section>
+{% endblock %}

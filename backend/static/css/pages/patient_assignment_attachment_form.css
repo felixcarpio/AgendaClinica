@@ -1,0 +1,83 @@
+.patient-assignment-attachment-form {
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+    gap: var(--spacing-5);
+    align-items: start;
+}
+
+.patient-assignment-attachment-form__summary {
+    position: sticky;
+    top: var(--spacing-5);
+}
+
+.patient-assignment-attachment-form__info-list {
+    display: grid;
+    gap: var(--spacing-4);
+}
+
+.patient-assignment-attachment-form__info-list > div {
+    display: grid;
+    gap: var(--spacing-1);
+}
+
+.patient-assignment-attachment-form__info-list span {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.patient-assignment-attachment-form__info-list strong {
+    overflow-wrap: anywhere;
+}
+
+.patient-assignment-attachment-form__card input[type="file"] {
+    width: 100%;
+}
+
+.patient-assignment-attachment-form__notice {
+    margin-top: var(--spacing-5);
+    padding: var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+}
+
+.patient-assignment-attachment-form__notice strong {
+    display: block;
+    margin-bottom: var(--spacing-2);
+}
+
+.patient-assignment-attachment-form__notice p {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.55;
+}
+
+.patient-assignment-attachment-form__card .form-actions {
+    justify-content: flex-end;
+    margin-top: var(--spacing-6);
+    padding-top: var(--spacing-5);
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 1000px) {
+    .patient-assignment-attachment-form {
+        grid-template-columns: 1fr;
+    }
+
+    .patient-assignment-attachment-form__summary {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .patient-assignment-attachment-form__card .form-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .patient-assignment-attachment-form__card .form-actions .btn {
+        width: 100%;
+    }
+}

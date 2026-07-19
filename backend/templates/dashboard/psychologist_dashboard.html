@@ -8,11 +8,13 @@
     <section class="page-heading">
         <div>
             <h2 class="page-heading__title">
-                Bienvenido a tu agenda
+                Bienvenido,
+                {{ request.user.first_name }}
             </h2>
 
             <p class="page-heading__description">
-                Consulta tus citas, pacientes y actividades clínicas.
+                Consulta tus próximas citas y el resumen
+                de tu actividad clínica.
             </p>
         </div>
     </section>
@@ -22,65 +24,175 @@
 
             <article class="card">
                 <div class="card__header">
-                    <h3 class="card__title">
-                        Próxima cita
-                    </h3>
+                    <div>
+                        <h3 class="card__title">
+                            Próxima cita
+                        </h3>
 
-                    <span class="badge badge--success">
-                        <span class="badge__dot" aria-hidden="true"></span>
-                        Confirmada
-                    </span>
+                        <p class="card__subtitle">
+                            Tu siguiente sesión programada.
+                        </p>
+                    </div>
+
+                    {% if next_appointment %}
+                        {% if next_appointment.status == "CONFIRMED" %}
+                            <span class="badge badge--success">
+                                <span
+                                    class="badge__dot"
+                                    aria-hidden="true"
+                                ></span>
+
+                                {{ next_appointment.get_status_display }}
+                            </span>
+                        {% else %}
+                            <span class="badge badge--warning">
+                                <span
+                                    class="badge__dot"
+                                    aria-hidden="true"
+                                ></span>
+
+                                {{ next_appointment.get_status_display }}
+                            </span>
+                        {% endif %}
+                    {% endif %}
                 </div>
 
                 <div class="card__body">
-                    <p>
-                        Aquí se mostrará la próxima cita programada.
-                    </p>
+                    {% if next_appointment %}
+                        <p>
+                            <strong>Paciente:</strong><br>
+                            {{ next_appointment.patient }}
+                        </p>
+
+                        <p>
+                            <strong>Fecha:</strong><br>
+                            {{ next_appointment.availability_slot.start_time|date:"d/m/Y" }}
+                        </p>
+
+                        <p>
+                            <strong>Horario:</strong><br>
+                            {{ next_appointment.availability_slot.start_time|time:"h:i A" }}
+                            -
+                            {{ next_appointment.availability_slot.end_time|time:"h:i A" }}
+                        </p>
+                    {% else %}
+                        <p>
+                            No tienes citas próximas programadas.
+                        </p>
+                    {% endif %}
                 </div>
 
                 <div class="card__footer">
-                    <a href="#" class="btn btn--primary btn--sm">
-                        Ver agenda
-                    </a>
+                    {% if next_appointment %}
+                        <a
+                            href="{% url 'psychologist-appointment-detail' next_appointment.public_id %}"
+                            class="btn btn--primary btn--sm"
+                        >
+                            Ver detalles
+                        </a>
+                    {% else %}
+                        <span class="text-muted">
+                            Sin citas próximas
+                        </span>
+                    {% endif %}
                 </div>
             </article>
 
             <article class="card card--soft">
                 <div class="card__header">
-                    <h3 class="card__title">
-                        Pacientes
-                    </h3>
+                    <div>
+                        <h3 class="card__title">
+                            Citas de hoy
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Sesiones pendientes para este día.
+                        </p>
+                    </div>
+
+                    {% if today_appointments_count %}
+                        <span class="badge badge--warning">
+                            {{ today_appointments_count }}
+                        </span>
+                    {% endif %}
                 </div>
 
                 <div class="card__body">
-                    <p>
-                        Consulta los pacientes vinculados a tus citas.
-                    </p>
+                    {% if today_appointments %}
+                        <p>
+                            Tienes
+                            <strong>
+                                {{ today_appointments_count }}
+                            </strong>
+
+                            {% if today_appointments_count == 1 %}
+                                cita pendiente hoy.
+                            {% else %}
+                                citas pendientes hoy.
+                            {% endif %}
+                        </p>
+
+                        {% with first_today_appointment=today_appointments.0 %}
+                            {% if first_today_appointment %}
+                                <p>
+                                    <strong>Próxima de hoy:</strong><br>
+                                    {{ first_today_appointment.availability_slot.start_time|time:"h:i A" }}
+                                    con
+                                    {{ first_today_appointment.patient }}
+                                </p>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        <p>
+                            No tienes citas pendientes para hoy.
+                        </p>
+                    {% endif %}
                 </div>
 
                 <div class="card__footer">
-                    <a href="#" class="btn btn--secondary btn--sm">
-                        Ver pacientes
+                    <a
+                        href="{% url 'psychologist-appointment-list' %}"
+                        class="btn btn--secondary btn--sm"
+                    >
+                        Ver agenda
                     </a>
                 </div>
             </article>
 
             <article class="card card--primary">
                 <div class="card__header">
-                    <h3 class="card__title">
-                        Asignaciones
-                    </h3>
+                    <div>
+                        <h3 class="card__title">
+                            Pacientes atendidos
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Pacientes con sesiones completadas.
+                        </p>
+                    </div>
                 </div>
 
                 <div class="card__body">
                     <p>
-                        Revisa las actividades terapéuticas asignadas.
+                        Has atendido a
+                        <strong>
+                            {{ attended_patients_count }}
+                        </strong>
+
+                        {% if attended_patients_count == 1 %}
+                            paciente.
+                        {% else %}
+                            pacientes.
+                        {% endif %}
                     </p>
                 </div>
 
                 <div class="card__footer">
-                    <a href="#" class="btn btn--outline btn--sm">
-                        Ver asignaciones
+                    <a
+                        href="{% url 'psychologist-patient-list' %}"
+                        class="btn btn--outline btn--sm"
+                    >
+                        Ver pacientes
                     </a>
                 </div>
             </article>

@@ -1,0 +1,301 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    {% if assignment %}
+        Editar asignación
+    {% else %}
+        Nueva asignación
+    {% endif %}
+    | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_assignment_form.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                {% if assignment %}
+                    Editar asignación
+                {% else %}
+                    Nueva asignación
+                {% endif %}
+            </h2>
+
+            <p class="page-heading__description">
+                Registra una actividad terapéutica para el paciente.
+            </p>
+        </div>
+
+        <div class="page-heading__actions">
+            <a
+                href="{% url 'psychologist-assignment-list' session_note.public_id %}"
+                class="btn btn--secondary"
+            >
+                Volver a las asignaciones
+            </a>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="psychologist-assignment-form">
+
+            <aside class="card psychologist-assignment-form__summary">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Datos de la sesión
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Paciente y cita asociada.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <div class="psychologist-assignment-form__info-list">
+                        <div>
+                            <span>Paciente</span>
+
+                            <strong>
+                                {{ patient.account.first_name }}
+                                {{ patient.account.last_name }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Fecha</span>
+
+                            <strong>
+                                {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Horario</span>
+
+                            <strong>
+                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                -
+                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                            </strong>
+                        </div>
+
+                        {% if assignment %}
+                            <div>
+                                <span>Respuesta del paciente</span>
+
+                                <strong>
+                                    {% if assignment.patient_response %}
+                                        {{ assignment.patient_response }}
+                                    {% else %}
+                                        Sin respuesta registrada
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% if assignment %}
+                        <div class="psychologist-assignment-form__attachments">
+                            <div class="psychologist-assignment-form__attachments-header">
+                                <h4>
+                                    Archivos adjuntos
+                                </h4>
+
+                                <a
+                                    href="{% url 'psychologist-assignment-attachment-upload' assignment.public_id %}"
+                                    class="btn btn--secondary psychologist-assignment-form__attachment-button"
+                                >
+                                    Adjuntar
+                                </a>
+                            </div>
+
+                            {% if attachments %}
+                                <div class="psychologist-assignment-form__attachment-list">
+                                    {% for attachment in attachments %}
+                                        <div class="psychologist-assignment-form__attachment-row">
+                                            <a
+                                                href="{{ attachment.file.url }}"
+                                                class="psychologist-assignment-form__attachment"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <span class="psychologist-assignment-form__attachment-icon">
+                                                    📎
+                                                </span>
+
+                                                <span class="psychologist-assignment-form__attachment-content">
+                                                    <strong>
+                                                        {% if attachment.original_name %}
+                                                            {{ attachment.original_name }}
+                                                        {% else %}
+                                                            {{ attachment.file.name }}
+                                                        {% endif %}
+                                                    </strong>
+
+                                                    <small>
+                                                        {{ attachment.get_uploaded_by_display }}
+                                                        ·
+                                                        {{ attachment.created_at|date:"d/m/Y h:i A" }}
+                                                    </small>
+                                                </span>
+                                            </a>
+
+                                            <form
+                                                method="post"
+                                                action="{% url 'psychologist-assignment-attachment-delete' attachment.id %}"
+                                                class="psychologist-assignment-form__attachment-delete-form"
+                                                onsubmit="return confirm('¿Deseas eliminar este archivo adjunto?');"
+                                            >
+                                                {% csrf_token %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="psychologist-assignment-form__attachment-delete"
+                                                    aria-label="Eliminar archivo {{ attachment.original_name }}"
+                                                    title="Eliminar archivo"
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="psychologist-assignment-form__empty">
+                                    No hay archivos adjuntos.
+                                </p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </aside>
+
+            <article class="card psychologist-assignment-form__card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Información de la asignación
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Completa las instrucciones y el estado.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div
+                                class="message message--danger"
+                                role="alert"
+                            >
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.title.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.title.label }}
+                            </label>
+
+                            {{ form.title }}
+
+                            {% for error in form.title.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.description.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.description.label }}
+                            </label>
+
+                            {{ form.description }}
+
+                            {% for error in form.description.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.status.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.status.label }}
+                            </label>
+
+                            {{ form.status }}
+
+                            {% for error in form.status.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.psychologist_comments.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.psychologist_comments.label }}
+                            </label>
+
+                            {{ form.psychologist_comments }}
+
+                            {% for error in form.psychologist_comments.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-actions">
+                            <a
+                                href="{% url 'psychologist-assignment-list' session_note.public_id %}"
+                                class="btn btn--secondary"
+                            >
+                                Cancelar
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn--primary"
+                            >
+                                {% if assignment %}
+                                    Guardar cambios
+                                {% else %}
+                                    Crear asignación
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Mis pacientes | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_patient_list.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Mis pacientes
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta los pacientes vinculados a tus citas.
+            </p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        {% if patients %}
+            <div class="psychologist-patient-grid">
+                {% for patient in patients %}
+                    <article class="card psychologist-patient-card">
+                        <div class="card__header">
+                            <div class="psychologist-patient-card__identity">
+                                <span
+                                    class="psychologist-patient-card__avatar"
+                                    aria-hidden="true"
+                                >
+                                    {% if patient.account.first_name %}
+                                        {{ patient.account.first_name|first|upper }}
+                                    {% else %}
+                                        P
+                                    {% endif %}
+                                </span>
+
+                                <div>
+                                    <h3 class="card__title">
+                                        {{ patient.account.first_name }}
+                                        {{ patient.account.last_name }}
+                                    </h3>
+
+                                    <p class="card__subtitle">
+                                        Paciente
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card__body">
+                            <div class="psychologist-patient-card__meta">
+                                <p>
+                                    <span>Correo</span>
+
+                                    <strong>
+                                        {{ patient.account.email }}
+                                    </strong>
+                                </p>
+
+                                {% if patient.phone %}
+                                    <p>
+                                        <span>Teléfono</span>
+
+                                        <strong>
+                                            {{ patient.phone }}
+                                        </strong>
+                                    </p>
+                                {% endif %}
+
+                                {% if patient.birth_date %}
+                                    <p>
+                                        <span>Fecha de nacimiento</span>
+
+                                        <strong>
+                                            {{ patient.birth_date|date:"d/m/Y" }}
+                                        </strong>
+                                    </p>
+                                {% endif %}
+
+                                {% if patient.gender %}
+                                    <p>
+                                        <span>Género</span>
+
+                                        <strong>
+                                            {{ patient.get_gender_display }}
+                                        </strong>
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="card__footer">
+                            <a
+                                href="{% url 'psychologist-patient-detail' patient.public_id %}"
+                                class="btn btn--primary btn--sm"
+                            >
+                                Ver paciente
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3 class="empty-state__title">
+                    No tienes pacientes vinculados
+                </h3>
+
+                <p class="empty-state__description">
+                    Los pacientes aparecerán aquí cuando tengan
+                    una cita asignada contigo.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

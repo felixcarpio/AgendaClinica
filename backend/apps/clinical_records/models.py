@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from apps.appointments.models import Appointment
 from apps.patients.models import Patient
-
+import uuid
 
 class ClinicalRecord(models.Model):
     """
@@ -114,12 +114,19 @@ class ClinicalRecord(models.Model):
 
 class SessionNote(models.Model):
     """
-    Representa una nota clínica elaborada por el psicólogo después
+    Representa la nota clínica elaborada por el psicólogo después
     de atender una sesión con el paciente.
 
     Cada nota pertenece a un expediente clínico y a una cita
-    específica. Una misma cita puede tener varias notas asociadas.
+    específica. Cada cita completada puede tener una única nota
+    de sesión.
     """
+    
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
 
     clinical_record = models.ForeignKey(
         ClinicalRecord,
@@ -128,10 +135,10 @@ class SessionNote(models.Model):
         verbose_name="Expediente clínico",
     )
 
-    appointment = models.ForeignKey(
+    appointment = models.OneToOneField(
         Appointment,
         on_delete=models.PROTECT,
-        related_name="session_notes",
+        related_name="session_note",
         verbose_name="Cita",
     )
 

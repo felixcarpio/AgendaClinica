@@ -1,0 +1,220 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Asignaciones de la sesión | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_assignment_list.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Asignaciones de la sesión
+            </h2>
+
+            <p class="page-heading__description">
+                Gestiona las actividades asignadas al paciente.
+            </p>
+        </div>
+
+        <div class="page-heading__actions">
+            <a
+                href="{% url 'psychologist-assignment-create' session_note.public_id %}"
+                class="btn btn--primary"
+            >
+                Nueva asignación
+            </a>
+
+            <a
+                href="{% url 'psychologist-session-note-manage' appointment.public_id %}"
+                class="btn btn--secondary"
+            >
+                Volver a la nota
+            </a>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="psychologist-assignment-list">
+
+            <article class="card psychologist-assignment-list__session">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Datos de la sesión
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Información general del paciente y de la cita.
+                        </p>
+                    </div>
+
+                    <span class="badge badge--neutral">
+                        {{ assignments|length }}
+                        {% if assignments|length == 1 %}
+                            asignación
+                        {% else %}
+                            asignaciones
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="card__body">
+                    <div class="psychologist-assignment-list__session-grid">
+                        <div>
+                            <span>Paciente</span>
+
+                            <strong>
+                                {{ patient.account.first_name }}
+                                {{ patient.account.last_name }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Fecha</span>
+
+                            <strong>
+                                {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Horario</span>
+
+                            <strong>
+                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                -
+                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Estado de la cita</span>
+
+                            <strong>
+                                {{ appointment.get_status_display }}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            {% if assignments %}
+                <div class="psychologist-assignment-list__grid">
+                    {% for assignment in assignments %}
+                        <article class="card psychologist-assignment-card">
+                            <div class="card__header">
+                                <div>
+                                    <h3 class="card__title">
+                                        {{ assignment.title }}
+                                    </h3>
+
+                                    <p class="card__subtitle">
+                                        Creada el
+                                        {{ assignment.created_at|date:"d/m/Y h:i A" }}
+                                    </p>
+                                </div>
+
+                                {% if assignment.status == "PENDING" %}
+                                    <span class="badge badge--warning">
+                                        {{ assignment.get_status_display }}
+                                    </span>
+                                {% elif assignment.status == "IN_PROGRESS" %}
+                                    <span class="badge badge--neutral">
+                                        {{ assignment.get_status_display }}
+                                    </span>
+                                {% elif assignment.status == "COMPLETED" %}
+                                    <span class="badge badge--success">
+                                        {{ assignment.get_status_display }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge--neutral">
+                                        {{ assignment.get_status_display }}
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="card__body">
+                                <section class="psychologist-assignment-card__section">
+                                    <h4>
+                                        Descripción
+                                    </h4>
+
+                                    <div>
+                                        {{ assignment.description|linebreaks }}
+                                    </div>
+                                </section>
+
+                                {% if assignment.psychologist_comments %}
+                                    <section class="psychologist-assignment-card__section">
+                                        <h4>
+                                            Comentarios del psicólogo
+                                        </h4>
+
+                                        <div>
+                                            {{ assignment.psychologist_comments|linebreaks }}
+                                        </div>
+                                    </section>
+                                {% endif %}
+
+                                {% if assignment.patient_response %}
+                                    <section class="psychologist-assignment-card__section">
+                                        <h4>
+                                            Respuesta del paciente
+                                        </h4>
+
+                                        <div>
+                                            {{ assignment.patient_response|linebreaks }}
+                                        </div>
+                                    </section>
+                                {% endif %}
+
+                                {% if assignment.completed_at %}
+                                    <p class="psychologist-assignment-card__completed">
+                                        Completada:
+                                        {{ assignment.completed_at|date:"d/m/Y h:i A" }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <div class="card__footer">
+                                <a
+                                    href="{% url 'psychologist-assignment-edit' assignment.public_id %}"
+                                    class="btn btn--primary btn--sm"
+                                >
+                                    Editar asignación
+                                </a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3 class="empty-state__title">
+                        No hay asignaciones
+                    </h3>
+
+                    <p class="empty-state__description">
+                        Crea una actividad para dar seguimiento
+                        al proceso terapéutico del paciente.
+                    </p>
+
+                    <a
+                        href="{% url 'psychologist-assignment-create' session_note.public_id %}"
+                        class="btn btn--primary"
+                    >
+                        Crear primera asignación
+                    </a>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+{% endblock %}

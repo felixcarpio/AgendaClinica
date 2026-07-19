@@ -1,0 +1,393 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Detalle de la cita | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_appointment_detail.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Detalle de la cita
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta la información de la sesión y su nota clínica.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'psychologist-appointment-list' %}"
+            class="btn btn--secondary"
+        >
+            Volver a mi Agenda
+        </a>
+    </section>
+
+    <section class="content-section">
+        <div class="psychologist-appointment-detail">
+
+            <article class="card psychologist-appointment-detail__card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Información de la cita
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Datos principales de la sesión.
+                        </p>
+                    </div>
+
+                    {% if appointment.status == "CONFIRMED" %}
+                        <span class="badge badge--success">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    {% elif appointment.status == "PENDING" %}
+                        <span class="badge badge--warning">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    {% elif appointment.status == "COMPLETED" %}
+                        <span class="badge badge--success">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    {% else %}
+                        <span class="badge badge--neutral">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="card__body">
+                    <div class="appointment-detail__info-grid">
+                        <div class="appointment-detail__info-item">
+                            <span class="appointment-detail__label">
+                                Fecha
+                            </span>
+
+                            <strong class="appointment-detail__value">
+                                {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                            </strong>
+                        </div>
+
+                        <div class="appointment-detail__info-item">
+                            <span class="appointment-detail__label">
+                                Horario
+                            </span>
+
+                            <strong class="appointment-detail__value">
+                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                -
+                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                            </strong>
+                        </div>
+
+                        <div class="appointment-detail__info-item">
+                            <span class="appointment-detail__label">
+                                Tipo de atención
+                            </span>
+
+                            <strong class="appointment-detail__value">
+                                {{ appointment.get_appointment_type_display }}
+                            </strong>
+                        </div>
+
+                        <div class="appointment-detail__info-item">
+                            <span class="appointment-detail__label">
+                                Estado
+                            </span>
+
+                            <strong class="appointment-detail__value">
+                                {{ appointment.get_status_display }}
+                            </strong>
+                        </div>
+                    </div>
+
+                    {% if appointment.reason %}
+                        <section class="appointment-detail__section">
+                            <h4 class="appointment-detail__section-title">
+                                Motivo de consulta
+                            </h4>
+
+                            <div class="appointment-detail__section-content">
+                                {{ appointment.reason|linebreaks }}
+                            </div>
+                        </section>
+                    {% endif %}
+
+                    {% if appointment.administrative_notes %}
+                        <section class="appointment-detail__section">
+                            <h4 class="appointment-detail__section-title">
+                                Observaciones administrativas
+                            </h4>
+
+                            <div class="appointment-detail__section-content">
+                                {{ appointment.administrative_notes|linebreaks }}
+                            </div>
+                        </section>
+                    {% endif %}
+
+                    {% if appointment.status == "PENDING" or appointment.status == "CONFIRMED" %}
+                        <section class="appointment-detail__section">
+                            <h4 class="appointment-detail__section-title">
+                                Gestionar estado
+                            </h4>
+
+                            <form method="post" novalidate>
+                                {% csrf_token %}
+
+                                {% if form.non_field_errors %}
+                                    <div
+                                        class="message message--danger"
+                                        role="alert"
+                                    >
+                                        {{ form.non_field_errors }}
+                                    </div>
+                                {% endif %}
+
+                                <div class="form-group">
+                                    <label
+                                        for="{{ form.status.id_for_label }}"
+                                        class="form-label"
+                                    >
+                                        {{ form.status.label }}
+                                    </label>
+
+                                    {{ form.status }}
+
+                                    {% for error in form.status.errors %}
+                                        <p class="form-error">
+                                            {{ error }}
+                                        </p>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="form-actions">
+                                    <button
+                                        type="submit"
+                                        class="btn btn--primary"
+                                    >
+                                        Guardar estado
+                                    </button>
+                                </div>
+                            </form>
+                        </section>
+
+                    {% elif appointment.status == "COMPLETED" %}
+                        <section class="appointment-detail__section">
+                            <h4 class="appointment-detail__section-title">
+                                Sesión finalizada
+                            </h4>
+
+                            <p class="appointment-detail__status-message">
+                                Esta cita ya fue completada y su estado
+                                no puede modificarse.
+                            </p>
+                        </section>
+
+                    {% elif appointment.status == "CANCELLED" %}
+                        <section class="appointment-detail__section">
+                            <h4 class="appointment-detail__section-title">
+                                Cita cancelada
+                            </h4>
+
+                            <p class="appointment-detail__status-message">
+                                Esta cita fue cancelada y su estado
+                                no puede modificarse.
+                            </p>
+
+                            {% if appointment.cancelled_reason %}
+                                <div class="appointment-detail__cancelled-reason">
+                                    <strong>
+                                        Motivo de cancelación
+                                    </strong>
+
+                                    <div class="appointment-detail__section-content">
+                                        {{ appointment.cancelled_reason|linebreaks }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </section>
+                    {% endif %}
+                </div>
+            </article>
+
+            <div class="psychologist-appointment-detail__side-column">
+                {% if session_note %}
+                    <article class="card card--soft psychologist-appointment-detail__note-card">
+                        <div class="card__header">
+                            <div>
+                                <h3 class="card__title">
+                                    Nota clínica
+                                </h3>
+
+                                <p class="card__subtitle">
+                                    Resumen registrado durante la sesión.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="card__body">
+                            <section class="appointment-note-summary__section">
+                                <h4 class="appointment-note-summary__title">
+                                    Resumen de la sesión
+                                </h4>
+
+                                <div class="appointment-note-summary__content">
+                                    {{ session_note.session_summary|linebreaks }}
+                                </div>
+                            </section>
+
+                            {% if session_note.observations %}
+                                <section class="appointment-note-summary__section">
+                                    <h4 class="appointment-note-summary__title">
+                                        Observaciones
+                                    </h4>
+
+                                    <div class="appointment-note-summary__content">
+                                        {{ session_note.observations|linebreaks }}
+                                    </div>
+                                </section>
+                            {% endif %}
+
+                            {% if session_note.interventions %}
+                                <section class="appointment-note-summary__section">
+                                    <h4 class="appointment-note-summary__title">
+                                        Técnicas o intervenciones
+                                    </h4>
+
+                                    <div class="appointment-note-summary__content">
+                                        {{ session_note.interventions|linebreaks }}
+                                    </div>
+                                </section>
+                            {% endif %}
+
+                            {% if session_note.homework %}
+                                <section class="appointment-note-summary__section">
+                                    <h4 class="appointment-note-summary__title">
+                                        Tareas asignadas
+                                    </h4>
+
+                                    <div class="appointment-note-summary__content">
+                                        {{ session_note.homework|linebreaks }}
+                                    </div>
+                                </section>
+                            {% endif %}
+
+                            {% if session_note.next_session_plan %}
+                                <section class="appointment-note-summary__section">
+                                    <h4 class="appointment-note-summary__title">
+                                        Plan para la siguiente sesión
+                                    </h4>
+
+                                    <div class="appointment-note-summary__content">
+                                        {{ session_note.next_session_plan|linebreaks }}
+                                    </div>
+                                </section>
+                            {% endif %}
+
+                            <div class="appointment-note-summary__meta">
+                                Última actualización:
+                                {{ session_note.updated_at|date:"d/m/Y h:i A" }}
+                            </div>
+
+                            <div class="appointment-note-summary__actions">
+                                <a
+                                    href="{% url 'psychologist-session-note-manage' appointment.public_id %}"
+                                    class="btn btn--primary"
+                                >
+                                    Editar nota
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                {% else %}
+                    <aside class="card card--soft psychologist-appointment-detail__patient-summary">
+                        <div class="card__header">
+                            <div>
+                                <h3 class="card__title">
+                                    Paciente
+                                </h3>
+
+                                <p class="card__subtitle">
+                                    Información básica.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="card__body">
+                            <div class="appointment-patient-summary">
+                                <div class="appointment-patient-summary__identity">
+                                    <span
+                                        class="appointment-patient-summary__avatar"
+                                        aria-hidden="true"
+                                    >
+                                        {% if appointment.patient.account.first_name %}
+                                            {{ appointment.patient.account.first_name|first|upper }}
+                                        {% else %}
+                                            P
+                                        {% endif %}
+                                    </span>
+
+                                    <div>
+                                        <strong>
+                                            {{ appointment.patient.account.first_name }}
+                                            {{ appointment.patient.account.last_name }}
+                                        </strong>
+
+                                        <span>
+                                            {{ appointment.patient.account.email }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {% if appointment.patient.phone %}
+                                    <div class="appointment-patient-summary__item">
+                                        <span>
+                                            Teléfono
+                                        </span>
+
+                                        <strong>
+                                            {{ appointment.patient.phone }}
+                                        </strong>
+                                    </div>
+                                {% endif %}
+
+                                {% if appointment.patient.birth_date %}
+                                    <div class="appointment-patient-summary__item">
+                                        <span>
+                                            Fecha de nacimiento
+                                        </span>
+
+                                        <strong>
+                                            {{ appointment.patient.birth_date|date:"d/m/Y" }}
+                                        </strong>
+                                    </div>
+                                {% endif %}
+
+                                <div class="appointment-patient-summary__actions">
+                                    <a
+                                        href="{% url 'psychologist-patient-detail' appointment.patient.public_id %}"
+                                        class="btn btn--outline btn--sm"
+                                    >
+                                        Ver paciente
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                {% endif %}
+            </div>
+
+        </div>
+    </section>
+{% endblock %}

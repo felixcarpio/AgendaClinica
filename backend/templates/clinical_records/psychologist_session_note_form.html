@@ -1,0 +1,288 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Nota de sesión | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_session_note_form.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Nota de sesión
+            </h2>
+
+            <p class="page-heading__description">
+                Registra la información clínica correspondiente a la sesión.
+            </p>
+        </div>
+
+        <div class="page-heading__actions">
+            {% if session_note %}
+                <a
+                    href="{% url 'psychologist-assignment-list' session_note.public_id %}"
+                    class="btn btn--primary"
+                >
+                    Gestionar asignaciones
+                </a>
+            {% endif %}
+
+            <a
+                href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                class="btn btn--secondary"
+            >
+                Volver a la cita
+            </a>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="psychologist-session-note">
+
+            <aside class="card psychologist-session-note__summary">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Datos de la sesión
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Información general de la cita y del paciente.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <div class="psychologist-session-note__info-list">
+                        <div class="psychologist-session-note__info-item">
+                            <span>Paciente</span>
+
+                            <strong>
+                                {{ patient.account.first_name }}
+                                {{ patient.account.last_name }}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-session-note__info-item">
+                            <span>Correo</span>
+
+                            <strong>
+                                {{ patient.account.email }}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-session-note__info-item">
+                            <span>Fecha</span>
+
+                            <strong>
+                                {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-session-note__info-item">
+                            <span>Horario</span>
+
+                            <strong>
+                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                -
+                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-session-note__info-item">
+                            <span>Tipo de atención</span>
+
+                            <strong>
+                                {{ appointment.get_appointment_type_display }}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-session-note__info-item">
+                            <span>Estado</span>
+
+                            <strong>
+                                {{ appointment.get_status_display }}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <article class="card psychologist-session-note__form-card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            {% if session_note %}
+                                Editar nota clínica
+                            {% else %}
+                                Registrar nota clínica
+                            {% endif %}
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Completa la información relevante de la sesión.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div
+                                class="message message--danger"
+                                role="alert"
+                            >
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.session_summary.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.session_summary.label }}
+                            </label>
+
+                            {{ form.session_summary }}
+
+                            {% if form.session_summary.help_text %}
+                                <p class="form-help">
+                                    {{ form.session_summary.help_text }}
+                                </p>
+                            {% endif %}
+
+                            {% for error in form.session_summary.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.observations.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.observations.label }}
+                            </label>
+
+                            {{ form.observations }}
+
+                            {% if form.observations.help_text %}
+                                <p class="form-help">
+                                    {{ form.observations.help_text }}
+                                </p>
+                            {% endif %}
+
+                            {% for error in form.observations.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.interventions.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.interventions.label }}
+                            </label>
+
+                            {{ form.interventions }}
+
+                            {% if form.interventions.help_text %}
+                                <p class="form-help">
+                                    {{ form.interventions.help_text }}
+                                </p>
+                            {% endif %}
+
+                            {% for error in form.interventions.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.homework.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.homework.label }}
+                            </label>
+
+                            {{ form.homework }}
+
+                            {% if form.homework.help_text %}
+                                <p class="form-help">
+                                    {{ form.homework.help_text }}
+                                </p>
+                            {% endif %}
+
+                            {% for error in form.homework.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.next_session_plan.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.next_session_plan.label }}
+                            </label>
+
+                            {{ form.next_session_plan }}
+
+                            {% if form.next_session_plan.help_text %}
+                                <p class="form-help">
+                                    {{ form.next_session_plan.help_text }}
+                                </p>
+                            {% endif %}
+
+                            {% for error in form.next_session_plan.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-actions">
+                            <a
+                                href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                                class="btn btn--secondary"
+                            >
+                                Cancelar
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn--primary"
+                            >
+                                {% if session_note %}
+                                    Guardar cambios
+                                {% else %}
+                                    Registrar nota
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+
+        </div>
+    </section>
+{% endblock %}

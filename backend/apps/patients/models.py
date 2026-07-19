@@ -2,6 +2,7 @@
 from django.db import models
 from apps.accounts.models import Account
 from django.core.exceptions import ValidationError
+import uuid
 
 
 class Patient(models.Model):
@@ -10,6 +11,12 @@ class Patient(models.Model):
         FEMALE = "FEMALE", "Femenino"
         OTHER = "OTHER", "Otro"
         PREFER_NOT_TO_SAY = "PREFER_NOT_TO_SAY", "Prefiero no decirlo"
+
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
 
     account = models.OneToOneField(
         Account,

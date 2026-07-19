@@ -1,0 +1,172 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Adjuntar archivo | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_assignment_attachment_form.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Adjuntar archivo
+            </h2>
+
+            <p class="page-heading__description">
+                Agrega material de apoyo para la asignación del paciente.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'psychologist-assignment-edit' assignment.public_id %}"
+            class="btn btn--secondary"
+        >
+            Volver a la asignación
+        </a>
+    </section>
+
+    <section class="content-section">
+        <div class="psychologist-assignment-attachment-form">
+
+            <aside class="card psychologist-assignment-attachment-form__summary">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Datos de la asignación
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Información asociada al archivo.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <div class="psychologist-assignment-attachment-form__info-list">
+                        <div>
+                            <span>Paciente</span>
+
+                            <strong>
+                                {{ patient.account.first_name }}
+                                {{ patient.account.last_name }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Asignación</span>
+
+                            <strong>
+                                {{ assignment.title }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Fecha de la sesión</span>
+
+                            <strong>
+                                {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Estado</span>
+
+                            <strong>
+                                {{ assignment.get_status_display }}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <article class="card psychologist-assignment-attachment-form__card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Seleccionar archivo
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Formatos permitidos: PDF, Word, TXT, JPG y PNG.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <form
+                        method="post"
+                        enctype="multipart/form-data"
+                        novalidate
+                    >
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div
+                                class="message message--danger"
+                                role="alert"
+                            >
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.file.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.file.label }}
+                            </label>
+
+                            {{ form.file }}
+
+                            <p class="form-help">
+                                Tamaño máximo permitido: 10 MB.
+                            </p>
+
+                            {% for error in form.file.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="psychologist-assignment-attachment-form__notice">
+                            <strong>
+                                Material visible para el paciente
+                            </strong>
+
+                            <p>
+                                El archivo quedará asociado a esta asignación
+                                y podrá consultarse desde el portal del paciente.
+                            </p>
+                        </div>
+
+                        <div class="form-actions">
+                            <a
+                                href="{% url 'psychologist-assignment-edit' assignment.public_id %}"
+                                class="btn btn--secondary"
+                            >
+                                Cancelar
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn--primary"
+                            >
+                                Adjuntar archivo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+
+        </div>
+    </section>
+{% endblock %}

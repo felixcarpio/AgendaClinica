@@ -1,0 +1,351 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Editar expediente clínico | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_clinical_record_form.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Editar expediente clínico
+            </h2>
+
+            <p class="page-heading__description">
+                Actualiza la información general del proceso terapéutico.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'psychologist-clinical-record-detail' patient.public_id %}"
+            class="btn btn--secondary"
+        >
+            Volver al expediente
+        </a>
+    </section>
+
+    <section class="content-section">
+        <div class="psychologist-clinical-record-form">
+
+            <aside class="card psychologist-clinical-record-form__patient">
+                <div class="card__header">
+                    <div class="psychologist-clinical-record-form__identity">
+                        <span
+                            class="psychologist-clinical-record-form__avatar"
+                            aria-hidden="true"
+                        >
+                            {% if patient.account.first_name %}
+                                {{ patient.account.first_name|first|upper }}
+                            {% else %}
+                                P
+                            {% endif %}
+                        </span>
+
+                        <div>
+                            <h3 class="card__title">
+                                {{ patient.account.first_name }}
+                                {{ patient.account.last_name }}
+                            </h3>
+
+                            <p class="card__subtitle">
+                                Paciente asociado al expediente.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <div class="psychologist-clinical-record-form__patient-info">
+                        <div>
+                            <span>Correo</span>
+                            <strong>{{ patient.account.email }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Teléfono</span>
+                            <strong>
+                                {% if patient.phone %}
+                                    {{ patient.phone }}
+                                {% else %}
+                                    No registrado
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Fecha de nacimiento</span>
+                            <strong>
+                                {% if patient.birth_date %}
+                                    {{ patient.birth_date|date:"d/m/Y" }}
+                                {% else %}
+                                    No registrada
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Última actualización</span>
+                            <strong>
+                                {{ clinical_record.updated_at|date:"d/m/Y h:i A" }}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <article class="card psychologist-clinical-record-form__card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Información clínica
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Completa únicamente la información relevante.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div
+                                class="message message--danger"
+                                role="alert"
+                            >
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <section class="clinical-record-form-section">
+                            <div class="clinical-record-form-section__header">
+                                <h4>Información inicial</h4>
+
+                                <p>
+                                    Motivo de consulta, evaluación y objetivos.
+                                </p>
+                            </div>
+
+                            <div class="form-group">
+                                <label
+                                    for="{{ form.chief_complaint.id_for_label }}"
+                                    class="form-label"
+                                >
+                                    {{ form.chief_complaint.label }}
+                                </label>
+
+                                {{ form.chief_complaint }}
+
+                                {% if form.chief_complaint.help_text %}
+                                    <p class="form-help">
+                                        {{ form.chief_complaint.help_text }}
+                                    </p>
+                                {% endif %}
+
+                                {% for error in form.chief_complaint.errors %}
+                                    <p class="form-error">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group">
+                                <label
+                                    for="{{ form.initial_assessment.id_for_label }}"
+                                    class="form-label"
+                                >
+                                    {{ form.initial_assessment.label }}
+                                </label>
+
+                                {{ form.initial_assessment }}
+
+                                {% if form.initial_assessment.help_text %}
+                                    <p class="form-help">
+                                        {{ form.initial_assessment.help_text }}
+                                    </p>
+                                {% endif %}
+
+                                {% for error in form.initial_assessment.errors %}
+                                    <p class="form-error">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group">
+                                <label
+                                    for="{{ form.therapeutic_objectives.id_for_label }}"
+                                    class="form-label"
+                                >
+                                    {{ form.therapeutic_objectives.label }}
+                                </label>
+
+                                {{ form.therapeutic_objectives }}
+
+                                {% if form.therapeutic_objectives.help_text %}
+                                    <p class="form-help">
+                                        {{ form.therapeutic_objectives.help_text }}
+                                    </p>
+                                {% endif %}
+
+                                {% for error in form.therapeutic_objectives.errors %}
+                                    <p class="form-error">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </section>
+
+                        <section class="clinical-record-form-section">
+                            <div class="clinical-record-form-section__header">
+                                <h4>Antecedentes</h4>
+
+                                <p>
+                                    Información personal, familiar y médica.
+                                </p>
+                            </div>
+
+                            <div class="clinical-record-form-grid">
+                                <div class="form-group">
+                                    <label
+                                        for="{{ form.personal_history.id_for_label }}"
+                                        class="form-label"
+                                    >
+                                        {{ form.personal_history.label }}
+                                    </label>
+
+                                    {{ form.personal_history }}
+
+                                    {% if form.personal_history.help_text %}
+                                        <p class="form-help">
+                                            {{ form.personal_history.help_text }}
+                                        </p>
+                                    {% endif %}
+
+                                    {% for error in form.personal_history.errors %}
+                                        <p class="form-error">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label
+                                        for="{{ form.family_history.id_for_label }}"
+                                        class="form-label"
+                                    >
+                                        {{ form.family_history.label }}
+                                    </label>
+
+                                    {{ form.family_history }}
+
+                                    {% if form.family_history.help_text %}
+                                        <p class="form-help">
+                                            {{ form.family_history.help_text }}
+                                        </p>
+                                    {% endif %}
+
+                                    {% for error in form.family_history.errors %}
+                                        <p class="form-error">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label
+                                        for="{{ form.medical_history.id_for_label }}"
+                                        class="form-label"
+                                    >
+                                        {{ form.medical_history.label }}
+                                    </label>
+
+                                    {{ form.medical_history }}
+
+                                    {% if form.medical_history.help_text %}
+                                        <p class="form-help">
+                                            {{ form.medical_history.help_text }}
+                                        </p>
+                                    {% endif %}
+
+                                    {% for error in form.medical_history.errors %}
+                                        <p class="form-error">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label
+                                        for="{{ form.current_medication.id_for_label }}"
+                                        class="form-label"
+                                    >
+                                        {{ form.current_medication.label }}
+                                    </label>
+
+                                    {{ form.current_medication }}
+
+                                    {% if form.current_medication.help_text %}
+                                        <p class="form-help">
+                                            {{ form.current_medication.help_text }}
+                                        </p>
+                                    {% endif %}
+
+                                    {% for error in form.current_medication.errors %}
+                                        <p class="form-error">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="clinical-record-form-section">
+                            <div class="clinical-record-form-section__header">
+                                <h4>Observaciones generales</h4>
+
+                                <p>
+                                    Información adicional del proceso terapéutico.
+                                </p>
+                            </div>
+
+                            <div class="form-group">
+                                <label
+                                    for="{{ form.general_observations.id_for_label }}"
+                                    class="form-label"
+                                >
+                                    {{ form.general_observations.label }}
+                                </label>
+
+                                {{ form.general_observations }}
+
+                                {% if form.general_observations.help_text %}
+                                    <p class="form-help">
+                                        {{ form.general_observations.help_text }}
+                                    </p>
+                                {% endif %}
+
+                                {% for error in form.general_observations.errors %}
+                                    <p class="form-error">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </section>
+
+                        <div class="form-actions">
+                            <a
+                                href="{% url 'psychologist-clinical-record-detail' patient.public_id %}"
+                                class="btn btn--secondary"
+                            >
+                                Cancelar
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn--primary"
+                            >
+                                Guardar cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+
+        </div>
+    </section>
+{% endblock %}

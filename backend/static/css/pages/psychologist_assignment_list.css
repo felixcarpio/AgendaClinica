@@ -1,0 +1,113 @@
+.psychologist-assignment-list {
+    display: grid;
+    gap: var(--spacing-5);
+}
+
+.psychologist-assignment-list__session {
+    width: 100%;
+}
+
+.psychologist-assignment-list__session-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--spacing-4);
+}
+
+.psychologist-assignment-list__session-grid > div {
+    display: grid;
+    gap: var(--spacing-1);
+    min-width: 0;
+}
+
+.psychologist-assignment-list__session-grid span {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.psychologist-assignment-list__session-grid strong {
+    overflow-wrap: anywhere;
+}
+
+.psychologist-assignment-list__grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(320px, 1fr)
+    );
+    gap: var(--spacing-5);
+}
+
+.psychologist-assignment-card {
+    height: 100%;
+}
+
+.psychologist-assignment-card .card__body {
+    flex: 1;
+}
+
+.psychologist-assignment-card__section + .psychologist-assignment-card__section {
+    margin-top: var(--spacing-4);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.psychologist-assignment-card__section h4 {
+    margin: 0 0 var(--spacing-2);
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+}
+
+.psychologist-assignment-card__section div {
+    color: var(--text-muted);
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.psychologist-assignment-card__section p {
+    margin: 0;
+}
+
+.psychologist-assignment-card__section p + p {
+    margin-top: var(--spacing-2);
+}
+
+.psychologist-assignment-card__completed {
+    margin: var(--spacing-4) 0 0;
+    padding-top: var(--spacing-3);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+}
+
+.page-heading__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+    .psychologist-assignment-list__session-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .psychologist-assignment-list__session-grid,
+    .psychologist-assignment-list__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-heading__actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .page-heading__actions .btn,
+    .psychologist-assignment-card .card__footer .btn {
+        width: 100%;
+    }
+}

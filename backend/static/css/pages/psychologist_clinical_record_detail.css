@@ -1,0 +1,231 @@
+.psychologist-clinical-record {
+    display: grid;
+    gap: var(--spacing-5);
+}
+
+.psychologist-clinical-record__patient-card,
+.psychologist-clinical-record__observations-card,
+.psychologist-clinical-record__notes-card {
+    width: 100%;
+}
+
+.psychologist-clinical-record__identity {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.psychologist-clinical-record__avatar {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    color: var(--primary-color);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+}
+
+.psychologist-clinical-record__patient-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--spacing-4);
+}
+
+.psychologist-clinical-record__info-item {
+    display: grid;
+    gap: var(--spacing-1);
+    min-width: 0;
+}
+
+.psychologist-clinical-record__label {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.psychologist-clinical-record__value {
+    overflow-wrap: anywhere;
+}
+
+.psychologist-clinical-record__record-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-5);
+    align-items: stretch;
+}
+
+.psychologist-clinical-record__section-card {
+    width: 100%;
+    height: 100%;
+}
+
+.clinical-record-field + .clinical-record-field {
+    margin-top: var(--spacing-5);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.clinical-record-field__title {
+    margin: 0 0 var(--spacing-2);
+    font-size: var(--font-size-base);
+    line-height: 1.4;
+}
+
+.clinical-record-field__content {
+    color: var(--text-muted);
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.clinical-record-field__content p {
+    margin: 0;
+}
+
+.clinical-record-field__content p + p {
+    margin-top: var(--spacing-2);
+}
+
+.clinical-record-field__empty {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.clinical-record-note-list {
+    display: grid;
+    gap: var(--spacing-4);
+}
+
+.clinical-record-note {
+    padding: var(--spacing-5);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--surface-color);
+}
+
+.clinical-record-note__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+}
+
+.clinical-record-note__title {
+    margin: 0;
+    font-size: var(--font-size-base);
+}
+
+.clinical-record-note__time {
+    margin: var(--spacing-1) 0 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.clinical-record-note__section {
+    margin-top: var(--spacing-4);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.clinical-record-note__section-title {
+    margin: 0 0 var(--spacing-2);
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+}
+
+.clinical-record-note__content {
+    color: var(--text-muted);
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.clinical-record-note__content p {
+    margin: 0;
+}
+
+.clinical-record-note__content p + p {
+    margin-top: var(--spacing-2);
+}
+
+.clinical-record-note__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    margin-top: var(--spacing-5);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.clinical-record-note__footer > span {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+}
+
+.clinical-record-note__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
+}
+
+.psychologist-clinical-record__updated {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-align: right;
+}
+
+.page-heading__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+}
+
+@media (max-width: 1100px) {
+    .psychologist-clinical-record__patient-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .psychologist-clinical-record__record-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .psychologist-clinical-record__patient-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .clinical-record-note__header,
+    .clinical-record-note__footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .clinical-record-note__actions {
+        width: 100%;
+    }
+
+    .clinical-record-note__actions .btn {
+        flex: 1;
+    }
+
+    .page-heading__actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .page-heading__actions .btn {
+        width: 100%;
+    }
+
+    .psychologist-clinical-record__updated {
+        text-align: left;
+    }
+}

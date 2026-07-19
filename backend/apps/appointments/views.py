@@ -11,6 +11,7 @@ from django.utils.dateparse import parse_date
 from apps.appointments.forms import (
     PatientAppointmentCancellationForm,
     PatientAppointmentConfirmationForm,
+    PsychologistAppointmentStatusForm,
 )
 from apps.patients.models import Patient
 from apps.appointments.models import Appointment
@@ -795,5 +796,134 @@ def patient_appointment_reschedule_confirm(
     return render(
         request,
         "appointments/patient_appointment_reschedule_confirm.html",
+        context,
+    )
+    
+@login_required
+def psychologist_appointment_list(request):
+    """
+    Muestra las citas asignadas al psicólogo autenticado.
+
+    Se separan en:
+    - citas próximas;
+    - citas completadas.
+    """
+
+    if request.user.role != "PSYCHOLOGIST":
+        return redirect("dashboard-redirect")
+
+    now = timezone.now()
+
+    appointments = (
+        Appointment.objects
+        .filter(
+            psychologist__account=request.user,
+        )
+        .select_related(
+            "patient",
+            "patient__account",
+            "psychologist",
+            "availability_slot",
+        )
+    )
+
+    upcoming_appointments = (
+        appointments
+        .filter(
+            status__in=[
+                Appointment.Status.PENDING,
+                Appointment.Status.CONFIRMED,
+            ],
+            availability_slot__start_time__gte=now,
+        )
+        .order_by(
+            "availability_slot__start_time",
+        )
+    )
+
+    completed_appointments = (
+        appointments
+        .filter(
+            status=Appointment.Status.COMPLETED,
+        )
+        .order_by(
+            "-availability_slot__start_time",
+        )
+    )
+
+    context = {
+        "page_title": "Mi agenda",
+        "upcoming_appointments": upcoming_appointments,
+        "completed_appointments": completed_appointments,
+    }
+
+    return render(
+        request,
+        "appointments/psychologist_appointment_list.html",
+        context,
+    )
+    
+@login_required
+def psychologist_appointment_detail(request, public_id):
+    """
+    Muestra el detalle de una cita asignada al psicólogo
+    autenticado y permite actualizar su estado.
+    """
+
+    if request.user.role != "PSYCHOLOGIST":
+        return redirect("dashboard-redirect")
+
+    appointment = get_object_or_404(
+        Appointment.objects.select_related(
+            "patient",
+            "patient__account",
+            "psychologist",
+            "psychologist__account",
+            "availability_slot",
+            "session_note",
+        ),
+        public_id=public_id,
+        psychologist__account=request.user,
+    )
+
+    if request.method == "POST":
+        form = PsychologistAppointmentStatusForm(
+            request.POST,
+            instance=appointment,
+        )
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "El estado de la cita se actualizó correctamente.",
+            )
+
+            return redirect(
+                "psychologist-appointment-detail",
+                public_id=appointment.public_id,
+            )
+    else:
+        form = PsychologistAppointmentStatusForm(
+            instance=appointment,
+        )
+
+    session_note = getattr(
+        appointment,
+        "session_note",
+        None,
+    )
+
+    context = {
+        "page_title": "Detalle de la cita",
+        "appointment": appointment,
+        "session_note": session_note,
+        "form": form
+    }
+
+    return render(
+        request,
+        "appointments/psychologist_appointment_detail.html",
         context,
     )

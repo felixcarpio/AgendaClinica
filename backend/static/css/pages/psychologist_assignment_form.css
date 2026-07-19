@@ -1,0 +1,237 @@
+.psychologist-assignment-form {
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+    gap: var(--spacing-5);
+    align-items: start;
+}
+
+.psychologist-assignment-form__summary {
+    position: sticky;
+    top: var(--spacing-5);
+}
+
+.psychologist-assignment-form__info-list {
+    display: grid;
+    gap: var(--spacing-4);
+}
+
+.psychologist-assignment-form__info-list > div {
+    display: grid;
+    gap: var(--spacing-1);
+}
+
+.psychologist-assignment-form__info-list span {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.psychologist-assignment-form__info-list strong {
+    overflow-wrap: anywhere;
+}
+
+.psychologist-assignment-form__card textarea,
+.psychologist-assignment-form__card input,
+.psychologist-assignment-form__card select {
+    width: 100%;
+}
+
+.psychologist-assignment-form__card textarea {
+    resize: vertical;
+}
+
+.psychologist-assignment-form__card .form-group {
+    margin-bottom: var(--spacing-5);
+}
+
+.psychologist-assignment-form__card .form-actions {
+    justify-content: flex-end;
+    margin-top: var(--spacing-6);
+    padding-top: var(--spacing-5);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Selector de estado */
+
+.psychologist-assignment-form__card select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    padding-right: 2.75rem;
+    cursor: pointer;
+
+    background-image:
+        linear-gradient(
+            45deg,
+            transparent 50%,
+            currentColor 50%
+        ),
+        linear-gradient(
+            135deg,
+            currentColor 50%,
+            transparent 50%
+        );
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+    background-size:
+        5px 5px,
+        5px 5px;
+    background-repeat: no-repeat;
+}
+
+/* Archivos adjuntos */
+
+.psychologist-assignment-form__attachments {
+    margin-top: var(--spacing-5);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.psychologist-assignment-form__attachments-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-3);
+}
+
+.psychologist-assignment-form__attachments-header h4 {
+    margin: 0;
+    font-size: var(--font-size-base);
+}
+
+.psychologist-assignment-form__attachment-button {
+    flex-shrink: 0;
+    padding: 0.45rem 0.75rem;
+    font-size: var(--font-size-sm);
+}
+
+.psychologist-assignment-form__attachment-list {
+    display: grid;
+    gap: var(--spacing-3);
+}
+
+.psychologist-assignment-form__attachment {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    min-width: 0;
+    padding: var(--spacing-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: inherit;
+    text-decoration: none;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.psychologist-assignment-form__attachment:hover {
+    border-color: var(--primary-color);
+    background: var(--surface-soft);
+}
+
+.psychologist-assignment-form__attachment-icon {
+    flex-shrink: 0;
+    font-size: 1.2rem;
+}
+
+.psychologist-assignment-form__attachment-content {
+    display: grid;
+    gap: var(--spacing-1);
+    min-width: 0;
+}
+
+.psychologist-assignment-form__attachment-content strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.psychologist-assignment-form__attachment-content small {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+}
+
+.psychologist-assignment-form__empty {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.psychologist-assignment-form__attachment-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--spacing-2);
+    align-items: stretch;
+}
+
+.psychologist-assignment-form__attachment-row
+.psychologist-assignment-form__attachment {
+    min-width: 0;
+}
+
+.psychologist-assignment-form__attachment-delete-form {
+    display: flex;
+    margin: 0;
+}
+
+.psychologist-assignment-form__attachment-delete {
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--danger-color, #b42318);
+    font: inherit;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.psychologist-assignment-form__attachment-delete:hover {
+    border-color: currentColor;
+    background: var(--surface-soft);
+}
+
+@media (max-width: 1000px) {
+    .psychologist-assignment-form {
+        grid-template-columns: 1fr;
+    }
+
+    .psychologist-assignment-form__summary {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .psychologist-assignment-form__attachments-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .psychologist-assignment-form__attachment-button {
+        width: 100%;
+    }
+
+    .psychologist-assignment-form__card .form-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .psychologist-assignment-form__card .form-actions .btn {
+        width: 100%;
+    }
+
+    .psychologist-assignment-form__attachment-row {
+        grid-template-columns: 1fr;
+    }
+
+    .psychologist-assignment-form__attachment-delete {
+        width: 100%;
+    }
+}

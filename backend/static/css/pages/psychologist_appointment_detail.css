@@ -1,0 +1,269 @@
+.psychologist-appointment-detail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-5);
+    align-items: stretch;
+}
+
+.psychologist-appointment-detail__card,
+.psychologist-appointment-detail__side-column,
+.psychologist-appointment-detail__note-card {
+    width: 100%;
+    height: 100%;
+}
+
+.psychologist-appointment-detail__side-column {
+    display: grid;
+    min-width: 0;
+}
+
+/* Información general de la cita */
+
+.appointment-detail__info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-4);
+}
+
+.appointment-detail__info-item {
+    display: grid;
+    gap: var(--spacing-1);
+    min-width: 0;
+}
+
+.appointment-detail__label {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.appointment-detail__value {
+    overflow-wrap: anywhere;
+}
+
+/* Secciones de la tarjeta principal */
+
+.appointment-detail__section {
+    margin-top: var(--spacing-5);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.appointment-detail__section-title {
+    margin: 0 0 var(--spacing-2);
+    line-height: 1.4;
+}
+
+.appointment-detail__section-content {
+    color: var(--text-muted);
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.appointment-detail__section-content p {
+    margin: 0;
+}
+
+.appointment-detail__section-content p + p {
+    margin-top: var(--spacing-2);
+}
+
+.appointment-detail__section .form-group {
+    max-width: 320px;
+    margin-bottom: var(--spacing-4);
+}
+
+.appointment-detail__section .form-actions {
+    justify-content: flex-start;
+}
+
+/* Selector de estado */
+
+.appointment-detail__section select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    padding-right: 2.75rem;
+    cursor: pointer;
+
+    background-image:
+        linear-gradient(
+            45deg,
+            transparent 50%,
+            currentColor 50%
+        ),
+        linear-gradient(
+            135deg,
+            currentColor 50%,
+            transparent 50%
+        );
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+    background-size:
+        5px 5px,
+        5px 5px;
+    background-repeat: no-repeat;
+}
+
+/* Estados cerrados de la cita */
+
+.appointment-detail__status-message {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.55;
+}
+
+.appointment-detail__cancelled-reason {
+    margin-top: var(--spacing-3);
+}
+
+.appointment-detail__cancelled-reason > strong {
+    display: block;
+    margin-bottom: var(--spacing-2);
+}
+
+/* Resumen de la nota clínica */
+
+.appointment-note-summary__section {
+    display: grid;
+    gap: var(--spacing-2);
+}
+
+.appointment-note-summary__section + .appointment-note-summary__section {
+    margin-top: var(--spacing-5);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.appointment-note-summary__title {
+    margin: 0;
+    font-size: var(--font-size-base);
+    line-height: 1.4;
+}
+
+.appointment-note-summary__content {
+    color: var(--text-muted);
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.appointment-note-summary__content p {
+    margin: 0;
+}
+
+.appointment-note-summary__content p + p {
+    margin-top: var(--spacing-2);
+}
+
+.appointment-note-summary__meta {
+    margin-top: var(--spacing-5);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+}
+
+.appointment-note-summary__actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: var(--spacing-5);
+}
+
+/* Resumen compacto del paciente */
+
+.psychologist-appointment-detail__patient-summary {
+    width: 100%;
+    max-width: 360px;
+    justify-self: end;
+}
+
+.appointment-patient-summary {
+    display: grid;
+    gap: var(--spacing-4);
+}
+
+.appointment-patient-summary__identity {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.appointment-patient-summary__identity > div {
+    display: grid;
+    gap: var(--spacing-1);
+    min-width: 0;
+}
+
+.appointment-patient-summary__identity strong {
+    overflow-wrap: anywhere;
+}
+
+.appointment-patient-summary__identity span {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    overflow-wrap: anywhere;
+}
+
+.appointment-patient-summary__avatar {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.appointment-patient-summary__item {
+    display: grid;
+    gap: var(--spacing-1);
+}
+
+.appointment-patient-summary__item span {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.appointment-patient-summary__item strong {
+    overflow-wrap: anywhere;
+}
+
+.appointment-patient-summary__actions {
+    display: flex;
+    justify-content: flex-start;
+    padding-top: var(--spacing-2);
+}
+
+/* Adaptación para pantallas medianas */
+
+@media (max-width: 1000px) {
+    .psychologist-appointment-detail {
+        grid-template-columns: 1fr;
+    }
+
+    .psychologist-appointment-detail__patient-summary {
+        max-width: none;
+        justify-self: stretch;
+    }
+}
+
+/* Adaptación para dispositivos móviles */
+
+@media (max-width: 600px) {
+    .appointment-detail__info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .appointment-note-summary__actions .btn,
+    .appointment-patient-summary__actions .btn {
+        width: 100%;
+    }
+}

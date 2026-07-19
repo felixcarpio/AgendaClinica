@@ -1,0 +1,67 @@
+.psychologist-session-note {
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+    gap: var(--spacing-5);
+    align-items: start;
+}
+
+.psychologist-session-note__summary {
+    position: sticky;
+    top: var(--spacing-5);
+}
+
+.psychologist-session-note__info-list {
+    display: grid;
+    gap: var(--spacing-4);
+}
+
+.psychologist-session-note__info-item {
+    display: grid;
+    gap: var(--spacing-1);
+}
+
+.psychologist-session-note__info-item span {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.psychologist-session-note__info-item strong {
+    overflow-wrap: anywhere;
+}
+
+.psychologist-session-note__form-card textarea {
+    width: 100%;
+    resize: vertical;
+}
+
+.psychologist-session-note__form-card .form-group {
+    margin-bottom: var(--spacing-5);
+}
+
+.psychologist-session-note__form-card .form-actions {
+    justify-content: flex-end;
+    padding-top: var(--spacing-2);
+}
+
+@media (max-width: 1000px) {
+    .psychologist-session-note {
+        grid-template-columns: 1fr;
+    }
+
+    .psychologist-session-note__summary {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .psychologist-session-note__form-card .form-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .psychologist-session-note__form-card .form-actions .btn {
+        width: 100%;
+    }
+}

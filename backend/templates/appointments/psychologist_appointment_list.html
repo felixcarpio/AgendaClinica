@@ -1,0 +1,182 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Mi agenda | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/appointment_list.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Mi agenda
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta tus próximas citas y el historial de sesiones completadas.
+            </p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <div>
+                <h3 class="section-heading__title">
+                    Próximas citas
+                </h3>
+
+                <p class="section-heading__description">
+                    Sesiones pendientes o confirmadas.
+                </p>
+            </div>
+        </div>
+
+        {% if upcoming_appointments %}
+            <div class="appointment-list-grid">
+                {% for appointment in upcoming_appointments %}
+                    <article class="card appointment-card">
+                        <div class="card__header">
+                            <div>
+                                <h4 class="card__title">
+                                    {{ appointment.patient }}
+                                </h4>
+
+                                <p class="card__subtitle">
+                                    {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                </p>
+                            </div>
+
+                            {% if appointment.status == "CONFIRMED" %}
+                                <span class="badge badge--success">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            {% else %}
+                                <span class="badge badge--warning">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card__body">
+                            <p>
+                                <strong>Horario:</strong><br>
+                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                -
+                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                            </p>
+
+                            <p>
+                                <strong>Tipo:</strong><br>
+                                {{ appointment.get_appointment_type_display }}
+                            </p>
+
+                            {% if appointment.reason %}
+                                <p>
+                                    <strong>Motivo:</strong><br>
+                                    {{ appointment.reason|truncatechars:120 }}
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <div class="card__footer">
+                            <a
+                                href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                                class="btn btn--primary btn--sm"
+                            >
+                                Ver detalles
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h4 class="empty-state__title">
+                    No tienes citas próximas
+                </h4>
+
+                <p class="empty-state__description">
+                    Las nuevas citas aparecerán aquí cuando sean programadas.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <div>
+                <h3 class="section-heading__title">
+                    Sesiones completadas
+                </h3>
+
+                <p class="section-heading__description">
+                    Historial de citas atendidas.
+                </p>
+            </div>
+        </div>
+
+        {% if completed_appointments %}
+            <div class="appointment-list-grid">
+                {% for appointment in completed_appointments %}
+                    <article class="card card--soft appointment-card">
+                        <div class="card__header">
+                            <div>
+                                <h4 class="card__title">
+                                    {{ appointment.patient }}
+                                </h4>
+
+                                <p class="card__subtitle">
+                                    {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                </p>
+                            </div>
+
+                            <span class="badge badge--success">
+                                {{ appointment.get_status_display }}
+                            </span>
+                        </div>
+
+                        <div class="card__body">
+                            <p>
+                                <strong>Horario:</strong><br>
+                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                -
+                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                            </p>
+
+                            <p>
+                                <strong>Tipo:</strong><br>
+                                {{ appointment.get_appointment_type_display }}
+                            </p>
+                        </div>
+
+                        <div class="card__footer">
+                            <a
+                                href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                                class="btn btn--secondary btn--sm"
+                            >
+                                Ver detalles
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h4 class="empty-state__title">
+                    No hay sesiones completadas
+                </h4>
+
+                <p class="empty-state__description">
+                    Las citas completadas aparecerán en esta sección.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

@@ -1,23 +1,12 @@
 """
 URL configuration for config project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
-from django.urls import path
-from django.urls import include
-from django.views.generic import TemplateView
+from django.urls import include, path
+from django.conf import settings
+from django.conf.urls.static import static
+
 from apps.accounts.views import (
     admin_dashboard,
     dashboard_redirect,
@@ -33,56 +22,78 @@ from apps.appointments.views import (
     patient_appointment_list,
     patient_appointment_reschedule,
     patient_appointment_reschedule_confirm,
+    psychologist_appointment_detail,
+    psychologist_appointment_list,
 )
 from apps.assignments.views import (
     patient_assignment_detail,
     patient_assignment_list,
+    psychologist_assignment_create,
+    psychologist_assignment_edit,
+    psychologist_assignment_list,
+    psychologist_assignment_attachment_upload,
+    psychologist_assignment_attachment_delete,
+    patient_assignment_attachment_upload,
+    patient_assignment_attachment_delete,
+)
+from apps.patients.views import (
+    psychologist_patient_detail,
+    psychologist_patient_list,
+)
+from apps.clinical_records.views import (
+    psychologist_clinical_record_detail,
+    psychologist_clinical_record_edit,
+    psychologist_session_note_manage,
 )
 
-urlpatterns = [
-    path("admin/", admin.site.urls),
 
+urlpatterns = [
+    # Administración de Django.
+    path(
+        "admin/",
+        admin.site.urls,
+    ),
+
+    # Autenticación.
     path(
         "accounts/",
         include("django.contrib.auth.urls"),
     ),
+
+    # Dashboards.
     path(
         "dashboard/",
         dashboard_redirect,
         name="dashboard-redirect",
     ),
-
     path(
         "dashboard/administracion/",
         admin_dashboard,
         name="admin-dashboard",
     ),
-
     path(
         "dashboard/psicologo/",
         psychologist_dashboard,
         name="psychologist-dashboard",
     ),
-
     path(
         "dashboard/paciente/",
         patient_dashboard,
         name="patient-dashboard",
     ),
+
+    # Perfil.
     path(
         "perfil/",
         profile_view,
         name="profile",
     ),
+
+    # Citas del paciente.
     path(
         "mis-citas/",
         patient_appointment_list,
         name="patient-appointment-list",
-    ),
-    path(
-        "mis-citas/<uuid:public_id>/detalle/",
-        patient_appointment_detail,
-        name="patient-appointment-detail",
     ),
     path(
         "mis-citas/agendar/",
@@ -93,6 +104,11 @@ urlpatterns = [
         "mis-citas/agendar/<uuid:public_id>/confirmar/",
         patient_appointment_confirm,
         name="patient-appointment-confirm",
+    ),
+    path(
+        "mis-citas/<uuid:public_id>/detalle/",
+        patient_appointment_detail,
+        name="patient-appointment-detail",
     ),
     path(
         "mis-citas/<uuid:public_id>/cancelar/",
@@ -112,6 +128,20 @@ urlpatterns = [
         patient_appointment_reschedule_confirm,
         name="patient-appointment-reschedule-confirm",
     ),
+
+    # Agenda del psicólogo.
+    path(
+        "agenda/",
+        psychologist_appointment_list,
+        name="psychologist-appointment-list",
+    ),
+    path(
+        "agenda/<uuid:public_id>/detalle/",
+        psychologist_appointment_detail,
+        name="psychologist-appointment-detail",
+    ),
+
+    # Asignaciones del paciente.
     path(
         "mis-asignaciones/",
         patient_assignment_list,
@@ -122,4 +152,76 @@ urlpatterns = [
         patient_assignment_detail,
         name="patient-assignment-detail",
     ),
+    path(
+        "mis-asignaciones/<uuid:public_id>/adjuntar/",
+        patient_assignment_attachment_upload,
+        name="patient-assignment-attachment-upload",
+    ),
+    path(
+        "mis-asignaciones/archivos/<int:attachment_id>/eliminar/",
+        patient_assignment_attachment_delete,
+        name="patient-assignment-attachment-delete",
+    ),
+    
+    # Asignaciones del psicólogo.
+    path(
+        "notas/<uuid:note_public_id>/asignaciones/",
+        psychologist_assignment_list,
+        name="psychologist-assignment-list",
+    ),
+    path(
+        "notas/<uuid:note_public_id>/asignaciones/nueva/",
+        psychologist_assignment_create,
+        name="psychologist-assignment-create",
+    ),
+    path(
+        "asignaciones/<uuid:public_id>/editar/",
+        psychologist_assignment_edit,
+        name="psychologist-assignment-edit",
+    ),
+    path(
+        "asignaciones/<uuid:public_id>/adjuntar/",
+        psychologist_assignment_attachment_upload,
+        name="psychologist-assignment-attachment-upload",
+    ),
+    path(
+        "archivos-adjuntos/<int:attachment_id>/eliminar/",
+        psychologist_assignment_attachment_delete,
+        name="psychologist-assignment-attachment-delete",
+    ),
+    
+    # Pacientes
+        path(
+        "mis-pacientes/",
+        psychologist_patient_list,
+        name="psychologist-patient-list",
+    ),
+    path(
+        "mis-pacientes/<uuid:public_id>/detalle/",
+        psychologist_patient_detail,
+        name="psychologist-patient-detail",
+    ),
+    path(
+        "mis-pacientes/<uuid:patient_public_id>/expediente/",
+        psychologist_clinical_record_detail,
+        name="psychologist-clinical-record-detail",
+    ),
+    path(
+        "mis-pacientes/<uuid:patient_public_id>/expediente/editar/",
+        psychologist_clinical_record_edit,
+        name="psychologist-clinical-record-edit",
+    ),
+    
+    # Notas de sesiones
+    path(
+        "agenda/<uuid:appointment_public_id>/nota/",
+        psychologist_session_note_manage,
+        name="psychologist-session-note-manage",
+    ),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT,
+    )

@@ -69,6 +69,38 @@
     letter-spacing: 0.04em;
 }
 
+/* Selector de estado de la actividad */
+
+.assignment-detail-layout select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    padding-right: 2.75rem;
+    cursor: pointer;
+
+    background-image:
+        linear-gradient(
+            45deg,
+            transparent 50%,
+            currentColor 50%
+        ),
+        linear-gradient(
+            135deg,
+            currentColor 50%,
+            transparent 50%
+        );
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+    background-size:
+        5px 5px,
+        5px 5px;
+    background-repeat: no-repeat;
+}
+
+/* Archivos adjuntos */
+
 .assignment-attachment-list {
     display: grid;
     gap: var(--spacing-3);
@@ -78,6 +110,7 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-3);
+    min-width: 0;
     padding: var(--spacing-3);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -114,8 +147,82 @@
     color: var(--text-muted);
 }
 
+.assignment-detail__attachments-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+    width: 100%;
+}
+
+.assignment-detail__attachments-header .card__title {
+    margin: 0;
+}
+
+.assignment-detail__attachments-header .btn {
+    flex-shrink: 0;
+    padding: 0.45rem 0.75rem;
+    font-size: var(--font-size-sm);
+}
+
+.assignment-attachment-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--spacing-2);
+    align-items: stretch;
+}
+
+.assignment-attachment-row .assignment-attachment {
+    min-width: 0;
+}
+
+.assignment-attachment-delete-form {
+    display: flex;
+    margin: 0;
+}
+
+.assignment-attachment-delete {
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--danger-color, #b42318);
+    font: inherit;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.assignment-attachment-delete:hover {
+    border-color: currentColor;
+    background: var(--surface-soft);
+}
+
+/* Adaptación para pantallas pequeñas */
+
 @media (max-width: 900px) {
     .assignment-detail-layout {
         grid-template-columns: 1fr;
     }
+}
+
+@media (max-width: 600px) {
+    .assignment-detail__attachments-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .assignment-detail__attachments-header .btn {
+        width: 100%;
+    }
+
+    .assignment-attachment-row {
+        grid-template-columns: 1fr;
+    }
+
+    .assignment-attachment-delete {
+        width: 100%;
+}
 }

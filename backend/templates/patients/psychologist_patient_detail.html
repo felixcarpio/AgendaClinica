@@ -1,0 +1,275 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Detalle del paciente | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_patient_detail.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Detalle del paciente
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta la información general y el historial de citas.
+            </p>
+        </div>
+
+        <div class="page-heading__actions">
+            <a
+                href="{% url 'psychologist-clinical-record-detail' patient.public_id %}"
+                class="btn btn--primary"
+            >
+                Ver expediente clínico
+            </a>
+
+            <a
+                href="{% url 'psychologist-patient-list' %}"
+                class="btn btn--secondary"
+            >
+                Volver a mis pacientes
+            </a>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="psychologist-patient-detail">
+
+            <article class="card psychologist-patient-detail__profile">
+                <div class="card__header">
+                    <div class="psychologist-patient-detail__identity">
+                        <span
+                            class="psychologist-patient-detail__avatar"
+                            aria-hidden="true"
+                        >
+                            {% if patient.account.first_name %}
+                                {{ patient.account.first_name|first|upper }}
+                            {% else %}
+                                P
+                            {% endif %}
+                        </span>
+
+                        <div>
+                            <h3 class="card__title">
+                                {{ patient.account.first_name }}
+                                {{ patient.account.last_name }}
+                            </h3>
+
+                            <p class="card__subtitle">
+                                Información personal y de contacto.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <div class="psychologist-patient-detail__info-grid">
+                        <div class="psychologist-patient-detail__info-item">
+                            <span class="psychologist-patient-detail__label">
+                                Correo
+                            </span>
+
+                            <strong class="psychologist-patient-detail__value">
+                                {{ patient.account.email }}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-patient-detail__info-item">
+                            <span class="psychologist-patient-detail__label">
+                                Teléfono
+                            </span>
+
+                            <strong class="psychologist-patient-detail__value">
+                                {% if patient.phone %}
+                                    {{ patient.phone }}
+                                {% else %}
+                                    No registrado
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-patient-detail__info-item">
+                            <span class="psychologist-patient-detail__label">
+                                Fecha de nacimiento
+                            </span>
+
+                            <strong class="psychologist-patient-detail__value">
+                                {% if patient.birth_date %}
+                                    {{ patient.birth_date|date:"d/m/Y" }}
+                                {% else %}
+                                    No registrada
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-patient-detail__info-item">
+                            <span class="psychologist-patient-detail__label">
+                                Género
+                            </span>
+
+                            <strong class="psychologist-patient-detail__value">
+                                {% if patient.gender %}
+                                    {{ patient.get_gender_display }}
+                                {% else %}
+                                    No registrado
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-patient-detail__info-item psychologist-patient-detail__info-item--full">
+                            <span class="psychologist-patient-detail__label">
+                                Dirección
+                            </span>
+
+                            <strong class="psychologist-patient-detail__value">
+                                {% if patient.address %}
+                                    {{ patient.address }}
+                                {% else %}
+                                    No registrada
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <section class="psychologist-patient-detail__appointments">
+                <article class="card">
+                    <div class="card__header">
+                        <div>
+                            <h3 class="card__title">
+                                Próximas citas
+                            </h3>
+
+                            <p class="card__subtitle">
+                                Sesiones pendientes o confirmadas.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card__body">
+                        {% if upcoming_appointments %}
+                            <div class="psychologist-patient-detail__appointment-list">
+                                {% for appointment in upcoming_appointments %}
+                                    <article class="psychologist-patient-detail__appointment">
+                                        <div>
+                                            <strong>
+                                                {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                            </strong>
+
+                                            <span>
+                                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                                -
+                                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                                            </span>
+                                        </div>
+
+                                        <div class="psychologist-patient-detail__appointment-actions">
+                                            {% if appointment.status == "CONFIRMED" %}
+                                                <span class="badge badge--success">
+                                                    {{ appointment.get_status_display }}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge badge--warning">
+                                                    {{ appointment.get_status_display }}
+                                                </span>
+                                            {% endif %}
+
+                                            <a
+                                                href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                                                class="btn btn--outline btn--sm"
+                                            >
+                                                Ver cita
+                                            </a>
+                                        </div>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <h4 class="empty-state__title">
+                                    No hay próximas citas
+                                </h4>
+
+                                <p class="empty-state__description">
+                                    Este paciente no tiene sesiones pendientes
+                                    o confirmadas contigo.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="card__header">
+                        <div>
+                            <h3 class="card__title">
+                                Historial de citas
+                            </h3>
+
+                            <p class="card__subtitle">
+                                Sesiones completadas con este paciente.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card__body">
+                        {% if completed_appointments %}
+                            <div class="psychologist-patient-detail__appointment-list">
+                                {% for appointment in completed_appointments %}
+                                    <article class="psychologist-patient-detail__appointment">
+                                        <div>
+                                            <strong>
+                                                {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                            </strong>
+
+                                            <span>
+                                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                                -
+                                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                                            </span>
+                                        </div>
+
+                                        <div class="psychologist-patient-detail__appointment-actions">
+                                            <span class="badge badge--success">
+                                                {{ appointment.get_status_display }}
+                                            </span>
+
+                                            <a
+                                                href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                                                class="btn btn--outline btn--sm"
+                                            >
+                                                Ver cita
+                                            </a>
+                                        </div>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <h4 class="empty-state__title">
+                                    No hay sesiones completadas
+                                </h4>
+
+                                <p class="empty-state__description">
+                                    El historial aparecerá cuando una cita
+                                    sea marcada como completada.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+            </section>
+
+        </div>
+    </section>
+{% endblock %}

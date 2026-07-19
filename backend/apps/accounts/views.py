@@ -51,14 +51,81 @@ def admin_dashboard(request):
 @login_required
 def psychologist_dashboard(request):
     """
-    Muestra el dashboard exclusivo para psicólogos.
+    Muestra el dashboard exclusivo para psicólogos
+    utilizando información real de sus citas.
     """
 
     if request.user.role != "PSYCHOLOGIST":
         return redirect("dashboard-redirect")
 
+    now = timezone.now()
+    today = timezone.localdate()
+
+    appointments = (
+        Appointment.objects
+        .filter(
+            psychologist__account=request.user,
+        )
+        .select_related(
+            "patient",
+            "patient__account",
+            "psychologist",
+            "availability_slot",
+        )
+    )
+
+    # Próxima cita pendiente o confirmada.
+    next_appointment = (
+        appointments
+        .filter(
+            status__in=[
+                Appointment.Status.PENDING,
+                Appointment.Status.CONFIRMED,
+            ],
+            availability_slot__start_time__gte=now,
+        )
+        .order_by(
+            "availability_slot__start_time",
+        )
+        .first()
+    )
+
+    # Citas activas programadas para el día actual.
+    today_appointments = (
+        appointments
+        .filter(
+            status__in=[
+                Appointment.Status.PENDING,
+                Appointment.Status.CONFIRMED,
+            ],
+            availability_slot__start_time__date=today,
+            availability_slot__start_time__gte=now,
+        )
+        .order_by(
+            "availability_slot__start_time",
+        )
+    )
+
+    # Cantidad de pacientes distintos atendidos
+    # en citas completadas.
+    attended_patients_count = (
+        appointments
+        .filter(
+            status=Appointment.Status.COMPLETED,
+        )
+        .values(
+            "patient_id",
+        )
+        .distinct()
+        .count()
+    )
+
     context = {
         "page_title": "Panel del psicólogo",
+        "next_appointment": next_appointment,
+        "today_appointments": today_appointments,
+        "today_appointments_count": today_appointments.count(),
+        "attended_patients_count": attended_patients_count,
     }
 
     return render(
@@ -66,7 +133,6 @@ def psychologist_dashboard(request):
         "dashboard/psychologist_dashboard.html",
         context,
     )
-
 
 @login_required
 def patient_dashboard(request):
