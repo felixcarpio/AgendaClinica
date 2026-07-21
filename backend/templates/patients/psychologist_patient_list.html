@@ -13,113 +13,510 @@
 {% endblock %}
 
 {% block content %}
-    <section class="page-heading">
+    <section class="page-heading page-heading--with-actions">
         <div>
             <h2 class="page-heading__title">
                 Mis pacientes
             </h2>
 
             <p class="page-heading__description">
-                Consulta los pacientes vinculados a tus citas.
+                Consulta y administra los pacientes vinculados a tu atención.
             </p>
+        </div>
+
+        <a
+            href="{% url 'psychologist-patient-create' %}"
+            class="btn btn--primary"
+        >
+            Nuevo paciente
+        </a>
+    </section>
+
+    <!-- Resumen general -->
+    <section class="content-section">
+        <div class="patient-summary-grid">
+
+            <article class="card patient-summary-card">
+                <div class="card__body patient-summary-card__body">
+                    <span
+                        class="patient-summary-card__icon"
+                        aria-hidden="true"
+                    >
+                        👥
+                    </span>
+
+                    <div class="patient-summary-card__content">
+                        <span class="patient-summary-card__label">
+                            Pacientes totales
+                        </span>
+
+                        <strong class="patient-summary-card__value">
+                            {{ total_patients_count }}
+                        </strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card patient-summary-card">
+                <div class="card__body patient-summary-card__body">
+                    <span
+                        class="patient-summary-card__icon"
+                        aria-hidden="true"
+                    >
+                        📋
+                    </span>
+
+                    <div class="patient-summary-card__content">
+                        <span class="patient-summary-card__label">
+                            Casos activos
+                        </span>
+
+                        <strong class="patient-summary-card__value">
+                            {{ active_patients_count }}
+                        </strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card patient-summary-card">
+                <div class="card__body patient-summary-card__body">
+                    <span
+                        class="patient-summary-card__icon"
+                        aria-hidden="true"
+                    >
+                        🗓️
+                    </span>
+
+                    <div class="patient-summary-card__content">
+                        <span class="patient-summary-card__label">
+                            Sesiones de hoy
+                        </span>
+
+                        <strong class="patient-summary-card__value">
+                            {{ today_sessions_count }}
+                        </strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card patient-summary-card">
+                <div class="card__body patient-summary-card__body">
+                    <span
+                        class="patient-summary-card__icon"
+                        aria-hidden="true"
+                    >
+                        ✅
+                    </span>
+
+                    <div class="patient-summary-card__content">
+                        <span class="patient-summary-card__label">
+                            Sesiones completadas
+                        </span>
+
+                        <strong class="patient-summary-card__value">
+                            {{ completed_sessions_count }}
+                        </strong>
+                    </div>
+                </div>
+            </article>
+
         </div>
     </section>
 
+    <!-- Listado de pacientes -->
     <section class="content-section">
-        {% if patients %}
-            <div class="psychologist-patient-grid">
-                {% for patient in patients %}
-                    <article class="card psychologist-patient-card">
-                        <div class="card__header">
-                            <div class="psychologist-patient-card__identity">
-                                <span
-                                    class="psychologist-patient-card__avatar"
-                                    aria-hidden="true"
+        <article class="card patient-list-card">
+
+            <div class="patient-list-card__header">
+                <div>
+                    <h3 class="card__title">
+                        Listado de pacientes
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Busca por nombre y consulta su actividad clínica.
+                    </p>
+                </div>
+
+                <span class="badge badge--neutral">
+                    {{ filtered_patients_count }}
+
+                    {% if filtered_patients_count == 1 %}
+                        paciente
+                    {% else %}
+                        pacientes
+                    {% endif %}
+                </span>
+            </div>
+
+            <!-- Filtros por estado de la relación terapéutica -->
+            <nav
+                class="patient-status-filters"
+                aria-label="Filtrar pacientes por estado"
+            >
+                <a
+                    href="{% url 'psychologist-patient-list' %}{% if query %}?q={{ query|urlencode }}{% endif %}"
+                    class="patient-status-filter{% if not status_filter %} patient-status-filter--active{% endif %}"
+                    {% if not status_filter %}
+                        aria-current="page"
+                    {% endif %}
+                >
+                    <span class="patient-status-filter__label">
+                        Todos
+                    </span>
+
+                    <span class="patient-status-filter__count">
+                        {{ total_patients_count }}
+                    </span>
+                </a>
+
+                <a
+                    href="{% url 'psychologist-patient-list' %}?status=ACTIVE{% if query %}&q={{ query|urlencode }}{% endif %}"
+                    class="patient-status-filter{% if status_filter == 'ACTIVE' %} patient-status-filter--active{% endif %}"
+                    {% if status_filter == "ACTIVE" %}
+                        aria-current="page"
+                    {% endif %}
+                >
+                    <span class="patient-status-filter__label">
+                        Activos
+                    </span>
+
+                    <span class="patient-status-filter__count">
+                        {{ active_patients_count }}
+                    </span>
+                </a>
+
+                <a
+                    href="{% url 'psychologist-patient-list' %}?status=INACTIVE{% if query %}&q={{ query|urlencode }}{% endif %}"
+                    class="patient-status-filter{% if status_filter == 'INACTIVE' %} patient-status-filter--active{% endif %}"
+                    {% if status_filter == "INACTIVE" %}
+                        aria-current="page"
+                    {% endif %}
+                >
+                    <span class="patient-status-filter__label">
+                        Inactivos
+                    </span>
+
+                    <span class="patient-status-filter__count">
+                        {{ inactive_patients_count }}
+                    </span>
+                </a>
+
+                <a
+                    href="{% url 'psychologist-patient-list' %}?status=DISCHARGED{% if query %}&q={{ query|urlencode }}{% endif %}"
+                    class="patient-status-filter{% if status_filter == 'DISCHARGED' %} patient-status-filter--active{% endif %}"
+                    {% if status_filter == "DISCHARGED" %}
+                        aria-current="page"
+                    {% endif %}
+                >
+                    <span class="patient-status-filter__label">
+                        Dados de alta
+                    </span>
+
+                    <span class="patient-status-filter__count">
+                        {{ discharged_patients_count }}
+                    </span>
+                </a>
+            </nav>
+
+            <!-- Búsqueda automática -->
+            <div class="patient-list-card__search">
+                <form
+                    method="get"
+                    action="{% url 'psychologist-patient-list' %}"
+                    class="patient-search-form"
+                    id="patient-search-form"
+                    role="search"
+                >
+                    {% if status_filter %}
+                        <input
+                            type="hidden"
+                            name="status"
+                            value="{{ status_filter }}"
+                        >
+                    {% endif %}
+
+                    <div class="patient-search-form__field">
+                        <span
+                            class="patient-search-form__icon"
+                            aria-hidden="true"
+                        >
+                            🔍
+                        </span>
+
+                        <input
+                            type="search"
+                            name="q"
+                            value="{{ query }}"
+                            class="form-control patient-search-form__input"
+                            id="patient-search-input"
+                            placeholder="Buscar paciente por nombre o apellido"
+                            aria-label="Buscar paciente por nombre o apellido"
+                            autocomplete="off"
+                        >
+
+                        <span
+                            class="patient-search-form__status"
+                            id="patient-search-status"
+                            aria-live="polite"
+                        ></span>
+                    </div>
+                </form>
+            </div>
+
+            {% if page_obj %}
+                <div class="patient-table-wrapper">
+                    <table class="patient-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    Nombre completo
+                                </th>
+
+                                <th scope="col">
+                                    Última sesión
+                                </th>
+
+                                <th scope="col">
+                                    Próxima sesión
+                                </th>
+
+                                <th scope="col">
+                                    Estado
+                                </th>
+
+                                <th scope="col">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for patient in page_obj %}
+                                <tr>
+                                    <td>
+                                        <strong class="patient-table__name">
+                                            {{ patient.account.first_name }}
+                                            {{ patient.account.last_name }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        {% if patient.last_session %}
+                                            <div class="patient-table__session">
+                                                <strong>
+                                                    {{ patient.last_session.availability_slot.start_time|date:"d/m/Y" }}
+                                                </strong>
+
+                                                <span>
+                                                    {{ patient.last_session.availability_slot.start_time|time:"h:i A" }}
+                                                </span>
+                                            </div>
+                                        {% else %}
+                                            <span class="patient-table__empty-value">
+                                                Sin sesiones completadas
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if patient.next_session %}
+                                            <div class="patient-table__session">
+                                                <strong>
+                                                    {{ patient.next_session.availability_slot.start_time|date:"d/m/Y" }}
+                                                </strong>
+
+                                                <span>
+                                                    {{ patient.next_session.availability_slot.start_time|time:"h:i A" }}
+                                                </span>
+                                            </div>
+                                        {% else %}
+                                            <span class="patient-table__empty-value">
+                                                No programada
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if patient.is_active_patient %}
+                                            <span class="badge badge--success">
+                                                Activo
+                                            </span>
+
+                                        {% elif patient.is_discharged_patient %}
+                                            <span class="badge badge--neutral">
+                                                Dado de alta
+                                            </span>
+
+                                        {% else %}
+                                            <span class="badge badge--neutral">
+                                                Inactivo
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <a
+                                            href="{% url 'psychologist-patient-detail' patient.public_id %}"
+                                            class="btn btn--primary btn--sm"
+                                        >
+                                            Ver paciente
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if page_obj.paginator.num_pages > 1 %}
+                    <div class="patient-pagination">
+                        <p class="patient-pagination__summary">
+                            Página {{ page_obj.number }}
+                            de {{ page_obj.paginator.num_pages }}
+                        </p>
+
+                        <nav
+                            class="patient-pagination__navigation"
+                            aria-label="Paginación de pacientes"
+                        >
+                            {% if page_obj.has_previous %}
+                                <a
+                                    href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                                    class="btn btn--secondary btn--sm"
                                 >
-                                    {% if patient.account.first_name %}
-                                        {{ patient.account.first_name|first|upper }}
-                                    {% else %}
-                                        P
-                                    {% endif %}
-                                </span>
+                                    Anterior
+                                </a>
+                            {% endif %}
 
-                                <div>
-                                    <h3 class="card__title">
-                                        {{ patient.account.first_name }}
-                                        {{ patient.account.last_name }}
-                                    </h3>
+                            {% for page_number in page_obj.paginator.page_range %}
+                                {% if page_number == page_obj.number %}
+                                    <span
+                                        class="patient-pagination__current"
+                                        aria-current="page"
+                                    >
+                                        {{ page_number }}
+                                    </span>
 
-                                    <p class="card__subtitle">
-                                        Paciente
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card__body">
-                            <div class="psychologist-patient-card__meta">
-                                <p>
-                                    <span>Correo</span>
-
-                                    <strong>
-                                        {{ patient.account.email }}
-                                    </strong>
-                                </p>
-
-                                {% if patient.phone %}
-                                    <p>
-                                        <span>Teléfono</span>
-
-                                        <strong>
-                                            {{ patient.phone }}
-                                        </strong>
-                                    </p>
+                                {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                                    <a
+                                        href="?page={{ page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                                        class="patient-pagination__page"
+                                    >
+                                        {{ page_number }}
+                                    </a>
                                 {% endif %}
+                            {% endfor %}
 
-                                {% if patient.birth_date %}
-                                    <p>
-                                        <span>Fecha de nacimiento</span>
+                            {% if page_obj.has_next %}
+                                <a
+                                    href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                                    class="btn btn--secondary btn--sm"
+                                >
+                                    Siguiente
+                                </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                {% endif %}
 
-                                        <strong>
-                                            {{ patient.birth_date|date:"d/m/Y" }}
-                                        </strong>
-                                    </p>
-                                {% endif %}
+            {% else %}
+                <div class="patient-list-empty">
+                    {% if query %}
+                        <h3>
+                            No encontramos pacientes
+                        </h3>
 
-                                {% if patient.gender %}
-                                    <p>
-                                        <span>Género</span>
+                        <p>
+                            No hay resultados para
+                            <strong>“{{ query }}”</strong>.
+                        </p>
 
-                                        <strong>
-                                            {{ patient.get_gender_display }}
-                                        </strong>
-                                    </p>
-                                {% endif %}
-                            </div>
-                        </div>
+                    {% elif status_filter == "ACTIVE" %}
+                        <h3>
+                            No hay pacientes activos
+                        </h3>
 
-                        <div class="card__footer">
-                            <a
-                                href="{% url 'psychologist-patient-detail' patient.public_id %}"
-                                class="btn btn--primary btn--sm"
-                            >
-                                Ver paciente
-                            </a>
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-state">
-                <h3 class="empty-state__title">
-                    No tienes pacientes vinculados
-                </h3>
+                        <p>
+                            Actualmente no tienes pacientes activos
+                            vinculados a tu atención.
+                        </p>
 
-                <p class="empty-state__description">
-                    Los pacientes aparecerán aquí cuando tengan
-                    una cita asignada contigo.
-                </p>
-            </div>
-        {% endif %}
+                    {% elif status_filter == "INACTIVE" %}
+                        <h3>
+                            No hay pacientes inactivos
+                        </h3>
+
+                        <p>
+                            Actualmente no tienes pacientes inactivos
+                            vinculados a tu atención.
+                        </p>
+
+                    {% elif status_filter == "DISCHARGED" %}
+                        <h3>
+                            No hay pacientes dados de alta
+                        </h3>
+
+                        <p>
+                            Actualmente no tienes pacientes cuyo proceso
+                            terapéutico haya finalizado formalmente.
+                        </p>
+
+                    {% else %}
+                        <h3>
+                            No tienes pacientes vinculados
+                        </h3>
+
+                        <p>
+                            Los pacientes aparecerán aquí cuando sean
+                            asignados a tu atención.
+                        </p>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </article>
     </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById(
+                "patient-search-form"
+            );
+
+            const input = document.getElementById(
+                "patient-search-input"
+            );
+
+            const status = document.getElementById(
+                "patient-search-status"
+            );
+
+            if (!form || !input) {
+                return;
+            }
+
+            let searchTimer;
+            let previousValue = input.value.trim();
+
+            input.addEventListener("input", function () {
+                window.clearTimeout(searchTimer);
+
+                const currentValue = input.value.trim();
+
+                if (currentValue === previousValue) {
+                    return;
+                }
+
+                if (status) {
+                    status.textContent = "Buscando…";
+                }
+
+                searchTimer = window.setTimeout(function () {
+                    previousValue = currentValue;
+                    form.submit();
+                }, 450);
+            });
+        });
+    </script>
 {% endblock %}

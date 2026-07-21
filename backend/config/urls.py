@@ -41,8 +41,11 @@ from apps.assignments.views import (
     patient_assignment_attachment_delete,
 )
 from apps.patients.views import (
+    psychologist_patient_create,
+    psychologist_patient_created,
     psychologist_patient_detail,
     psychologist_patient_list,
+    psychologist_patient_status_update,
 )
 from apps.clinical_records.views import (
     psychologist_clinical_record_detail,
@@ -215,11 +218,21 @@ urlpatterns = [
         name="psychologist-assignment-general-list",
     ),
     
-    # Pacientes
-        path(
+    # Pacientes.
+    path(
         "mis-pacientes/",
         psychologist_patient_list,
         name="psychologist-patient-list",
+    ),
+    path(
+        "mis-pacientes/nuevo/",
+        psychologist_patient_create,
+        name="psychologist-patient-create",
+    ),
+    path(
+        "mis-pacientes/nuevo/creado/",
+        psychologist_patient_created,
+        name="psychologist-patient-created",
     ),
     path(
         "mis-pacientes/<uuid:public_id>/detalle/",
@@ -235,6 +248,11 @@ urlpatterns = [
         "mis-pacientes/<uuid:patient_public_id>/expediente/editar/",
         psychologist_clinical_record_edit,
         name="psychologist-clinical-record-edit",
+    ),
+    path(
+        "mis-pacientes/<uuid:public_id>/estado/",
+        psychologist_patient_status_update,
+        name="psychologist-patient-status-update",
     ),
     
     # Notas de sesiones

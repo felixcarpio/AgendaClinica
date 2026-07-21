@@ -3,8 +3,17 @@
     gap: var(--spacing-5);
 }
 
+/* Información general */
+
 .psychologist-patient-detail__profile {
     width: 100%;
+}
+
+.psychologist-patient-detail__profile .card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
 }
 
 .psychologist-patient-detail__identity {
@@ -35,6 +44,7 @@
 .psychologist-patient-detail__info-item {
     display: grid;
     gap: var(--spacing-1);
+    min-width: 0;
 }
 
 .psychologist-patient-detail__info-item--full {
@@ -51,6 +61,136 @@
 .psychologist-patient-detail__value {
     overflow-wrap: anywhere;
 }
+
+/* Estado del paciente */
+
+.psychologist-patient-status-card {
+    overflow: hidden;
+}
+
+.psychologist-patient-status-card .card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+}
+
+.psychologist-patient-status-card__body {
+    display: grid;
+    gap: var(--spacing-5);
+}
+
+.psychologist-patient-status-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: var(--spacing-4);
+}
+
+.psychologist-patient-status-form__field {
+    display: grid;
+    gap: var(--spacing-2);
+    min-width: 0;
+}
+
+.psychologist-patient-status-form__select {
+    position: relative;
+    width: 100%;
+}
+
+.psychologist-patient-status-form__select select {
+    width: 100%;
+    min-height: 46px;
+    padding-right: 3rem;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.psychologist-patient-status-form__select select::-ms-expand {
+    display: none;
+}
+
+.psychologist-patient-status-form__arrow {
+    position: absolute;
+    top: 50%;
+    right: var(--spacing-4);
+    width: 9px;
+    height: 9px;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+}
+
+.psychologist-patient-status-form__select:focus-within
+.psychologist-patient-status-form__arrow {
+    border-color: var(--primary-color);
+}
+
+.psychologist-patient-status-form__button {
+    min-height: 46px;
+    padding-inline: var(--spacing-5);
+    white-space: nowrap;
+}
+
+.psychologist-patient-status-help {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-3);
+}
+
+.psychologist-patient-status-help__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    min-width: 0;
+    padding: var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+}
+
+.psychologist-patient-status-help__item > div {
+    display: grid;
+    gap: var(--spacing-1);
+    min-width: 0;
+}
+
+.psychologist-patient-status-help__item strong {
+    color: var(--text-color);
+    font-size: var(--font-size-sm);
+}
+
+.psychologist-patient-status-help__item p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.psychologist-patient-status-help__indicator {
+    width: 10px;
+    height: 10px;
+    margin-top: 0.3rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.psychologist-patient-status-help__indicator--active {
+    background: var(--success-color);
+}
+
+.psychologist-patient-status-help__indicator--inactive {
+    background: var(--warning-color);
+}
+
+.psychologist-patient-status-help__indicator--discharged {
+    background: var(--primary-color);
+}
+
+/* Citas */
 
 .psychologist-patient-detail__appointments {
     display: grid;
@@ -91,6 +231,8 @@
     flex-shrink: 0;
 }
 
+/* Acciones del encabezado */
+
 .page-heading__actions {
     display: flex;
     align-items: center;
@@ -103,33 +245,23 @@
     .psychologist-patient-detail__appointments {
         grid-template-columns: 1fr;
     }
+
+    .psychologist-patient-status-help {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 700px) {
-    .psychologist-patient-detail__info-grid {
+    .psychologist-patient-status-card .card__header {
+    align-items: flex-start;
+    flex-direction: column;
+    }
+
+    .psychologist-patient-status-form {
         grid-template-columns: 1fr;
     }
 
-    .psychologist-patient-detail__info-item--full {
-        grid-column: auto;
-    }
-
-    .psychologist-patient-detail__appointment {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .psychologist-patient-detail__appointment-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .page-heading__actions {
-        width: 100%;
-        justify-content: flex-start;
-    }
-
-    .page-heading__actions .btn {
+    .psychologist-patient-status-form__button {
         width: 100%;
     }
 }

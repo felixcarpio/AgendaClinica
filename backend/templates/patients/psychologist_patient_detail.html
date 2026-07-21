@@ -20,7 +20,8 @@
             </h2>
 
             <p class="page-heading__description">
-                Consulta la información general y el historial de citas.
+                Consulta la información general, el estado de atención
+                y el historial de citas.
             </p>
         </div>
 
@@ -44,6 +45,7 @@
     <section class="content-section">
         <div class="psychologist-patient-detail">
 
+            <!-- Información general -->
             <article class="card psychologist-patient-detail__profile">
                 <div class="card__header">
                     <div class="psychologist-patient-detail__identity">
@@ -69,6 +71,24 @@
                             </p>
                         </div>
                     </div>
+
+                    {% if current_relationship %}
+                        {% if current_relationship.status == "ACTIVE" %}
+                            <span class="badge badge--success">
+                                {{ current_relationship.get_status_display }}
+                            </span>
+
+                        {% elif current_relationship.status == "DISCHARGED" %}
+                            <span class="badge badge--neutral">
+                                {{ current_relationship.get_status_display }}
+                            </span>
+
+                        {% else %}
+                            <span class="badge badge--warning">
+                                {{ current_relationship.get_status_display }}
+                            </span>
+                        {% endif %}
+                    {% endif %}
                 </div>
 
                 <div class="card__body">
@@ -125,6 +145,34 @@
                             </strong>
                         </div>
 
+                        <div class="psychologist-patient-detail__info-item">
+                            <span class="psychologist-patient-detail__label">
+                                Inicio de atención
+                            </span>
+
+                            <strong class="psychologist-patient-detail__value">
+                                {% if current_relationship %}
+                                    {{ current_relationship.started_at|date:"d/m/Y" }}
+                                {% else %}
+                                    No registrado
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-patient-detail__info-item">
+                            <span class="psychologist-patient-detail__label">
+                                Finalización
+                            </span>
+
+                            <strong class="psychologist-patient-detail__value">
+                                {% if current_relationship and current_relationship.ended_at %}
+                                    {{ current_relationship.ended_at|date:"d/m/Y" }}
+                                {% else %}
+                                    No aplica
+                                {% endif %}
+                            </strong>
+                        </div>
+
                         <div class="psychologist-patient-detail__info-item psychologist-patient-detail__info-item--full">
                             <span class="psychologist-patient-detail__label">
                                 Dirección
@@ -138,10 +186,170 @@
                                 {% endif %}
                             </strong>
                         </div>
+
+                        <div class="psychologist-patient-detail__info-item">
+                            <span class="psychologist-patient-detail__label">
+                                Contacto de emergencia
+                            </span>
+
+                            <strong class="psychologist-patient-detail__value">
+                                {% if patient.emergency_contact_name %}
+                                    {{ patient.emergency_contact_name }}
+                                {% else %}
+                                    No registrado
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="psychologist-patient-detail__info-item">
+                            <span class="psychologist-patient-detail__label">
+                                Teléfono de emergencia
+                            </span>
+
+                            <strong class="psychologist-patient-detail__value">
+                                {% if patient.emergency_contact_phone %}
+                                    {{ patient.emergency_contact_phone }}
+                                {% else %}
+                                    No registrado
+                                {% endif %}
+                            </strong>
+                        </div>
                     </div>
                 </div>
             </article>
 
+            <!-- Administración del estado -->
+            {% if current_relationship %}
+                <article class="card psychologist-patient-status-card">
+                    <div class="card__header">
+                        <div>
+                            <h3 class="card__title">
+                                Estado de atención
+                            </h3>
+
+                            <p class="card__subtitle">
+                                Actualiza el estado del proceso terapéutico sin eliminar
+                                al paciente ni su historial.
+                            </p>
+                        </div>
+
+                        {% if current_relationship.status == "ACTIVE" %}
+                            <span class="badge badge--success">
+                                Activo
+                            </span>
+
+                        {% elif current_relationship.status == "DISCHARGED" %}
+                            <span class="badge badge--neutral">
+                                Dado de alta
+                            </span>
+
+                        {% else %}
+                            <span class="badge badge--warning">
+                                Inactivo
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="card__body psychologist-patient-status-card__body">
+                        <form
+                            method="post"
+                            action="{% url 'psychologist-patient-status-update' patient.public_id %}"
+                            class="psychologist-patient-status-form"
+                            novalidate
+                        >
+                            {% csrf_token %}
+
+                            <div class="psychologist-patient-status-form__field">
+                                <label
+                                    for="{{ status_form.status.id_for_label }}"
+                                    class="form-label"
+                                >
+                                    {{ status_form.status.label }}
+                                </label>
+
+                                <div class="psychologist-patient-status-form__select">
+                                    {{ status_form.status }}
+
+                                    <span
+                                        class="psychologist-patient-status-form__arrow"
+                                        aria-hidden="true"
+                                    ></span>
+                                </div>
+
+                                {% for error in status_form.status.errors %}
+                                    <span class="form-error">
+                                        {{ error }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="btn btn--primary psychologist-patient-status-form__button"
+                            >
+                                Actualizar estado
+                            </button>
+                        </form>
+
+                        <div class="psychologist-patient-status-help">
+                            <article class="psychologist-patient-status-help__item">
+                                <span
+                                    class="psychologist-patient-status-help__indicator psychologist-patient-status-help__indicator--active"
+                                    aria-hidden="true"
+                                ></span>
+
+                                <div>
+                                    <strong>
+                                        Activo
+                                    </strong>
+
+                                    <p>
+                                        El paciente se encuentra actualmente en atención
+                                        o seguimiento.
+                                    </p>
+                                </div>
+                            </article>
+
+                            <article class="psychologist-patient-status-help__item">
+                                <span
+                                    class="psychologist-patient-status-help__indicator psychologist-patient-status-help__indicator--inactive"
+                                    aria-hidden="true"
+                                ></span>
+
+                                <div>
+                                    <strong>
+                                        Inactivo
+                                    </strong>
+
+                                    <p>
+                                        El proceso se encuentra pausado, interrumpido
+                                        o sin seguimiento actual.
+                                    </p>
+                                </div>
+                            </article>
+
+                            <article class="psychologist-patient-status-help__item">
+                                <span
+                                    class="psychologist-patient-status-help__indicator psychologist-patient-status-help__indicator--discharged"
+                                    aria-hidden="true"
+                                ></span>
+
+                                <div>
+                                    <strong>
+                                        Dado de alta
+                                    </strong>
+
+                                    <p>
+                                        El proceso terapéutico finalizó formalmente.
+                                    </p>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </article>
+            {% endif %}
+
+            <!-- Citas -->
             <section class="psychologist-patient-detail__appointments">
                 <article class="card">
                     <div class="card__header">

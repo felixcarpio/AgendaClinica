@@ -1,0 +1,345 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Nuevo paciente | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_patient_create.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading page-heading--with-actions">
+        <div>
+            <h2 class="page-heading__title">
+                Nuevo paciente
+            </h2>
+
+            <p class="page-heading__description">
+                Registra la cuenta, la información personal y el expediente
+                clínico inicial del paciente.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'psychologist-patient-list' %}"
+            class="btn btn--secondary"
+        >
+            Volver al listado
+        </a>
+    </section>
+
+    <section class="content-section">
+        <form
+            method="post"
+            class="patient-create-form"
+            novalidate
+        >
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div
+                    class="form-alert form-alert--error"
+                    role="alert"
+                >
+                    {% for error in form.non_field_errors %}
+                        <p>
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <article class="card patient-create-card">
+                <div class="patient-create-card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Datos de acceso
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Esta información se utilizará para crear la cuenta
+                            del paciente en el sistema.
+                        </p>
+                    </div>
+
+                    <span class="patient-create-card__step">
+                        1
+                    </span>
+                </div>
+
+                <div class="card__body patient-create-card__body">
+                    <div class="patient-create-grid patient-create-grid--two">
+                        <div class="form-field">
+                            <label
+                                for="{{ form.first_name.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.first_name.label }}
+                            </label>
+
+                            {{ form.first_name }}
+
+                            {% for error in form.first_name.errors %}
+                                <span class="form-error">
+                                    {{ error }}
+                                </span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-field">
+                            <label
+                                for="{{ form.last_name.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.last_name.label }}
+                            </label>
+
+                            {{ form.last_name }}
+
+                            {% for error in form.last_name.errors %}
+                                <span class="form-error">
+                                    {{ error }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label
+                            for="{{ form.email.id_for_label }}"
+                            class="form-label"
+                        >
+                            {{ form.email.label }}
+                        </label>
+
+                        {{ form.email }}
+
+                        {% if form.email.help_text %}
+                            <span class="form-help-text">
+                                {{ form.email.help_text }}
+                            </span>
+                        {% endif %}
+
+                        {% for error in form.email.errors %}
+                            <span class="form-error">
+                                {{ error }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </article>
+
+            <article class="card patient-create-card">
+                <div class="patient-create-card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Información personal
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Registra los datos generales y de contacto.
+                        </p>
+                    </div>
+
+                    <span class="patient-create-card__step">
+                        2
+                    </span>
+                </div>
+
+                <div class="card__body patient-create-card__body">
+                    <div class="patient-create-grid patient-create-grid--two">
+                        <div class="form-field">
+                            <label
+                                for="{{ form.phone.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.phone.label }}
+                            </label>
+
+                            {{ form.phone }}
+
+                            {% for error in form.phone.errors %}
+                                <span class="form-error">
+                                    {{ error }}
+                                </span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-field">
+                            <label
+                                for="{{ form.birth_date.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.birth_date.label }}
+                            </label>
+
+                            {{ form.birth_date }}
+
+                            {% for error in form.birth_date.errors %}
+                                <span class="form-error">
+                                    {{ error }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label
+                            for="{{ form.gender.id_for_label }}"
+                            class="form-label"
+                        >
+                            {{ form.gender.label }}
+                        </label>
+
+                        {{ form.gender }}
+
+                        {% for error in form.gender.errors %}
+                            <span class="form-error">
+                                {{ error }}
+                            </span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-field">
+                        <label
+                            for="{{ form.address.id_for_label }}"
+                            class="form-label"
+                        >
+                            {{ form.address.label }}
+                        </label>
+
+                        {{ form.address }}
+
+                        {% for error in form.address.errors %}
+                            <span class="form-error">
+                                {{ error }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </article>
+
+            <article class="card patient-create-card">
+                <div class="patient-create-card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Contacto de emergencia
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Completa ambos datos cuando exista una persona
+                            de contacto.
+                        </p>
+                    </div>
+
+                    <span class="patient-create-card__step">
+                        3
+                    </span>
+                </div>
+
+                <div class="card__body patient-create-card__body">
+                    <div class="patient-create-grid patient-create-grid--two">
+                        <div class="form-field">
+                            <label
+                                for="{{ form.emergency_contact_name.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.emergency_contact_name.label }}
+                            </label>
+
+                            {{ form.emergency_contact_name }}
+
+                            {% for error in form.emergency_contact_name.errors %}
+                                <span class="form-error">
+                                    {{ error }}
+                                </span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-field">
+                            <label
+                                for="{{ form.emergency_contact_phone.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.emergency_contact_phone.label }}
+                            </label>
+
+                            {{ form.emergency_contact_phone }}
+
+                            {% for error in form.emergency_contact_phone.errors %}
+                                <span class="form-error">
+                                    {{ error }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card patient-create-card">
+                <div class="patient-create-card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Expediente clínico inicial
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Registra la razón principal por la que el paciente
+                            inicia el proceso terapéutico.
+                        </p>
+                    </div>
+
+                    <span class="patient-create-card__step">
+                        4
+                    </span>
+                </div>
+
+                <div class="card__body patient-create-card__body">
+                    <div class="form-field">
+                        <label
+                            for="{{ form.chief_complaint.id_for_label }}"
+                            class="form-label"
+                        >
+                            {{ form.chief_complaint.label }}
+                        </label>
+
+                        {{ form.chief_complaint }}
+
+                        {% if form.chief_complaint.help_text %}
+                            <span class="form-help-text">
+                                {{ form.chief_complaint.help_text }}
+                            </span>
+                        {% endif %}
+
+                        {% for error in form.chief_complaint.errors %}
+                            <span class="form-error">
+                                {{ error }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </article>
+
+            <div class="patient-create-actions">
+                <a
+                    href="{% url 'psychologist-patient-list' %}"
+                    class="btn btn--secondary"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn--primary"
+                >
+                    Registrar paciente
+                </button>
+            </div>
+        </form>
+    </section>
+{% endblock %}

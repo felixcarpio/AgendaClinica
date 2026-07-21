@@ -1,0 +1,108 @@
+.patient-created-card {
+    display: grid;
+    gap: var(--spacing-5);
+    max-width: 780px;
+    margin-inline: auto;
+    padding: var(--spacing-6);
+}
+
+.patient-created-card__icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 999px;
+    background: var(--success-soft);
+    color: var(--success-color);
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.patient-created-card__content {
+    display: grid;
+    gap: var(--spacing-2);
+}
+
+.patient-created-card__title,
+.patient-created-card__description {
+    margin: 0;
+}
+
+.patient-created-card__description {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.patient-created-credentials {
+    display: grid;
+    gap: var(--spacing-4);
+}
+
+.patient-created-credential {
+    display: grid;
+    gap: var(--spacing-2);
+}
+
+.patient-created-credential__label {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.patient-created-credential__value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+}
+
+.patient-created-credential__value code {
+    overflow-wrap: anywhere;
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.patient-created-warning {
+    padding: var(--spacing-4);
+    border: 1px solid var(--warning-color);
+    border-radius: var(--radius-md);
+    background: var(--warning-soft);
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+.patient-created-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+}
+
+@media (max-width: 600px) {
+    .patient-created-card {
+        padding: var(--spacing-4);
+    }
+
+    .patient-created-credential__value {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .patient-created-credential__value .btn {
+        width: 100%;
+    }
+
+    .patient-created-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .patient-created-actions .btn {
+        width: 100%;
+    }
+}

@@ -20,7 +20,7 @@
             </h2>
 
             <p class="page-heading__description">
-                Consulta las notas clínicas registradas
+                Consulta y administra las notas clínicas registradas
                 en las sesiones completadas.
             </p>
         </div>
@@ -42,120 +42,255 @@
                     </h3>
 
                     <p class="card__subtitle">
-                        Notas registradas para tus pacientes.
+                        Busca, filtra y consulta las notas de tus pacientes.
                     </p>
                 </div>
-
-                {% if session_notes_count %}
-                    <span class="badge badge--neutral">
-                        {{ session_notes_count }}
-
-                        {% if session_notes_count == 1 %}
-                            nota
-                        {% else %}
-                            notas
-                        {% endif %}
-                    </span>
-                {% endif %}
             </div>
 
             <div class="card__body">
-                {% if session_notes %}
-                    <div class="session-note-list">
-                        {% for note in session_notes %}
-                            <article class="session-note-item">
-                                <div class="session-note-item__header">
-                                    <div>
-                                        <h4 class="session-note-item__title">
-                                            {{ note.clinical_record.patient }}
-                                        </h4>
+                <form method="get" class="session-note-filters">
+                    <div class="session-note-filters__grid">
+                        <div class="form-group session-note-filters__field session-note-filters__field--full">
+                            <label
+                                for="id_q"
+                                class="form-label"
+                            >
+                                Búsqueda
+                            </label>
 
-                                        <p class="session-note-item__date">
-                                            Sesión del
-                                            {{ note.appointment.availability_slot.start_time|date:"d/m/Y" }}
+                            <div class="session-note-filters__search">
+                                <span
+                                    class="session-note-filters__search-icon"
+                                    aria-hidden="true"
+                                >
+                                    🔎
+                                </span>
 
-                                            ·
+                                <input
+                                    type="text"
+                                    name="q"
+                                    id="id_q"
+                                    class="form-control"
+                                    placeholder="Buscar por nombre del paciente"
+                                    value="{{ query }}"
+                                >
+                            </div>
+                        </div>
 
-                                            {{ note.appointment.availability_slot.start_time|time:"h:i A" }}
-                                            -
-                                            {{ note.appointment.availability_slot.end_time|time:"h:i A" }}
-                                        </p>
-                                    </div>
+                        <div class="form-group session-note-filters__field">
+                            <label
+                                for="id_date_from"
+                                class="form-label"
+                            >
+                                Desde
+                            </label>
 
-                                    <span class="badge badge--success">
-                                        Nota registrada
-                                    </span>
-                                </div>
+                            <input
+                                type="date"
+                                name="date_from"
+                                id="id_date_from"
+                                class="form-control"
+                                value="{{ date_from }}"
+                            >
+                        </div>
 
-                                <div class="session-note-item__body">
-                                    <div class="session-note-item__summary">
-                                        <span>Resumen de la sesión</span>
+                        <div class="form-group session-note-filters__field">
+                            <label
+                                for="id_date_to"
+                                class="form-label"
+                            >
+                                Hasta
+                            </label>
 
-                                        <p>
-                                            {{ note.session_summary|truncatechars:220 }}
-                                        </p>
-                                    </div>
+                            <input
+                                type="date"
+                                name="date_to"
+                                id="id_date_to"
+                                class="form-control"
+                                value="{{ date_to }}"
+                            >
+                        </div>
 
-                                    <div class="session-note-item__meta">
-                                        <p>
-                                            <span>Última actualización</span>
+                        <div class="form-group session-note-filters__field session-note-filters__field--full">
+                            <label
+                                for="id_ordering"
+                                class="form-label"
+                            >
+                                Orden
+                            </label>
 
-                                            <strong>
-                                                {{ note.updated_at|date:"d/m/Y h:i A" }}
-                                            </strong>
-                                        </p>
-
-                                        <p>
-                                            <span>Asignaciones</span>
-
-                                            <strong>
-                                                {{ note.assignments.count }}
-                                            </strong>
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="session-note-item__actions">
-                                    <a
-                                        href="{% url 'psychologist-appointment-detail' note.appointment.public_id %}"
-                                        class="btn btn--secondary btn--sm"
-                                    >
-                                        Ver cita
-                                    </a>
-
-                                    <a
-                                        href="{% url 'psychologist-assignment-list' note.public_id %}"
-                                        class="btn btn--secondary btn--sm"
-                                    >
-                                        Ver asignaciones
-                                    </a>
-
-                                    <a
-                                        href="{% url 'psychologist-session-note-manage' note.appointment.public_id %}"
-                                        class="btn btn--primary btn--sm"
-                                    >
-                                        Editar nota
-                                    </a>
-                                </div>
-                            </article>
-                        {% endfor %}
+                            <select
+                                name="ordering"
+                                id="id_ordering"
+                                class="form-control"
+                            >
+                                <option
+                                    value="newest"
+                                    {% if ordering == "newest" or not ordering %}selected{% endif %}
+                                >
+                                    Más recientes
+                                </option>
+                                <option
+                                    value="oldest"
+                                    {% if ordering == "oldest" %}selected{% endif %}
+                                >
+                                    Más antiguas
+                                </option>
+                            </select>
+                        </div>
                     </div>
+
+                    <div class="session-note-filters__actions">
+                        <button
+                            type="submit"
+                            class="btn btn--primary"
+                        >
+                            Aplicar filtros
+                        </button>
+
+                        <a
+                            href="{% url 'psychologist-session-note-list' %}"
+                            class="btn btn--secondary"
+                        >
+                            Limpiar
+                        </a>
+                    </div>
+                </form>
+
+                {% if page_obj.object_list %}
+                    <div class="session-note-table-wrapper">
+                        <table class="session-note-table">
+                            <thead>
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Sesión</th>
+                                    <th>Resumen</th>
+                                    <th>Asignaciones</th>
+                                    <th>Actualización</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for note in page_obj.object_list %}
+                                    <tr>
+                                        <td>
+                                            <div class="session-note-table__patient">
+                                                <strong>
+                                                    {{ note.clinical_record.patient }}
+                                                </strong>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="session-note-table__session">
+                                                <strong>
+                                                    {{ note.appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                                </strong>
+
+                                                <span>
+                                                    {{ note.appointment.availability_slot.start_time|time:"h:i A" }}
+                                                    -
+                                                    {{ note.appointment.availability_slot.end_time|time:"h:i A" }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="session-note-table__summary">
+                                                {{ note.session_summary|truncatechars:120 }}
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <a
+                                                href="{% url 'psychologist-assignment-list' note.public_id %}"
+                                                class="session-note-table__assignments-link"
+                                            >
+                                                {{ note.assignments.count }}
+                                                {% if note.assignments.count == 1 %}
+                                                    asignación
+                                                {% else %}
+                                                    asignaciones
+                                                {% endif %}
+                                            </a>
+                                        </td>
+
+                                        <td>
+                                            <div class="session-note-table__updated">
+                                                <strong>
+                                                    {{ note.updated_at|date:"d/m/Y" }}
+                                                </strong>
+
+                                                <span>
+                                                    {{ note.updated_at|time:"h:i A" }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="session-note-table__actions">
+                                                <a
+                                                    href="{% url 'psychologist-session-note-manage' note.appointment.public_id %}"
+                                                    class="btn btn--primary btn--sm"
+                                                >
+                                                    Editar
+                                                </a>
+
+                                                <a
+                                                    href="{% url 'psychologist-appointment-detail' note.appointment.public_id %}"
+                                                    class="btn btn--secondary btn--sm"
+                                                >
+                                                    Ver cita
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if page_obj.paginator.num_pages > 1 %}
+                        <div class="pagination">
+                            {% if page_obj.has_previous %}
+                                <a
+                                    href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                    class="pagination__link"
+                                >
+                                    Anterior
+                                </a>
+                            {% endif %}
+
+                            <span class="pagination__current">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+
+                            {% if page_obj.has_next %}
+                                <a
+                                    href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                    class="pagination__link"
+                                >
+                                    Siguiente
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 {% else %}
                     <div class="empty-state">
                         <h3 class="empty-state__title">
-                            No hay notas de sesión
+                            No se encontraron notas
                         </h3>
 
                         <p class="empty-state__description">
-                            Las notas aparecerán aquí después de registrar
-                            información en una cita completada.
+                            No hay resultados con los filtros seleccionados.
                         </p>
 
                         <a
-                            href="{% url 'psychologist-appointment-list' %}"
+                            href="{% url 'psychologist-session-note-list' %}"
                             class="btn btn--secondary"
                         >
-                            Ver mi agenda
+                            Limpiar filtros
                         </a>
                     </div>
                 {% endif %}

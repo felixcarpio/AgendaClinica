@@ -1,0 +1,148 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Paciente registrado | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/psychologist_patient_created.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Paciente registrado
+            </h2>
+
+            <p class="page-heading__description">
+                La cuenta, el perfil del paciente, la relación terapéutica
+                y el expediente clínico fueron creados correctamente.
+            </p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <article class="card patient-created-card">
+            <div class="patient-created-card__icon" aria-hidden="true">
+                ✓
+            </div>
+
+            <div class="patient-created-card__content">
+                <h3 class="patient-created-card__title">
+                    {{ credentials.patient_name }}
+                </h3>
+
+                <p class="patient-created-card__description">
+                    Comparte estas credenciales con el paciente de forma segura.
+                    La contraseña temporal solo se mostrará en esta pantalla.
+                </p>
+            </div>
+
+            <div class="patient-created-credentials">
+                <div class="patient-created-credential">
+                    <span class="patient-created-credential__label">
+                        Correo electrónico
+                    </span>
+
+                    <div class="patient-created-credential__value">
+                        <code id="patient-email">
+                            {{ credentials.email }}
+                        </code>
+
+                        <button
+                            type="button"
+                            class="btn btn--secondary btn--sm"
+                            data-copy-target="patient-email"
+                        >
+                            Copiar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="patient-created-credential">
+                    <span class="patient-created-credential__label">
+                        Contraseña temporal
+                    </span>
+
+                    <div class="patient-created-credential__value">
+                        <code id="patient-password">
+                            {{ credentials.temporary_password }}
+                        </code>
+
+                        <button
+                            type="button"
+                            class="btn btn--secondary btn--sm"
+                            data-copy-target="patient-password"
+                        >
+                            Copiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="patient-created-warning"
+                role="note"
+            >
+                <strong>Importante:</strong>
+
+                esta contraseña no podrá volver a consultarse después
+                de salir de esta pantalla.
+            </div>
+
+            <div class="patient-created-actions">
+                <a
+                    href="{% url 'psychologist-patient-list' %}"
+                    class="btn btn--secondary"
+                >
+                    Volver al listado
+                </a>
+
+                <a
+                    href="{% url 'psychologist-patient-detail' credentials.patient_public_id %}"
+                    class="btn btn--primary"
+                >
+                    Ver paciente
+                </a>
+            </div>
+        </article>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const copyButtons = document.querySelectorAll(
+                "[data-copy-target]"
+            );
+
+            copyButtons.forEach(function (button) {
+                button.addEventListener("click", async function () {
+                    const targetId = button.dataset.copyTarget;
+                    const target = document.getElementById(targetId);
+
+                    if (!target) {
+                        return;
+                    }
+
+                    const text = target.textContent.trim();
+                    const originalText = button.textContent.trim();
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        button.textContent = "Copiado";
+                    } catch (error) {
+                        button.textContent = "No se pudo copiar";
+                    }
+
+                    window.setTimeout(function () {
+                        button.textContent = originalText;
+                    }, 1800);
+                });
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,119 @@
+.patient-create-form {
+    display: grid;
+    gap: var(--spacing-5);
+}
+
+.patient-create-card {
+    overflow: hidden;
+}
+
+.patient-create-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding: var(--spacing-5);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.patient-create-card__header .card__title,
+.patient-create-card__header .card__subtitle {
+    margin: 0;
+}
+
+.patient-create-card__header .card__subtitle {
+    margin-top: var(--spacing-2);
+}
+
+.patient-create-card__step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.patient-create-card__body {
+    display: grid;
+    gap: var(--spacing-4);
+    padding: var(--spacing-5);
+}
+
+.patient-create-grid {
+    display: grid;
+    gap: var(--spacing-4);
+}
+
+.patient-create-grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.patient-create-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+}
+
+.form-field {
+    display: grid;
+    gap: var(--spacing-2);
+    min-width: 0;
+}
+
+.form-label {
+    font-weight: 600;
+}
+
+.form-help-text {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.form-error {
+    color: var(--danger-color);
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+}
+
+.form-alert {
+    padding: var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.form-alert p {
+    margin: 0;
+}
+
+.form-alert--error {
+    border-color: var(--danger-color);
+    background: var(--danger-soft);
+    color: var(--danger-color);
+}
+
+@media (max-width: 700px) {
+    .page-heading--with-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .patient-create-grid--two {
+        grid-template-columns: 1fr;
+    }
+
+    .patient-create-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .patient-create-actions .btn {
+        width: 100%;
+    }
+}
