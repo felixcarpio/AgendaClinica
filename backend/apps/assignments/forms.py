@@ -7,6 +7,43 @@ from apps.clinical_records.models import SessionNote
 from .models import Assignment, AssignmentAttachment
 from pathlib import Path
 
+class MultipleFileInput(forms.ClearableFileInput):
+    """
+    Widget que permite seleccionar varios archivos
+    desde un único campo.
+    """
+
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    """
+    Campo que valida y devuelve una lista de archivos.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault(
+            "widget",
+            MultipleFileInput(),
+        )
+
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+
+        if isinstance(data, (list, tuple)):
+            return [
+                single_file_clean(file, initial)
+                for file in data
+            ]
+
+        if data:
+            return [
+                single_file_clean(data, initial)
+            ]
+
+        return []
 
 class AssignmentPsychologistForm(forms.ModelForm):
     """
@@ -244,6 +281,20 @@ class PsychologistAssignmentForm(forms.ModelForm):
     el psicólogo pueda vincular la actividad manualmente
     con una sesión diferente.
     """
+    
+    attachments = MultipleFileField(
+        required=False,
+        label="Archivos adjuntos",
+        widget=MultipleFileInput(
+            attrs={
+                "class": "form-control",
+                "accept": (
+                    ".pdf,.doc,.docx,.txt,"
+                    ".jpg,.jpeg,.png"
+                ),
+            }
+        ),
+    )
 
     class Meta:
         model = Assignment
@@ -339,6 +390,65 @@ class PsychologistAssignmentForm(forms.ModelForm):
             for choice in Assignment.Status.choices
             if choice[0] in allowed_values
         ]
+        
+        # Los archivos iniciales únicamente se muestran
+        # al crear una asignación.
+        #
+        # Durante la edición se administran desde la sección
+        # independiente de archivos adjuntos.
+        if self.instance and self.instance.pk:
+            self.fields.pop(
+                "attachments",
+                None,
+            )
+            
+    def clean_attachments(self):
+        """
+        Valida el tamaño y la extensión de cada archivo
+        seleccionado al crear la asignación.
+        """
+
+        uploaded_files = self.cleaned_data.get(
+            "attachments",
+            [],
+        )
+
+        max_size = 10 * 1024 * 1024
+
+        allowed_extensions = {
+            ".pdf",
+            ".doc",
+            ".docx",
+            ".txt",
+            ".jpg",
+            ".jpeg",
+            ".png",
+        }
+
+        for uploaded_file in uploaded_files:
+            if uploaded_file.size > max_size:
+                raise forms.ValidationError(
+                    (
+                        f'El archivo "{uploaded_file.name}" '
+                        "supera el límite de 10 MB."
+                    )
+                )
+
+            extension = Path(
+                uploaded_file.name
+            ).suffix.lower()
+
+            if extension not in allowed_extensions:
+                raise forms.ValidationError(
+                    (
+                        f'El archivo "{uploaded_file.name}" '
+                        "tiene un formato no permitido. "
+                        "Puedes subir archivos PDF, Word, "
+                        "TXT, JPG o PNG."
+                    )
+                )
+
+        return uploaded_files
 
     def clean_title(self):
         """

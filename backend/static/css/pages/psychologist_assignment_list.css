@@ -3,9 +3,12 @@
     gap: var(--spacing-5);
 }
 
-.psychologist-assignment-list__session {
+.psychologist-assignment-list__session,
+.psychologist-assignment-list__results {
     width: 100%;
 }
+
+/* Datos de la sesión */
 
 .psychologist-assignment-list__session-grid {
     display: grid;
@@ -30,84 +33,267 @@
     overflow-wrap: anywhere;
 }
 
-.psychologist-assignment-list__grid {
+/* Filtros */
+
+.assignment-filters {
+    margin-bottom: var(--spacing-6);
+}
+
+.assignment-filters__grid {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fill,
-        minmax(320px, 1fr)
-    );
-    gap: var(--spacing-5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--spacing-4);
+    row-gap: var(--spacing-2);
 }
 
-.psychologist-assignment-card {
-    height: 100%;
+.assignment-filters__field {
+    display: grid;
+    gap: var(--spacing-1);
+    min-width: 0;
 }
 
-.psychologist-assignment-card .card__body {
-    flex: 1;
+.assignment-filters__field.form-group {
+    margin: 0;
 }
 
-.psychologist-assignment-card__section + .psychologist-assignment-card__section {
-    margin-top: var(--spacing-4);
+.assignment-filters__field--full {
+    grid-column: 1 / -1;
+}
+
+.assignment-filters__search {
+    position: relative;
+}
+
+.assignment-filters__search-icon {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    font-size: var(--font-size-sm);
+}
+
+.assignment-filters__search .form-control {
+    padding-left: 2.8rem;
+}
+
+.assignment-filters__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-3);
+    padding-top: var(--spacing-3);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Flecha personalizada de select */
+
+.assignment-filters select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2.75rem;
+    cursor: pointer;
+
+    background-image:
+        linear-gradient(
+            45deg,
+            transparent 50%,
+            currentColor 50%
+        ),
+        linear-gradient(
+            135deg,
+            currentColor 50%,
+            transparent 50%
+        );
+
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+
+    background-size:
+        5px 5px,
+        5px 5px;
+
+    background-repeat: no-repeat;
+}
+
+/* Tabla */
+
+.assignment-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.assignment-table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+}
+
+.assignment-table thead th {
+    padding: 0 0 var(--spacing-3);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.assignment-table tbody td {
+    padding: var(--spacing-4) 0;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+}
+
+.assignment-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.assignment-table__title {
+    display: grid;
+    gap: var(--spacing-1);
+    min-width: 150px;
+}
+
+.assignment-table__title strong {
+    overflow-wrap: anywhere;
+}
+
+.assignment-table__title span,
+.assignment-table__updated span {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.assignment-table__description {
+    max-width: 380px;
+    margin: 0;
+    color: var(--text-color);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.assignment-table__attachment-count {
+    color: var(--primary-color);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.assignment-table__empty-value {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+.assignment-table__updated {
+    display: grid;
+    gap: var(--spacing-1);
+    min-width: 105px;
+}
+
+.assignment-table__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+}
+
+/* Paginación */
+
+.assignment-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    margin-top: var(--spacing-5);
     padding-top: var(--spacing-4);
     border-top: 1px solid var(--border-color);
 }
 
-.psychologist-assignment-card__section h4 {
-    margin: 0 0 var(--spacing-2);
-    font-size: var(--font-size-sm);
-    line-height: 1.4;
-}
-
-.psychologist-assignment-card__section div {
-    color: var(--text-muted);
-    line-height: 1.55;
-    overflow-wrap: anywhere;
-}
-
-.psychologist-assignment-card__section p {
+.assignment-pagination__summary {
     margin: 0;
-}
-
-.psychologist-assignment-card__section p + p {
-    margin-top: var(--spacing-2);
-}
-
-.psychologist-assignment-card__completed {
-    margin: var(--spacing-4) 0 0;
-    padding-top: var(--spacing-3);
-    border-top: 1px solid var(--border-color);
     color: var(--text-muted);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
 }
+
+.assignment-pagination__navigation {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+}
+
+.assignment-pagination__page,
+.assignment-pagination__current {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+}
+
+.assignment-pagination__page {
+    color: var(--text-color);
+}
+
+.assignment-pagination__page:hover {
+    background: var(--surface-soft);
+}
+
+.assignment-pagination__current {
+    background: var(--primary-color);
+    color: white;
+    font-weight: 700;
+}
+
+/* Encabezado */
 
 .page-heading__actions {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--spacing-3);
     flex-wrap: wrap;
+    gap: var(--spacing-3);
 }
 
+/* Responsive */
+
 @media (max-width: 900px) {
-    .psychologist-assignment-list__session-grid {
+    .psychologist-assignment-list__session-grid,
+    .assignment-filters__grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 600px) {
     .psychologist-assignment-list__session-grid,
-    .psychologist-assignment-list__grid {
+    .assignment-filters__grid {
         grid-template-columns: 1fr;
     }
 
-    .page-heading__actions {
-        width: 100%;
-        justify-content: flex-start;
+    .assignment-filters__field--full {
+        grid-column: auto;
     }
 
-    .page-heading__actions .btn,
-    .psychologist-assignment-card .card__footer .btn {
+    .assignment-filters__actions,
+    .page-heading__actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .assignment-filters__actions .btn,
+    .page-heading__actions .btn {
         width: 100%;
+    }
+
+    .assignment-pagination {
+        align-items: stretch;
+        flex-direction: column;
     }
 }

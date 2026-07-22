@@ -34,214 +34,282 @@
     </section>
 
     <section class="content-section">
-        <div class="availability-summary-grid">
-
-            <article class="card card--soft">
-                <div class="card__body">
-                    <span class="availability-summary__label">
-                        Disponibles
-                    </span>
-
-                    <strong class="availability-summary__value">
-                        {{ available_slots_count }}
-                    </strong>
-
-                    <p class="availability-summary__description">
-                        Cupos que pueden reservar los pacientes.
-                    </p>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="card__body">
-                    <span class="availability-summary__label">
-                        Reservados
-                    </span>
-
-                    <strong class="availability-summary__value">
-                        {{ booked_slots_count }}
-                    </strong>
-
-                    <p class="availability-summary__description">
-                        Cupos asociados a una cita.
-                    </p>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="card__body">
-                    <span class="availability-summary__label">
-                        Bloqueados
-                    </span>
-
-                    <strong class="availability-summary__value">
-                        {{ blocked_slots_count }}
-                    </strong>
-
-                    <p class="availability-summary__description">
-                        Horarios no disponibles temporalmente.
-                    </p>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="card__body">
-                    <span class="availability-summary__label">
-                        Cancelados
-                    </span>
-
-                    <strong class="availability-summary__value">
-                        {{ cancelled_slots_count }}
-                    </strong>
-
-                    <p class="availability-summary__description">
-                        Cupos retirados de la agenda.
-                    </p>
-                </div>
-            </article>
-
-        </div>
-    </section>
-
-    <section class="content-section">
         <article class="card">
             <div class="card__header">
                 <div>
                     <h3 class="card__title">
-                        Cupos disponibles
+                        Historial de cupos
                     </h3>
 
                     <p class="card__subtitle">
-                        Horarios que pueden ser reservados por los pacientes.
+                        Filtra y administra los horarios de tu agenda.
                     </p>
                 </div>
-
-                {% if available_slots_count %}
-                    <span class="badge badge--success">
-                        {{ available_slots_count }}
-                    </span>
-                {% endif %}
             </div>
 
             <div class="card__body">
-                {% if available_slots %}
-                    <div class="availability-slot-list">
-                        {% for slot in available_slots %}
-                            {% include "appointments/components/psychologist_availability_slot_item.html" %}
-                        {% endfor %}
+                <form method="get" class="slot-filters">
+                    <div class="slot-filters__grid">
+                        <div class="slot-filters__field">
+                            <label for="id_date_from" class="form-label">
+                                Desde
+                            </label>
+                            <input
+                                type="date"
+                                name="date_from"
+                                id="id_date_from"
+                                class="form-control"
+                                value="{{ date_from }}"
+                            >
+                        </div>
+
+                        <div class="slot-filters__field">
+                            <label for="id_date_to" class="form-label">
+                                Hasta
+                            </label>
+                            <input
+                                type="date"
+                                name="date_to"
+                                id="id_date_to"
+                                class="form-control"
+                                value="{{ date_to }}"
+                            >
+                        </div>
+
+                        <div class="slot-filters__field">
+                            <label for="id_status" class="form-label">
+                                Estado
+                            </label>
+                            <select
+                                name="status"
+                                id="id_status"
+                                class="form-control"
+                            >
+                                <option value="">
+                                    Todos los estados
+                                </option>
+                                <option
+                                    value="AVAILABLE"
+                                    {% if status_filter == "AVAILABLE" %}selected{% endif %}
+                                >
+                                    Disponible
+                                </option>
+                                <option
+                                    value="BOOKED"
+                                    {% if status_filter == "BOOKED" %}selected{% endif %}
+                                >
+                                    Reservado
+                                </option>
+                                <option
+                                    value="BLOCKED"
+                                    {% if status_filter == "BLOCKED" %}selected{% endif %}
+                                >
+                                    Bloqueado
+                                </option>
+                                <option
+                                    value="CANCELLED"
+                                    {% if status_filter == "CANCELLED" %}selected{% endif %}
+                                >
+                                    Cancelado
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="slot-filters__field">
+                            <label for="id_order" class="form-label">
+                                Orden
+                            </label>
+                            <select
+                                name="order"
+                                id="id_order"
+                                class="form-control"
+                            >
+                                <option
+                                    value="upcoming"
+                                    {% if order == "upcoming" or not order %}selected{% endif %}
+                                >
+                                    Más próximos
+                                </option>
+                                <option
+                                    value="recent"
+                                    {% if order == "recent" %}selected{% endif %}
+                                >
+                                    Más recientes
+                                </option>
+                            </select>
+                        </div>
                     </div>
-                {% else %}
-                    <p class="availability-slot-empty">
-                        No tienes cupos disponibles.
-                    </p>
-                {% endif %}
-            </div>
-        </article>
-    </section>
 
-    <section class="content-section">
-        <article class="card">
-            <div class="card__header">
-                <div>
-                    <h3 class="card__title">
-                        Cupos reservados
-                    </h3>
+                    <div class="slot-filters__actions">
+                        <button type="submit" class="btn btn--primary">
+                            Aplicar filtros
+                        </button>
 
-                    <p class="card__subtitle">
-                        Horarios que ya tienen una cita asociada.
-                    </p>
-                </div>
-
-                {% if booked_slots_count %}
-                    <span class="badge badge--warning">
-                        {{ booked_slots_count }}
-                    </span>
-                {% endif %}
-            </div>
-
-            <div class="card__body">
-                {% if booked_slots %}
-                    <div class="availability-slot-list">
-                        {% for slot in booked_slots %}
-                            {% include "appointments/components/psychologist_availability_slot_item.html" %}
-                        {% endfor %}
+                        <a
+                            href="{% url 'psychologist-availability-slot-list' %}"
+                            class="btn btn--secondary"
+                        >
+                            Limpiar
+                        </a>
                     </div>
-                {% else %}
-                    <p class="availability-slot-empty">
-                        No tienes cupos reservados.
-                    </p>
-                {% endif %}
-            </div>
-        </article>
-    </section>
+                </form>
 
-    <section class="content-section">
-        <article class="card">
-            <div class="card__header">
-                <div>
-                    <h3 class="card__title">
-                        Cupos bloqueados
-                    </h3>
+                {% if page_obj %}
+                    <div class="slot-table-wrapper">
+                        <table class="slot-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Horario</th>
+                                    <th>Estado</th>
+                                    <th>Paciente</th>
+                                    <th>Cita</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
 
-                    <p class="card__subtitle">
-                        Horarios deshabilitados temporalmente.
-                    </p>
-                </div>
+                            <tbody>
+                                {% for slot in page_obj %}
+                                    <tr>
+                                        <td class="slot-table__date">
+                                            <strong>
+                                                {{ slot.start_time|date:"d/m/Y" }}
+                                            </strong>
+                                        </td>
 
-                {% if blocked_slots_count %}
-                    <span class="badge badge--neutral">
-                        {{ blocked_slots_count }}
-                    </span>
-                {% endif %}
-            </div>
+                                        <td class="slot-table__time">
+                                            <strong>
+                                                {{ slot.start_time|time:"h:i A" }}
+                                            </strong>
+                                            <span>
+                                                hasta
+                                                {{ slot.end_time|time:"h:i A" }}
+                                            </span>
+                                        </td>
 
-            <div class="card__body">
-                {% if blocked_slots %}
-                    <div class="availability-slot-list">
-                        {% for slot in blocked_slots %}
-                            {% include "appointments/components/psychologist_availability_slot_item.html" %}
-                        {% endfor %}
+                                        <td class="slot-table__status">
+                                            {% if slot.status == "AVAILABLE" %}
+                                                <span class="badge badge--success">
+                                                    Disponible
+                                                </span>
+                                            {% elif slot.status == "BOOKED" %}
+                                                <span class="badge badge--warning">
+                                                    Reservado
+                                                </span>
+                                            {% elif slot.status == "BLOCKED" %}
+                                                <span class="badge badge--neutral">
+                                                    Bloqueado
+                                                </span>
+                                            {% else %}
+                                                <span class="badge badge--neutral">
+                                                    Cancelado
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="slot-table__patient">
+                                            {% if slot.active_appointments %}
+                                                {% with appointment=slot.active_appointments.0 %}
+                                                    <strong>
+                                                        {{ appointment.patient.account.first_name }}
+                                                        {{ appointment.patient.account.last_name }}
+                                                    </strong>
+                                                {% endwith %}
+                                            {% else %}
+                                                <span class="slot-table__empty-value">
+                                                    Sin paciente
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="slot-table__appointment">
+                                            {% if slot.active_appointments %}
+                                                {% with appointment=slot.active_appointments.0 %}
+                                                    <strong>
+                                                        {{ appointment.get_status_display }}
+                                                    </strong>
+                                                {% endwith %}
+                                            {% else %}
+                                                <span class="slot-table__empty-value">
+                                                    Sin cita asociada
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="slot-table__actions">
+                                            {% if slot.active_appointments %}
+                                                {% with appointment=slot.active_appointments.0 %}
+                                                    <a
+                                                        href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                                                        class="btn btn--secondary btn--sm"
+                                                    >
+                                                        Ver cita
+                                                    </a>
+                                                {% endwith %}
+                                            {% else %}
+                                                <a
+                                                    href="{% url 'psychologist-availability-slot-edit' slot.id %}"
+                                                    class="btn btn--primary btn--sm"
+                                                >
+                                                    Editar cupo
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
+
+                    {% if page_obj.has_other_pages %}
+                        <div class="slot-pagination">
+                            <p class="slot-pagination__summary">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </p>
+
+                            <div class="slot-pagination__navigation">
+                                {% if page_obj.has_previous %}
+                                    <a
+                                        href="?page={{ page_obj.previous_page_number }}&date_from={{ date_from }}&date_to={{ date_to }}&status={{ status_filter }}&order={{ order }}"
+                                        class="slot-pagination__page"
+                                    >
+                                        &laquo;
+                                    </a>
+                                {% endif %}
+
+                                <span class="slot-pagination__current">
+                                    {{ page_obj.number }}
+                                </span>
+
+                                {% if page_obj.has_next %}
+                                    <a
+                                        href="?page={{ page_obj.next_page_number }}&date_from={{ date_from }}&date_to={{ date_to }}&status={{ status_filter }}&order={{ order }}"
+                                        class="slot-pagination__page"
+                                    >
+                                        &raquo;
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
                 {% else %}
-                    <p class="availability-slot-empty">
-                        No tienes cupos bloqueados.
-                    </p>
-                {% endif %}
-            </div>
-        </article>
-    </section>
+                    <div class="empty-state">
+                        <h3 class="empty-state__title">
+                            No hay cupos registrados
+                        </h3>
 
-    <section class="content-section">
-        <article class="card">
-            <div class="card__header">
-                <div>
-                    <h3 class="card__title">
-                        Cupos cancelados
-                    </h3>
+                        <p class="empty-state__description">
+                            Aún no tienes horarios creados o ningún cupo coincide
+                            con los filtros seleccionados.
+                        </p>
 
-                    <p class="card__subtitle">
-                        Horarios cancelados y no disponibles.
-                    </p>
-                </div>
-
-                {% if cancelled_slots_count %}
-                    <span class="badge badge--neutral">
-                        {{ cancelled_slots_count }}
-                    </span>
-                {% endif %}
-            </div>
-
-            <div class="card__body">
-                {% if cancelled_slots %}
-                    <div class="availability-slot-list">
-                        {% for slot in cancelled_slots %}
-                            {% include "appointments/components/psychologist_availability_slot_item.html" %}
-                        {% endfor %}
+                        <a
+                            href="{% url 'psychologist-availability-slot-create' %}"
+                            class="btn btn--primary"
+                        >
+                            Crear primer cupo
+                        </a>
                     </div>
-                {% else %}
-                    <p class="availability-slot-empty">
-                        No tienes cupos cancelados.
-                    </p>
                 {% endif %}
             </div>
         </article>

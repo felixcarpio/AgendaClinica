@@ -1,4 +1,7 @@
 from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db import transaction
+from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -138,14 +141,32 @@ def psychologist_assignment_general_list(request):
     Muestra todas las asignaciones pertenecientes
     al psicólogo autenticado.
 
-    Las asignaciones se separan según su estado:
-    activas, completadas y canceladas.
+    Permite:
+    - buscar por paciente, título o descripción;
+    - filtrar por estado;
+    - ordenar los resultados;
+    - paginar el listado.
     """
 
     if request.user.role != "PSYCHOLOGIST":
         return redirect("dashboard-redirect")
 
-    assignments = (
+    query = request.GET.get(
+        "q",
+        "",
+    ).strip()
+
+    status_filter = request.GET.get(
+        "status",
+        "",
+    ).strip()
+
+    ordering = request.GET.get(
+        "ordering",
+        "updated",
+    ).strip()
+
+    base_assignments = (
         Assignment.objects
         .filter(
             session_note__appointment__psychologist__account=request.user,
@@ -158,46 +179,101 @@ def psychologist_assignment_general_list(request):
             "session_note__clinical_record__patient",
             "session_note__clinical_record__patient__account",
         )
-        .prefetch_related(
-            "attachments",
+        .annotate(
+            attachments_count=Count(
+                "attachments",
+                distinct=True,
+            ),
         )
     )
 
-    active_assignments = (
-        assignments
-        .filter(
-            status__in=[
-                Assignment.Status.PENDING,
-                Assignment.Status.IN_PROGRESS,
-            ],
+    active_assignments_count = base_assignments.filter(
+        status__in=[
+            Assignment.Status.PENDING,
+            Assignment.Status.IN_PROGRESS,
+        ],
+    ).count()
+
+    completed_assignments_count = base_assignments.filter(
+        status=Assignment.Status.COMPLETED,
+    ).count()
+
+    cancelled_assignments_count = base_assignments.filter(
+        status=Assignment.Status.CANCELLED,
+    ).count()
+
+    assignments = base_assignments
+
+    if query:
+        assignments = assignments.filter(
+            Q(title__icontains=query)
+            | Q(description__icontains=query)
+            | Q(
+                session_note__clinical_record__patient__account__first_name__icontains=query
+            )
+            | Q(
+                session_note__clinical_record__patient__account__last_name__icontains=query
+            )
         )
-        .order_by("-updated_at")
+
+    valid_statuses = {
+        Assignment.Status.PENDING,
+        Assignment.Status.IN_PROGRESS,
+        Assignment.Status.COMPLETED,
+        Assignment.Status.CANCELLED,
+    }
+
+    if status_filter in valid_statuses:
+        assignments = assignments.filter(
+            status=status_filter,
+        )
+    else:
+        status_filter = ""
+
+    if ordering == "newest":
+        assignments = assignments.order_by(
+            "-created_at",
+        )
+
+    elif ordering == "oldest":
+        assignments = assignments.order_by(
+            "created_at",
+        )
+
+    elif ordering == "patient":
+        assignments = assignments.order_by(
+            "session_note__clinical_record__patient__account__first_name",
+            "session_note__clinical_record__patient__account__last_name",
+        )
+
+    else:
+        ordering = "updated"
+
+        assignments = assignments.order_by(
+            "-updated_at",
+        )
+
+    filtered_assignments_count = assignments.count()
+
+    paginator = Paginator(
+        assignments,
+        10,
     )
 
-    completed_assignments = (
-        assignments
-        .filter(
-            status=Assignment.Status.COMPLETED,
-        )
-        .order_by("-completed_at", "-updated_at")
-    )
-
-    cancelled_assignments = (
-        assignments
-        .filter(
-            status=Assignment.Status.CANCELLED,
-        )
-        .order_by("-updated_at")
+    page_obj = paginator.get_page(
+        request.GET.get("page"),
     )
 
     context = {
         "page_title": "Asignaciones",
-        "active_assignments": active_assignments,
-        "completed_assignments": completed_assignments,
-        "cancelled_assignments": cancelled_assignments,
-        "active_assignments_count": active_assignments.count(),
-        "completed_assignments_count": completed_assignments.count(),
-        "cancelled_assignments_count": cancelled_assignments.count(),
+        "page_obj": page_obj,
+        "query": query,
+        "status_filter": status_filter,
+        "ordering": ordering,
+        "filtered_assignments_count": filtered_assignments_count,
+        "active_assignments_count": active_assignments_count,
+        "completed_assignments_count": completed_assignments_count,
+        "cancelled_assignments_count": cancelled_assignments_count,
     }
 
     return render(
@@ -210,6 +286,12 @@ def psychologist_assignment_general_list(request):
 def psychologist_assignment_list(request, note_public_id):
     """
     Muestra las asignaciones asociadas a una nota de sesión.
+
+    Permite:
+    - buscar por título o descripción;
+    - filtrar por estado;
+    - ordenar por fecha de creación o actualización;
+    - paginar los resultados.
 
     La nota debe pertenecer a una cita atendida por
     el psicólogo autenticado.
@@ -232,14 +314,80 @@ def psychologist_assignment_list(request, note_public_id):
         appointment__psychologist__account=request.user,
     )
 
+    # Parámetros recibidos desde el formulario de filtros.
+    query = request.GET.get(
+        "q",
+        "",
+    ).strip()
+
+    status_filter = request.GET.get(
+        "status",
+        "",
+    ).strip()
+
+    ordering = request.GET.get(
+        "ordering",
+        "newest",
+    ).strip()
+
     assignments = (
         session_note.assignments
-        .prefetch_related(
-            "attachments",
+        .annotate(
+            attachments_count=Count(
+                "attachments",
+                distinct=True,
+            ),
         )
-        .order_by(
+    )
+
+    # Busca coincidencias en el título y la descripción.
+    if query:
+        assignments = assignments.filter(
+            Q(title__icontains=query)
+            | Q(description__icontains=query)
+        )
+
+    # Aplica el filtro de estado solo cuando el valor es válido.
+    valid_statuses = {
+        Assignment.Status.PENDING,
+        Assignment.Status.IN_PROGRESS,
+        Assignment.Status.COMPLETED,
+        Assignment.Status.CANCELLED,
+    }
+
+    if status_filter in valid_statuses:
+        assignments = assignments.filter(
+            status=status_filter,
+        )
+    else:
+        status_filter = ""
+
+    # Define el orden de los resultados.
+    if ordering == "oldest":
+        assignments = assignments.order_by(
+            "created_at",
+        )
+    elif ordering == "updated":
+        assignments = assignments.order_by(
+            "-updated_at",
+        )
+    else:
+        ordering = "newest"
+
+        assignments = assignments.order_by(
             "-created_at",
         )
+
+    filtered_assignments_count = assignments.count()
+
+    # Muestra hasta diez asignaciones por página.
+    paginator = Paginator(
+        assignments,
+        10,
+    )
+
+    page_obj = paginator.get_page(
+        request.GET.get("page"),
     )
 
     context = {
@@ -247,7 +395,11 @@ def psychologist_assignment_list(request, note_public_id):
         "session_note": session_note,
         "appointment": session_note.appointment,
         "patient": session_note.clinical_record.patient,
-        "assignments": assignments,
+        "page_obj": page_obj,
+        "query": query,
+        "status_filter": status_filter,
+        "ordering": ordering,
+        "filtered_assignments_count": filtered_assignments_count,
     }
 
     return render(
@@ -285,15 +437,33 @@ def psychologist_assignment_create(request, note_public_id):
     if request.method == "POST":
         form = PsychologistAssignmentForm(
             request.POST,
+            request.FILES,
         )
 
         if form.is_valid():
-            assignment = form.save(
-                commit=False,
-            )
+            with transaction.atomic():
+                assignment = form.save(
+                    commit=False,
+                )
 
-            assignment.session_note = session_note
-            assignment.save()
+                assignment.session_note = session_note
+                assignment.save()
+
+                uploaded_files = form.cleaned_data.get(
+                    "attachments",
+                    [],
+                )
+
+                for uploaded_file in uploaded_files:
+                    AssignmentAttachment.objects.create(
+                        assignment=assignment,
+                        file=uploaded_file,
+                        uploaded_by=(
+                            AssignmentAttachment
+                            .UploadedBy
+                            .PSYCHOLOGIST
+                        ),
+                    )
 
             messages.success(
                 request,

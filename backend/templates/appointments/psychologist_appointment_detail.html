@@ -51,14 +51,17 @@
                         <span class="badge badge--success">
                             {{ appointment.get_status_display }}
                         </span>
+
                     {% elif appointment.status == "PENDING" %}
                         <span class="badge badge--warning">
                             {{ appointment.get_status_display }}
                         </span>
+
                     {% elif appointment.status == "COMPLETED" %}
                         <span class="badge badge--success">
                             {{ appointment.get_status_display }}
                         </span>
+
                     {% else %}
                         <span class="badge badge--neutral">
                             {{ appointment.get_status_display }}
@@ -191,6 +194,17 @@
                                 Esta cita ya fue completada y su estado
                                 no puede modificarse.
                             </p>
+
+                            {% if not has_session_note %}
+                                <div class="form-actions">
+                                    <a
+                                        href="{% url 'psychologist-session-note-manage' appointment.public_id %}"
+                                        class="btn btn--primary"
+                                    >
+                                        Crear nota de sesión
+                                    </a>
+                                </div>
+                            {% endif %}
                         </section>
 
                     {% elif appointment.status == "CANCELLED" %}

@@ -1,9 +1,10 @@
 import calendar
-from datetime import date
+from datetime import date, timedelta
 from django.utils import timezone
 from django.db import transaction
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
@@ -803,17 +804,53 @@ def patient_appointment_reschedule_confirm(
 @login_required
 def psychologist_appointment_list(request):
     """
-    Muestra las citas asignadas al psicólogo autenticado.
+    Muestra la agenda del psicólogo autenticado.
 
-    Se separan en:
-    - citas próximas;
-    - citas completadas.
+    Incluye:
+    - calendario semanal con las citas agrupadas por día;
+    - navegación entre semanas;
+    - próximas citas;
+    - historial de sesiones completadas.
     """
 
     if request.user.role != "PSYCHOLOGIST":
         return redirect("dashboard-redirect")
 
     now = timezone.now()
+    today = timezone.localdate()
+
+    # Fecha inicial de la semana solicitada desde la URL.
+    week_start_value = request.GET.get(
+        "week_start",
+        "",
+    ).strip()
+
+    requested_week_start = parse_date(
+        week_start_value,
+    )
+
+    if requested_week_start:
+        # Aunque se reciba cualquier día, siempre se normaliza
+        # al lunes correspondiente.
+        week_start = (
+            requested_week_start
+            - timedelta(
+                days=requested_week_start.weekday(),
+            )
+        )
+    else:
+        # Lunes de la semana actual.
+        week_start = (
+            today
+            - timedelta(
+                days=today.weekday(),
+            )
+        )
+
+    week_end = week_start + timedelta(days=6)
+
+    previous_week_start = week_start - timedelta(days=7)
+    next_week_start = week_start + timedelta(days=7)
 
     appointments = (
         Appointment.objects
@@ -828,6 +865,70 @@ def psychologist_appointment_list(request):
         )
     )
 
+    # Citas visibles en el calendario semanal.
+    #
+    # Se excluyen las canceladas para no ocupar espacio en la
+    # planificación diaria del psicólogo.
+    weekly_appointments = list(
+        appointments
+        .filter(
+            availability_slot__start_time__date__gte=week_start,
+            availability_slot__start_time__date__lte=week_end,
+        )
+        .exclude(
+            status=Appointment.Status.CANCELLED,
+        )
+        .order_by(
+            "availability_slot__start_time",
+        )
+    )
+
+    # Agrupa las citas por fecha para facilitar su renderizado
+    # dentro de las columnas del calendario.
+    appointments_by_date = {}
+
+    for appointment in weekly_appointments:
+        appointment_date = timezone.localtime(
+            appointment.availability_slot.start_time,
+        ).date()
+
+        appointments_by_date.setdefault(
+            appointment_date,
+            [],
+        ).append(
+            appointment,
+        )
+
+    day_names = {
+        0: "Lunes",
+        1: "Martes",
+        2: "Miércoles",
+        3: "Jueves",
+        4: "Viernes",
+        5: "Sábado",
+        6: "Domingo",
+    }
+
+    week_days = []
+
+    for day_offset in range(7):
+        current_date = week_start + timedelta(
+            days=day_offset,
+        )
+
+        week_days.append(
+            {
+                "date": current_date,
+                "name": day_names[current_date.weekday()],
+                "is_today": current_date == today,
+                "appointments": appointments_by_date.get(
+                    current_date,
+                    [],
+                ),
+            }
+        )
+
+    # Próximas citas activas.
     upcoming_appointments = (
         appointments
         .filter(
@@ -842,6 +943,7 @@ def psychologist_appointment_list(request):
         )
     )
 
+    # Historial de sesiones completadas.
     completed_appointments = (
         appointments
         .filter(
@@ -854,6 +956,20 @@ def psychologist_appointment_list(request):
 
     context = {
         "page_title": "Mi agenda",
+        "today": today,
+
+        # Calendario semanal.
+        "week_start": week_start,
+        "week_end": week_end,
+        "week_days": week_days,
+        "previous_week_start": previous_week_start,
+        "next_week_start": next_week_start,
+        "is_current_week": (
+            week_start
+            == today - timedelta(days=today.weekday())
+        ),
+
+        # Listados actuales.
         "upcoming_appointments": upcoming_appointments,
         "completed_appointments": completed_appointments,
     }
@@ -886,6 +1002,11 @@ def psychologist_appointment_detail(request, public_id):
         public_id=public_id,
         psychologist__account=request.user,
     )
+    
+    has_session_note = hasattr(
+        appointment,
+        "session_note",
+    )
 
     if request.method == "POST":
         form = PsychologistAppointmentStatusForm(
@@ -902,8 +1023,7 @@ def psychologist_appointment_detail(request, public_id):
             )
 
             return redirect(
-                "psychologist-appointment-detail",
-                public_id=appointment.public_id,
+                "psychologist-appointment-list",
             )
     else:
         form = PsychologistAppointmentStatusForm(
@@ -920,6 +1040,7 @@ def psychologist_appointment_detail(request, public_id):
         "page_title": "Detalle de la cita",
         "appointment": appointment,
         "session_note": session_note,
+        "has_session_note": has_session_note,
         "form": form
     }
 
@@ -932,17 +1053,42 @@ def psychologist_appointment_detail(request, public_id):
 @login_required
 def psychologist_availability_slot_list(request):
     """
-    Muestra los cupos de disponibilidad pertenecientes
-    al psicólogo autenticado.
+    Muestra los cupos futuros pertenecientes al psicólogo autenticado.
 
-    Los próximos cupos aparecen primero y se agrupan
-    según su estado.
+    Permite:
+    - filtrar por estado;
+    - filtrar por rango de fechas;
+    - ordenar cronológicamente;
+    - paginar los resultados.
     """
 
     if request.user.role != "PSYCHOLOGIST":
         return redirect("dashboard-redirect")
 
     now = timezone.now()
+
+    status_filter = request.GET.get(
+        "status",
+        "",
+    ).strip()
+
+    date_from_value = request.GET.get(
+        "date_from",
+        "",
+    ).strip()
+
+    date_to_value = request.GET.get(
+        "date_to",
+        "",
+    ).strip()
+
+    ordering = request.GET.get(
+        "ordering",
+        "oldest",
+    ).strip()
+
+    date_from = parse_date(date_from_value)
+    date_to = parse_date(date_to_value)
 
     slots = (
         AvailabilitySlot.objects
@@ -959,7 +1105,9 @@ def psychologist_availability_slot_list(request):
                 "appointments",
                 queryset=(
                     Appointment.objects
-                    .exclude(status=Appointment.Status.CANCELLED)
+                    .exclude(
+                        status=Appointment.Status.CANCELLED,
+                    )
                     .select_related(
                         "patient",
                         "patient__account",
@@ -968,35 +1116,62 @@ def psychologist_availability_slot_list(request):
                 to_attr="active_appointments",
             ),
         )
-        .order_by("start_time")
     )
 
-    available_slots = slots.filter(
-        status=AvailabilitySlot.Status.AVAILABLE,
+    valid_statuses = {
+        AvailabilitySlot.Status.AVAILABLE,
+        AvailabilitySlot.Status.BOOKED,
+        AvailabilitySlot.Status.BLOCKED,
+        AvailabilitySlot.Status.CANCELLED,
+    }
+
+    if status_filter in valid_statuses:
+        slots = slots.filter(
+            status=status_filter,
+        )
+    else:
+        status_filter = ""
+
+    if date_from:
+        slots = slots.filter(
+            start_time__date__gte=date_from,
+        )
+
+    if date_to:
+        slots = slots.filter(
+            start_time__date__lte=date_to,
+        )
+
+    if ordering == "newest":
+        slots = slots.order_by(
+            "-start_time",
+        )
+    else:
+        ordering = "oldest"
+
+        slots = slots.order_by(
+            "start_time",
+        )
+
+    filtered_slots_count = slots.count()
+
+    paginator = Paginator(
+        slots,
+        10,
     )
 
-    booked_slots = slots.filter(
-        status=AvailabilitySlot.Status.BOOKED,
-    )
-
-    blocked_slots = slots.filter(
-        status=AvailabilitySlot.Status.BLOCKED,
-    )
-
-    cancelled_slots = slots.filter(
-        status=AvailabilitySlot.Status.CANCELLED,
+    page_obj = paginator.get_page(
+        request.GET.get("page"),
     )
 
     context = {
         "page_title": "Administrar cupos",
-        "available_slots": available_slots,
-        "booked_slots": booked_slots,
-        "blocked_slots": blocked_slots,
-        "cancelled_slots": cancelled_slots,
-        "available_slots_count": available_slots.count(),
-        "booked_slots_count": booked_slots.count(),
-        "blocked_slots_count": blocked_slots.count(),
-        "cancelled_slots_count": cancelled_slots.count(),
+        "page_obj": page_obj,
+        "status_filter": status_filter,
+        "date_from": date_from_value,
+        "date_to": date_to_value,
+        "ordering": ordering,
+        "filtered_slots_count": filtered_slots_count,
     }
 
     return render(

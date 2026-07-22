@@ -193,7 +193,11 @@
                 </div>
 
                 <div class="card__body">
-                    <form method="post" novalidate>
+                    <form
+                        method="post"
+                        enctype="multipart/form-data"
+                        novalidate
+                    >
                         {% csrf_token %}
 
                         {% if form.non_field_errors %}
@@ -272,6 +276,31 @@
                                 </p>
                             {% endfor %}
                         </div>
+
+                        {% if not assignment %}
+                            <div class="form-group">
+                                <label
+                                    for="{{ form.attachments.id_for_label }}"
+                                    class="form-label"
+                                >
+                                    {{ form.attachments.label }}
+                                </label>
+
+                                {{ form.attachments }}
+
+                                <p class="form-help">
+                                    Puedes seleccionar uno o varios archivos.
+                                    Formatos permitidos: PDF, Word, TXT, JPG y PNG.
+                                    Cada archivo puede pesar hasta 10 MB.
+                                </p>
+
+                                {% for error in form.attachments.errors %}
+                                    <p class="form-error">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
 
                         <div class="form-actions">
                             <a

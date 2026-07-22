@@ -20,7 +20,8 @@
             </h2>
 
             <p class="page-heading__description">
-                Consulta las actividades terapéuticas asignadas a tus pacientes.
+                Consulta y administra las actividades terapéuticas
+                asignadas a tus pacientes.
             </p>
         </div>
 
@@ -33,160 +34,405 @@
     </section>
 
     <section class="content-section">
-        <div class="assignment-summary-grid">
-            <article class="card card--soft">
-                <div class="card__body">
-                    <span class="assignment-summary-card__label">
-                        Activas
-                    </span>
-
-                    <strong class="assignment-summary-card__value">
-                        {{ active_assignments_count }}
-                    </strong>
-
-                    <p class="assignment-summary-card__description">
-                        Pendientes o en progreso.
-                    </p>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="card__body">
-                    <span class="assignment-summary-card__label">
-                        Completadas
-                    </span>
-
-                    <strong class="assignment-summary-card__value">
-                        {{ completed_assignments_count }}
-                    </strong>
-
-                    <p class="assignment-summary-card__description">
-                        Actividades finalizadas.
-                    </p>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="card__body">
-                    <span class="assignment-summary-card__label">
-                        Canceladas
-                    </span>
-
-                    <strong class="assignment-summary-card__value">
-                        {{ cancelled_assignments_count }}
-                    </strong>
-
-                    <p class="assignment-summary-card__description">
-                        Actividades ocultas al paciente.
-                    </p>
-                </div>
-            </article>
-        </div>
-    </section>
-
-    <section class="content-section">
-        <article class="card">
+        <article class="card assignment-general-card">
             <div class="card__header">
                 <div>
                     <h3 class="card__title">
-                        Asignaciones activas
+                        Historial de asignaciones
                     </h3>
 
                     <p class="card__subtitle">
-                        Actividades pendientes o en progreso.
+                        Busca, filtra y consulta las actividades de tus pacientes.
                     </p>
                 </div>
-
-                {% if active_assignments_count %}
-                    <span class="badge badge--warning">
-                        {{ active_assignments_count }}
-                    </span>
-                {% endif %}
             </div>
 
             <div class="card__body">
-                {% if active_assignments %}
-                    <div class="assignment-general-list">
-                        {% for assignment in active_assignments %}
-                            {% include "assignments/components/psychologist_assignment_general_item.html" %}
-                        {% endfor %}
+                <form
+                    method="get"
+                    class="assignment-general-filters"
+                >
+                    <div class="assignment-general-filters__grid">
+                        <div class="form-group assignment-general-filters__field assignment-general-filters__field--full">
+                            <label
+                                for="id_q"
+                                class="form-label"
+                            >
+                                Búsqueda
+                            </label>
+
+                            <div class="assignment-general-filters__search">
+                                <span
+                                    class="assignment-general-filters__search-icon"
+                                    aria-hidden="true"
+                                >
+                                    🔎
+                                </span>
+
+                                <input
+                                    type="search"
+                                    name="q"
+                                    id="id_q"
+                                    class="form-control"
+                                    value="{{ query }}"
+                                    placeholder="Buscar por paciente, título o descripción"
+                                    autocomplete="off"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group assignment-general-filters__field">
+                            <label
+                                for="id_status"
+                                class="form-label"
+                            >
+                                Estado
+                            </label>
+
+                            <select
+                                name="status"
+                                id="id_status"
+                                class="form-control"
+                            >
+                                <option
+                                    value=""
+                                    {% if not status_filter %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Todos los estados
+                                </option>
+
+                                <option
+                                    value="PENDING"
+                                    {% if status_filter == "PENDING" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Pendiente
+                                </option>
+
+                                <option
+                                    value="IN_PROGRESS"
+                                    {% if status_filter == "IN_PROGRESS" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    En progreso
+                                </option>
+
+                                <option
+                                    value="COMPLETED"
+                                    {% if status_filter == "COMPLETED" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Completada
+                                </option>
+
+                                <option
+                                    value="CANCELLED"
+                                    {% if status_filter == "CANCELLED" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Cancelada
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group assignment-general-filters__field">
+                            <label
+                                for="id_ordering"
+                                class="form-label"
+                            >
+                                Orden
+                            </label>
+
+                            <select
+                                name="ordering"
+                                id="id_ordering"
+                                class="form-control"
+                            >
+                                <option
+                                    value="updated"
+                                    {% if ordering == "updated" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Actualizadas recientemente
+                                </option>
+
+                                <option
+                                    value="newest"
+                                    {% if ordering == "newest" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Más recientes
+                                </option>
+
+                                <option
+                                    value="oldest"
+                                    {% if ordering == "oldest" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Más antiguas
+                                </option>
+
+                                <option
+                                    value="patient"
+                                    {% if ordering == "patient" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Nombre del paciente
+                                </option>
+                            </select>
+                        </div>
                     </div>
-                {% else %}
-                    <p class="assignment-general-empty">
-                        No tienes asignaciones activas.
-                    </p>
-                {% endif %}
-            </div>
-        </article>
-    </section>
 
-    <section class="content-section">
-        <article class="card">
-            <div class="card__header">
-                <div>
-                    <h3 class="card__title">
-                        Asignaciones completadas
-                    </h3>
+                    <div class="assignment-general-filters__actions">
+                        <button
+                            type="submit"
+                            class="btn btn--primary"
+                        >
+                            Aplicar filtros
+                        </button>
 
-                    <p class="card__subtitle">
-                        Actividades finalizadas por los pacientes.
-                    </p>
-                </div>
-
-                {% if completed_assignments_count %}
-                    <span class="badge badge--success">
-                        {{ completed_assignments_count }}
-                    </span>
-                {% endif %}
-            </div>
-
-            <div class="card__body">
-                {% if completed_assignments %}
-                    <div class="assignment-general-list">
-                        {% for assignment in completed_assignments %}
-                            {% include "assignments/components/psychologist_assignment_general_item.html" %}
-                        {% endfor %}
+                        {% if query or status_filter or ordering != "updated" %}
+                            <a
+                                href="{% url 'psychologist-assignment-general-list' %}"
+                                class="btn btn--secondary"
+                            >
+                                Limpiar
+                            </a>
+                        {% endif %}
                     </div>
-                {% else %}
-                    <p class="assignment-general-empty">
-                        No tienes asignaciones completadas.
-                    </p>
-                {% endif %}
-            </div>
-        </article>
-    </section>
+                </form>
 
-    <section class="content-section">
-        <article class="card">
-            <div class="card__header">
-                <div>
-                    <h3 class="card__title">
-                        Asignaciones canceladas
-                    </h3>
+                {% if page_obj.object_list %}
+                    <div class="assignment-general-table-wrapper">
+                        <table class="assignment-general-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        Paciente
+                                    </th>
 
-                    <p class="card__subtitle">
-                        Actividades canceladas y ocultas al paciente.
-                    </p>
-                </div>
+                                    <th scope="col">
+                                        Asignación
+                                    </th>
 
-                {% if cancelled_assignments_count %}
-                    <span class="badge badge--neutral">
-                        {{ cancelled_assignments_count }}
-                    </span>
-                {% endif %}
-            </div>
+                                    <th scope="col">
+                                        Estado
+                                    </th>
 
-            <div class="card__body">
-                {% if cancelled_assignments %}
-                    <div class="assignment-general-list">
-                        {% for assignment in cancelled_assignments %}
-                            {% include "assignments/components/psychologist_assignment_general_item.html" %}
-                        {% endfor %}
+                                    <th scope="col">
+                                        Descripción
+                                    </th>
+
+                                    <th scope="col">
+                                        Sesión
+                                    </th>
+
+                                    <th scope="col">
+                                        Actualización
+                                    </th>
+
+                                    <th scope="col">
+                                        Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for assignment in page_obj.object_list %}
+                                    <tr>
+                                        <td>
+                                            <strong class="assignment-general-table__patient">
+                                                {{ assignment.session_note.clinical_record.patient.account.first_name }}
+                                                {{ assignment.session_note.clinical_record.patient.account.last_name }}
+                                            </strong>
+                                        </td>
+
+                                        <td>
+                                            <div class="assignment-general-table__title">
+                                                <strong>
+                                                    {{ assignment.title }}
+                                                </strong>
+
+                                                <span>
+                                                    Creada el
+                                                    {{ assignment.created_at|date:"d/m/Y" }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            {% if assignment.status == "PENDING" %}
+                                                <span class="badge badge--warning">
+                                                    {{ assignment.get_status_display }}
+                                                </span>
+
+                                            {% elif assignment.status == "IN_PROGRESS" %}
+                                                <span class="badge badge--neutral">
+                                                    {{ assignment.get_status_display }}
+                                                </span>
+
+                                            {% elif assignment.status == "COMPLETED" %}
+                                                <span class="badge badge--success">
+                                                    {{ assignment.get_status_display }}
+                                                </span>
+
+                                            {% else %}
+                                                <span class="badge badge--neutral">
+                                                    {{ assignment.get_status_display }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            <p class="assignment-general-table__description">
+                                                {{ assignment.description|truncatechars:110 }}
+                                            </p>
+                                        </td>
+
+                                        <td>
+                                            <div class="assignment-general-table__session">
+                                                <strong>
+                                                    {{ assignment.session_note.appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                                </strong>
+
+                                                <span>
+                                                    {{ assignment.session_note.appointment.availability_slot.start_time|time:"h:i A" }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="assignment-general-table__updated">
+                                                <strong>
+                                                    {{ assignment.updated_at|date:"d/m/Y" }}
+                                                </strong>
+
+                                                <span>
+                                                    {{ assignment.updated_at|time:"h:i A" }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="assignment-general-table__actions">
+                                                <a
+                                                    href="{% url 'psychologist-assignment-edit' assignment.public_id %}"
+                                                    class="btn btn--primary btn--sm"
+                                                >
+                                                    Editar
+                                                </a>
+
+                                                <a
+                                                    href="{% url 'psychologist-assignment-list' assignment.session_note.public_id %}"
+                                                    class="btn btn--secondary btn--sm"
+                                                >
+                                                    Ver sesión
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
+
+                    {% if page_obj.paginator.num_pages > 1 %}
+                        <div class="assignment-general-pagination">
+                            <p class="assignment-general-pagination__summary">
+                                Página {{ page_obj.number }}
+                                de {{ page_obj.paginator.num_pages }}
+                            </p>
+
+                            <nav
+                                class="assignment-general-pagination__navigation"
+                                aria-label="Paginación de asignaciones"
+                            >
+                                {% if page_obj.has_previous %}
+                                    <a
+                                        href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                        class="btn btn--secondary btn--sm"
+                                    >
+                                        Anterior
+                                    </a>
+                                {% endif %}
+
+                                {% for page_number in page_obj.paginator.page_range %}
+                                    {% if page_number == page_obj.number %}
+                                        <span
+                                            class="assignment-general-pagination__current"
+                                            aria-current="page"
+                                        >
+                                            {{ page_number }}
+                                        </span>
+
+                                    {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                                        <a
+                                            href="?page={{ page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                            class="assignment-general-pagination__page"
+                                        >
+                                            {{ page_number }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <a
+                                        href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                        class="btn btn--secondary btn--sm"
+                                    >
+                                        Siguiente
+                                    </a>
+                                {% endif %}
+                            </nav>
+                        </div>
+                    {% endif %}
+
                 {% else %}
-                    <p class="assignment-general-empty">
-                        No tienes asignaciones canceladas.
-                    </p>
+                    <div class="empty-state">
+                        {% if query or status_filter %}
+                            <h3 class="empty-state__title">
+                                No se encontraron asignaciones
+                            </h3>
+
+                            <p class="empty-state__description">
+                                No hay resultados que coincidan con los filtros seleccionados.
+                            </p>
+
+                            <a
+                                href="{% url 'psychologist-assignment-general-list' %}"
+                                class="btn btn--secondary"
+                            >
+                                Limpiar filtros
+                            </a>
+
+                        {% else %}
+                            <h3 class="empty-state__title">
+                                No hay asignaciones
+                            </h3>
+
+                            <p class="empty-state__description">
+                                Las actividades creadas desde las notas de sesión
+                                aparecerán aquí.
+                            </p>
+
+                            <a
+                                href="{% url 'psychologist-session-note-list' %}"
+                                class="btn btn--secondary"
+                            >
+                                Ver notas de sesión
+                            </a>
+                        {% endif %}
+                    </div>
                 {% endif %}
             </div>
         </article>

@@ -1,78 +1,290 @@
-/* ==============================
-   Contenedor de citas
-   ============================== */
+/* Calendario semanal */
 
-.appointment-list-grid {
-    display: grid;
-    grid-template-columns: repeat(
-        auto-fill,
-        minmax(300px, 380px)
-    );
-    gap: var(--spacing-4);
-    justify-content: start;
-}
-
-/* ==============================
-   Tarjeta compacta de cita
-   ============================== */
-
-.appointment-card {
-    gap: var(--spacing-2);
+.weekly-agenda-card {
     width: 100%;
-    min-height: auto;
+    overflow: hidden;
+}
+
+.weekly-agenda-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4);
     padding: var(--spacing-5);
-    border-radius: var(--radius-md);
+    border-bottom: 1px solid var(--border-color);
 }
 
-.appointment-card .card__header {
-    gap: var(--spacing-3);
+.weekly-agenda-card__header .card__title,
+.weekly-agenda-card__header .card__subtitle {
+    margin: 0;
 }
 
-.appointment-card .card__title {
-    font-size: var(--font-size-base);
+.weekly-agenda-card__header .card__subtitle {
+    margin-top: var(--spacing-2);
 }
 
-.appointment-card .card__subtitle {
+.weekly-agenda-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+}
+
+.weekly-agenda-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.weekly-agenda {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(170px, 1fr));
+    min-width: 1190px;
+}
+
+.weekly-agenda-day {
+    min-height: 260px;
+    border-right: 1px solid var(--border-color);
+    background: var(--surface-color);
+}
+
+.weekly-agenda-day:last-child {
+    border-right: 0;
+}
+
+.weekly-agenda-day--today {
+    background: var(--surface-soft);
+}
+
+.weekly-agenda-day__header {
+    display: grid;
+    place-items: center;
+    gap: var(--spacing-1);
+    min-height: 104px;
+    padding: var(--spacing-3);
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.weekly-agenda-day--today .weekly-agenda-day__header {
+    color: var(--primary-color);
+}
+
+.weekly-agenda-day__name,
+.weekly-agenda-day__month {
+    color: var(--text-muted);
     font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
-.appointment-card .card__body {
+.weekly-agenda-day__number {
+    font-size: 1.65rem;
+    line-height: 1;
+}
+
+.weekly-agenda-day__body {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3);
+}
+
+.weekly-agenda-day__empty {
+    padding: var(--spacing-5) var(--spacing-2);
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    text-align: center;
+}
+
+/* Cita dentro del calendario */
+
+.weekly-appointment {
+    display: grid;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.weekly-appointment__time {
+    color: var(--primary-color);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+}
+
+.weekly-appointment__patient {
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+}
+
+.weekly-appointment .badge {
+    justify-self: start;
+}
+
+.weekly-appointment__link {
+    color: var(--primary-color);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.weekly-appointment__link:hover {
+    text-decoration: underline;
+}
+
+/* Tablas */
+
+.appointment-table-card {
+    width: 100%;
+    overflow: hidden;
+}
+
+.appointment-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.appointment-table {
+    width: 100%;
+    min-width: 1000px;
+    border-collapse: collapse;
+}
+
+.appointment-table th,
+.appointment-table td {
+    padding: var(--spacing-4) var(--spacing-5);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.appointment-table thead {
+    background: var(--surface-soft);
+}
+
+.appointment-table th {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.appointment-table tbody tr {
+    border-top: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.appointment-table tbody tr:hover {
+    background: var(--surface-soft);
+}
+
+.appointment-table__patient {
+    display: block;
+    min-width: 150px;
+    overflow-wrap: anywhere;
+}
+
+.appointment-table__date {
+    white-space: nowrap;
+}
+
+.appointment-table__time {
+    display: grid;
+    gap: var(--spacing-1);
+    min-width: 115px;
+}
+
+.appointment-table__time strong,
+.appointment-table__time span {
+    white-space: nowrap;
+}
+
+.appointment-table__time span {
+    color: var(--text-muted);
     font-size: var(--font-size-sm);
 }
 
-.appointment-card .card__body p {
-    margin-bottom: var(--spacing-2);
+.appointment-table__reason {
+    display: -webkit-box;
+    max-width: 320px;
+    margin: 0;
+    overflow: hidden;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 
-.appointment-card .card__body p:last-child {
-    margin-bottom: 0;
+.appointment-table__empty {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
 }
 
-.appointment-card .card__footer {
-    padding-top: var(--spacing-3);
+/* Estado vacío */
+
+.appointment-list-empty {
+    display: grid;
+    place-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-8) var(--spacing-5);
+    text-align: center;
 }
 
-.appointment-card .badge {
-    flex-shrink: 0;
+.appointment-list-empty h3,
+.appointment-list-empty p {
+    margin: 0;
 }
 
-.appointment-list__create-button {
-    min-width: 170px;
-    padding-inline: var(--spacing-6);
-    box-shadow: var(--shadow-md);
+.appointment-list-empty p {
+    max-width: 520px;
+    color: var(--text-muted);
+    line-height: 1.6;
 }
 
-/* ==============================
-   Diseño adaptable
-   ============================== */
+/* Responsive */
 
-@media (max-width: 768px) {
-    .appointment-list-grid {
-        grid-template-columns: 1fr;
+@media (max-width: 900px) {
+    .weekly-agenda-card__header {
+        align-items: stretch;
+        flex-direction: column;
     }
 
-    .appointment-list__create-button {
+    .weekly-agenda-navigation {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 600px) {
+    .weekly-agenda-navigation {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .weekly-agenda-navigation .btn {
         width: 100%;
-        min-width: 0;
+    }
+
+    .weekly-agenda-card__header {
+        padding: var(--spacing-4);
+    }
+
+    .weekly-agenda {
+        grid-template-columns: repeat(7, minmax(155px, 1fr));
+        min-width: 1085px;
+    }
+
+    .weekly-agenda-day {
+        min-height: 220px;
+    }
+
+    .appointment-table th,
+    .appointment-table td {
+        padding-inline: var(--spacing-4);
     }
 }

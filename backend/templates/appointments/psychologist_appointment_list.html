@@ -20,163 +20,385 @@
             </h2>
 
             <p class="page-heading__description">
-                Consulta tus próximas citas y el historial de sesiones completadas.
+                Consulta tus sesiones de la semana, próximas citas
+                y el historial de citas completadas.
             </p>
         </div>
+
+        <a
+            href="{% url 'psychologist-availability-slot-create' %}"
+            class="btn btn--primary"
+        >
+            Crear cupo
+        </a>
     </section>
 
+    <!-- Calendario semanal -->
     <section class="content-section">
-        <div class="section-heading">
-            <div>
-                <h3 class="section-heading__title">
-                    Próximas citas
-                </h3>
+        <article class="card weekly-agenda-card">
+            <div class="weekly-agenda-card__header">
+                <div>
+                    <h3 class="card__title">
+                        Agenda semanal
+                    </h3>
 
-                <p class="section-heading__description">
-                    Sesiones pendientes o confirmadas.
-                </p>
+                    <p class="card__subtitle">
+                        Del {{ week_start|date:"d/m/Y" }}
+                        al {{ week_end|date:"d/m/Y" }}
+                    </p>
+                </div>
+
+                <nav
+                    class="weekly-agenda-navigation"
+                    aria-label="Navegación entre semanas"
+                >
+                    <a
+                        href="?week_start={{ previous_week_start|date:'Y-m-d' }}"
+                        class="btn btn--secondary btn--sm"
+                    >
+                        Semana anterior
+                    </a>
+
+                    {% if not is_current_week %}
+                        <a
+                            href="{% url 'psychologist-appointment-list' %}"
+                            class="btn btn--secondary btn--sm"
+                        >
+                            Hoy
+                        </a>
+                    {% endif %}
+
+                    <a
+                        href="?week_start={{ next_week_start|date:'Y-m-d' }}"
+                        class="btn btn--secondary btn--sm"
+                    >
+                        Semana siguiente
+                    </a>
+                </nav>
             </div>
-        </div>
 
-        {% if upcoming_appointments %}
-            <div class="appointment-list-grid">
-                {% for appointment in upcoming_appointments %}
-                    <article class="card appointment-card">
-                        <div class="card__header">
-                            <div>
-                                <h4 class="card__title">
-                                    {{ appointment.patient }}
-                                </h4>
+            <div class="weekly-agenda-wrapper">
+                <div class="weekly-agenda">
+                    {% for day in week_days %}
+                        <section
+                            class="weekly-agenda-day{% if day.is_today %} weekly-agenda-day--today{% endif %}"
+                        >
+                            <header class="weekly-agenda-day__header">
+                                <span class="weekly-agenda-day__name">
+                                    {{ day.name }}
+                                </span>
 
-                                <p class="card__subtitle">
-                                    {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
-                                </p>
+                                <strong class="weekly-agenda-day__number">
+                                    {{ day.date|date:"d" }}
+                                </strong>
+
+                                <span class="weekly-agenda-day__month">
+                                    {{ day.date|date:"M" }}
+                                </span>
+                            </header>
+
+                            <div class="weekly-agenda-day__body">
+                                {% if day.appointments %}
+                                    {% for appointment in day.appointments %}
+                                        <article class="weekly-appointment">
+                                            <div class="weekly-appointment__time">
+                                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                                -
+                                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                                            </div>
+
+                                            <strong class="weekly-appointment__patient">
+                                                {{ appointment.patient.account.first_name }}
+                                                {{ appointment.patient.account.last_name }}
+                                            </strong>
+
+                                            {% if appointment.status == "CONFIRMED" %}
+                                                <span class="badge badge--success">
+                                                    {{ appointment.get_status_display }}
+                                                </span>
+
+                                            {% elif appointment.status == "PENDING" %}
+                                                <span class="badge badge--warning">
+                                                    {{ appointment.get_status_display }}
+                                                </span>
+
+                                            {% elif appointment.status == "COMPLETED" %}
+                                                <span class="badge badge--success">
+                                                    {{ appointment.get_status_display }}
+                                                </span>
+
+                                            {% else %}
+                                                <span class="badge badge--neutral">
+                                                    {{ appointment.get_status_display }}
+                                                </span>
+                                            {% endif %}
+
+                                            <a
+                                                href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                                                class="weekly-appointment__link"
+                                            >
+                                                Ver cita
+                                            </a>
+                                        </article>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="weekly-agenda-day__empty">
+                                        Sin citas
+                                    </div>
+                                {% endif %}
                             </div>
-
-                            {% if appointment.status == "CONFIRMED" %}
-                                <span class="badge badge--success">
-                                    {{ appointment.get_status_display }}
-                                </span>
-                            {% else %}
-                                <span class="badge badge--warning">
-                                    {{ appointment.get_status_display }}
-                                </span>
-                            {% endif %}
-                        </div>
-
-                        <div class="card__body">
-                            <p>
-                                <strong>Horario:</strong><br>
-                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
-                                -
-                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
-                            </p>
-
-                            <p>
-                                <strong>Tipo:</strong><br>
-                                {{ appointment.get_appointment_type_display }}
-                            </p>
-
-                            {% if appointment.reason %}
-                                <p>
-                                    <strong>Motivo:</strong><br>
-                                    {{ appointment.reason|truncatechars:120 }}
-                                </p>
-                            {% endif %}
-                        </div>
-
-                        <div class="card__footer">
-                            <a
-                                href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
-                                class="btn btn--primary btn--sm"
-                            >
-                                Ver detalles
-                            </a>
-                        </div>
-                    </article>
-                {% endfor %}
+                        </section>
+                    {% endfor %}
+                </div>
             </div>
-        {% else %}
-            <div class="empty-state">
-                <h4 class="empty-state__title">
-                    No tienes citas próximas
-                </h4>
-
-                <p class="empty-state__description">
-                    Las nuevas citas aparecerán aquí cuando sean programadas.
-                </p>
-            </div>
-        {% endif %}
+        </article>
     </section>
 
+    <!-- Próximas citas -->
     <section class="content-section">
-        <div class="section-heading">
-            <div>
-                <h3 class="section-heading__title">
-                    Sesiones completadas
-                </h3>
+        <article class="card appointment-table-card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Próximas citas
+                    </h3>
 
-                <p class="section-heading__description">
-                    Historial de citas atendidas.
-                </p>
+                    <p class="card__subtitle">
+                        Sesiones pendientes o confirmadas.
+                    </p>
+                </div>
             </div>
-        </div>
 
-        {% if completed_appointments %}
-            <div class="appointment-list-grid">
-                {% for appointment in completed_appointments %}
-                    <article class="card card--soft appointment-card">
-                        <div class="card__header">
-                            <div>
-                                <h4 class="card__title">
-                                    {{ appointment.patient }}
-                                </h4>
+            {% if upcoming_appointments %}
+                <div class="appointment-table-wrapper">
+                    <table class="appointment-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    Paciente
+                                </th>
 
-                                <p class="card__subtitle">
-                                    {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
-                                </p>
-                            </div>
+                                <th scope="col">
+                                    Fecha
+                                </th>
 
-                            <span class="badge badge--success">
-                                {{ appointment.get_status_display }}
-                            </span>
-                        </div>
+                                <th scope="col">
+                                    Horario
+                                </th>
 
-                        <div class="card__body">
-                            <p>
-                                <strong>Horario:</strong><br>
-                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
-                                -
-                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
-                            </p>
+                                <th scope="col">
+                                    Estado
+                                </th>
 
-                            <p>
-                                <strong>Tipo:</strong><br>
-                                {{ appointment.get_appointment_type_display }}
-                            </p>
-                        </div>
+                                <th scope="col">
+                                    Tipo
+                                </th>
 
-                        <div class="card__footer">
-                            <a
-                                href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
-                                class="btn btn--secondary btn--sm"
-                            >
-                                Ver detalles
-                            </a>
-                        </div>
-                    </article>
-                {% endfor %}
+                                <th scope="col">
+                                    Motivo
+                                </th>
+
+                                <th scope="col">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for appointment in upcoming_appointments %}
+                                <tr>
+                                    <td>
+                                        <strong class="appointment-table__patient">
+                                            {{ appointment.patient.account.first_name }}
+                                            {{ appointment.patient.account.last_name }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        <strong class="appointment-table__date">
+                                            {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        <div class="appointment-table__time">
+                                            <strong>
+                                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                            </strong>
+
+                                            <span>
+                                                hasta
+                                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        {% if appointment.status == "CONFIRMED" %}
+                                            <span class="badge badge--success">
+                                                {{ appointment.get_status_display }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge--warning">
+                                                {{ appointment.get_status_display }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {{ appointment.get_appointment_type_display }}
+                                    </td>
+
+                                    <td>
+                                        {% if appointment.reason %}
+                                            <p class="appointment-table__reason">
+                                                {{ appointment.reason|truncatechars:100 }}
+                                            </p>
+                                        {% else %}
+                                            <span class="appointment-table__empty">
+                                                Sin motivo registrado
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <a
+                                            href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                                            class="btn btn--primary btn--sm"
+                                        >
+                                            Ver detalles
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            {% else %}
+                <div class="appointment-list-empty">
+                    <h3>
+                        No tienes citas próximas
+                    </h3>
+
+                    <p>
+                        Las nuevas citas aparecerán aquí cuando sean programadas.
+                    </p>
+                </div>
+            {% endif %}
+        </article>
+    </section>
+
+    <!-- Sesiones completadas -->
+    <section class="content-section">
+        <article class="card appointment-table-card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Sesiones completadas
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Historial de citas atendidas.
+                    </p>
+                </div>
             </div>
-        {% else %}
-            <div class="empty-state">
-                <h4 class="empty-state__title">
-                    No hay sesiones completadas
-                </h4>
 
-                <p class="empty-state__description">
-                    Las citas completadas aparecerán en esta sección.
-                </p>
-            </div>
-        {% endif %}
+            {% if completed_appointments %}
+                <div class="appointment-table-wrapper">
+                    <table class="appointment-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    Paciente
+                                </th>
+
+                                <th scope="col">
+                                    Fecha
+                                </th>
+
+                                <th scope="col">
+                                    Horario
+                                </th>
+
+                                <th scope="col">
+                                    Estado
+                                </th>
+
+                                <th scope="col">
+                                    Tipo
+                                </th>
+
+                                <th scope="col">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for appointment in completed_appointments %}
+                                <tr>
+                                    <td>
+                                        <strong class="appointment-table__patient">
+                                            {{ appointment.patient.account.first_name }}
+                                            {{ appointment.patient.account.last_name }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        <strong class="appointment-table__date">
+                                            {{ appointment.availability_slot.start_time|date:"d/m/Y" }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        <div class="appointment-table__time">
+                                            <strong>
+                                                {{ appointment.availability_slot.start_time|time:"h:i A" }}
+                                            </strong>
+
+                                            <span>
+                                                hasta
+                                                {{ appointment.availability_slot.end_time|time:"h:i A" }}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge badge--success">
+                                            {{ appointment.get_status_display }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        {{ appointment.get_appointment_type_display }}
+                                    </td>
+
+                                    <td>
+                                        <a
+                                            href="{% url 'psychologist-appointment-detail' appointment.public_id %}"
+                                            class="btn btn--secondary btn--sm"
+                                        >
+                                            Ver detalles
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            {% else %}
+                <div class="appointment-list-empty">
+                    <h3>
+                        No hay sesiones completadas
+                    </h3>
+
+                    <p>
+                        Las citas completadas aparecerán en esta sección.
+                    </p>
+                </div>
+            {% endif %}
+        </article>
     </section>
 {% endblock %}

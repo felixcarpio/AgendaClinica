@@ -1,123 +1,200 @@
-.availability-summary-grid {
+.slot-filters {
+    margin-bottom: var(--spacing-6);
+}
+
+.slot-filters__grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--spacing-4);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--spacing-4);
+    row-gap: var(--spacing-4);
 }
 
-.availability-summary__label {
-    display: block;
-    margin-bottom: var(--spacing-2);
-    color: var(--text-muted);
-    font-size: var(--font-size-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.availability-summary__value {
-    display: block;
-    margin-bottom: var(--spacing-2);
-    font-size: 2rem;
-    line-height: 1;
-}
-
-.availability-summary__description {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: var(--font-size-sm);
-}
-
-.availability-slot-list {
-    display: grid;
-    gap: var(--spacing-3);
-}
-
-.availability-slot-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-4);
-    padding: var(--spacing-4);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    background: var(--surface-color);
-}
-
-.availability-slot-item__main {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-4);
-    min-width: 0;
-    flex: 1;
-}
-
-.availability-slot-item__main > div {
+.slot-filters__field {
     display: grid;
     gap: var(--spacing-1);
     min-width: 0;
 }
 
-.availability-slot-item__date {
-    color: var(--text-muted);
-    font-size: var(--font-size-sm);
-    text-transform: capitalize;
+.slot-filters__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-4);
+    padding-top: var(--spacing-3);
+    border-top: 1px solid var(--border-color);
 }
 
-.availability-slot-item__time {
-    font-size: var(--font-size-base);
+/* Flecha personalizada para selects */
+
+.slot-filters select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    padding-right: 2.75rem;
+    cursor: pointer;
+
+    background-image:
+        linear-gradient(
+            45deg,
+            transparent 50%,
+            currentColor 50%
+        ),
+        linear-gradient(
+            135deg,
+            currentColor 50%,
+            transparent 50%
+        );
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+    background-size:
+        5px 5px,
+        5px 5px;
+    background-repeat: no-repeat;
+}
+
+/* Tabla */
+
+.slot-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.slot-table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.slot-table thead th {
+    padding: 0 1rem var(--spacing-3);
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-color);
+}
+
+.slot-table tbody td {
+    padding: var(--spacing-4) 1rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    text-align: center;
+}
+
+.slot-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.slot-table__date strong,
+.slot-table__time strong,
+.slot-table__patient strong,
+.slot-table__appointment strong {
+    display: block;
     overflow-wrap: anywhere;
 }
 
-.availability-slot-item__actions {
+.slot-table__time {
+    line-height: 1.5;
+}
+
+.slot-table__time span {
+    display: block;
+    margin-top: var(--spacing-1);
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.slot-table__empty-value {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.slot-table__actions {
+    text-align: center;
+}
+
+.slot-table__actions .btn {
+    min-width: 112px;
+}
+
+/* Paginación */
+
+.slot-pagination {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    flex-shrink: 0;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-5);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.slot-pagination__summary {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.slot-pagination__navigation {
+    display: flex;
+    align-items: center;
     gap: var(--spacing-2);
 }
 
-.availability-slot-empty {
-    margin: 0;
-    color: var(--text-muted);
-}
-
-.availability-slot-item__main .badge,
-.availability-slot-item__actions .btn {
+.slot-pagination__page,
+.slot-pagination__current {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    min-width: 94px;
-    min-height: 34px;
-    padding: 0.45rem 0.75rem;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
 }
 
-@media (max-width: 1100px) {
-    .availability-summary-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+.slot-pagination__page {
+    color: inherit;
 }
 
-@media (max-width: 700px) {
-    .availability-summary-grid {
+.slot-pagination__page:hover {
+    background: var(--surface-soft);
+}
+
+.slot-pagination__current {
+    background: var(--primary-color);
+    color: #fff;
+    font-weight: 700;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+    .slot-filters__grid {
         grid-template-columns: 1fr;
     }
 
-    .availability-slot-item {
-        align-items: stretch;
+    .slot-table {
+        min-width: 860px;
+    }
+}
+
+@media (max-width: 600px) {
+    .slot-filters__actions {
         flex-direction: column;
-    }
-
-    .availability-slot-item__main {
         align-items: stretch;
-        flex-direction: column;
     }
 
-    .availability-slot-item__actions {
-        justify-content: stretch;
-    }
-
-    .availability-slot-item__actions .btn {
+    .slot-filters__actions .btn {
         width: 100%;
+    }
+
+    .slot-pagination {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }

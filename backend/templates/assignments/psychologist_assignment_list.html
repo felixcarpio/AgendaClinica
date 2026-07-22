@@ -55,15 +55,6 @@
                             Información general del paciente y de la cita.
                         </p>
                     </div>
-
-                    <span class="badge badge--neutral">
-                        {{ assignments|length }}
-                        {% if assignments|length == 1 %}
-                            asignación
-                        {% else %}
-                            asignaciones
-                        {% endif %}
-                    </span>
                 </div>
 
                 <div class="card__body">
@@ -106,114 +97,387 @@
                 </div>
             </article>
 
-            {% if assignments %}
-                <div class="psychologist-assignment-list__grid">
-                    {% for assignment in assignments %}
-                        <article class="card psychologist-assignment-card">
-                            <div class="card__header">
-                                <div>
-                                    <h3 class="card__title">
-                                        {{ assignment.title }}
-                                    </h3>
+            <article class="card psychologist-assignment-list__results">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Asignaciones
+                        </h3>
 
-                                    <p class="card__subtitle">
-                                        Creada el
-                                        {{ assignment.created_at|date:"d/m/Y h:i A" }}
-                                    </p>
-                                </div>
-
-                                {% if assignment.status == "PENDING" %}
-                                    <span class="badge badge--warning">
-                                        {{ assignment.get_status_display }}
-                                    </span>
-                                {% elif assignment.status == "IN_PROGRESS" %}
-                                    <span class="badge badge--neutral">
-                                        {{ assignment.get_status_display }}
-                                    </span>
-                                {% elif assignment.status == "COMPLETED" %}
-                                    <span class="badge badge--success">
-                                        {{ assignment.get_status_display }}
-                                    </span>
-                                {% else %}
-                                    <span class="badge badge--neutral">
-                                        {{ assignment.get_status_display }}
-                                    </span>
-                                {% endif %}
-                            </div>
-
-                            <div class="card__body">
-                                <section class="psychologist-assignment-card__section">
-                                    <h4>
-                                        Descripción
-                                    </h4>
-
-                                    <div>
-                                        {{ assignment.description|linebreaks }}
-                                    </div>
-                                </section>
-
-                                {% if assignment.psychologist_comments %}
-                                    <section class="psychologist-assignment-card__section">
-                                        <h4>
-                                            Comentarios del psicólogo
-                                        </h4>
-
-                                        <div>
-                                            {{ assignment.psychologist_comments|linebreaks }}
-                                        </div>
-                                    </section>
-                                {% endif %}
-
-                                {% if assignment.patient_response %}
-                                    <section class="psychologist-assignment-card__section">
-                                        <h4>
-                                            Respuesta del paciente
-                                        </h4>
-
-                                        <div>
-                                            {{ assignment.patient_response|linebreaks }}
-                                        </div>
-                                    </section>
-                                {% endif %}
-
-                                {% if assignment.completed_at %}
-                                    <p class="psychologist-assignment-card__completed">
-                                        Completada:
-                                        {{ assignment.completed_at|date:"d/m/Y h:i A" }}
-                                    </p>
-                                {% endif %}
-                            </div>
-
-                            <div class="card__footer">
-                                <a
-                                    href="{% url 'psychologist-assignment-edit' assignment.public_id %}"
-                                    class="btn btn--primary btn--sm"
-                                >
-                                    Editar asignación
-                                </a>
-                            </div>
-                        </article>
-                    {% endfor %}
+                        <p class="card__subtitle">
+                            Busca, filtra y administra las actividades de esta sesión.
+                        </p>
+                    </div>
                 </div>
-            {% else %}
-                <div class="empty-state">
-                    <h3 class="empty-state__title">
-                        No hay asignaciones
-                    </h3>
 
-                    <p class="empty-state__description">
-                        Crea una actividad para dar seguimiento
-                        al proceso terapéutico del paciente.
-                    </p>
-
-                    <a
-                        href="{% url 'psychologist-assignment-create' session_note.public_id %}"
-                        class="btn btn--primary"
+                <div class="card__body">
+                    <form
+                        method="get"
+                        class="assignment-filters"
                     >
-                        Crear primera asignación
-                    </a>
+                        <div class="assignment-filters__grid">
+                            <div class="form-group assignment-filters__field assignment-filters__field--full">
+                                <label
+                                    for="id_q"
+                                    class="form-label"
+                                >
+                                    Búsqueda
+                                </label>
+
+                                <div class="assignment-filters__search">
+                                    <span
+                                        class="assignment-filters__search-icon"
+                                        aria-hidden="true"
+                                    >
+                                        🔎
+                                    </span>
+
+                                    <input
+                                        type="search"
+                                        name="q"
+                                        id="id_q"
+                                        class="form-control"
+                                        placeholder="Buscar por título o descripción"
+                                        value="{{ query }}"
+                                        autocomplete="off"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group assignment-filters__field">
+                                <label
+                                    for="id_status"
+                                    class="form-label"
+                                >
+                                    Estado
+                                </label>
+
+                                <select
+                                    name="status"
+                                    id="id_status"
+                                    class="form-control"
+                                >
+                                    <option
+                                        value=""
+                                        {% if not status_filter %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        Todos los estados
+                                    </option>
+
+                                    <option
+                                        value="PENDING"
+                                        {% if status_filter == "PENDING" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        Pendiente
+                                    </option>
+
+                                    <option
+                                        value="IN_PROGRESS"
+                                        {% if status_filter == "IN_PROGRESS" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        En progreso
+                                    </option>
+
+                                    <option
+                                        value="COMPLETED"
+                                        {% if status_filter == "COMPLETED" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        Completada
+                                    </option>
+
+                                    <option
+                                        value="CANCELLED"
+                                        {% if status_filter == "CANCELLED" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        Cancelada
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group assignment-filters__field">
+                                <label
+                                    for="id_ordering"
+                                    class="form-label"
+                                >
+                                    Orden
+                                </label>
+
+                                <select
+                                    name="ordering"
+                                    id="id_ordering"
+                                    class="form-control"
+                                >
+                                    <option
+                                        value="newest"
+                                        {% if ordering == "newest" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        Más recientes
+                                    </option>
+
+                                    <option
+                                        value="oldest"
+                                        {% if ordering == "oldest" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        Más antiguas
+                                    </option>
+
+                                    <option
+                                        value="updated"
+                                        {% if ordering == "updated" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        Actualizadas recientemente
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="assignment-filters__actions">
+                            <button
+                                type="submit"
+                                class="btn btn--primary"
+                            >
+                                Aplicar filtros
+                            </button>
+
+                            {% if query or status_filter or ordering != "newest" %}
+                                <a
+                                    href="{% url 'psychologist-assignment-list' session_note.public_id %}"
+                                    class="btn btn--secondary"
+                                >
+                                    Limpiar
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+
+                    {% if page_obj.object_list %}
+                        <div class="assignment-table-wrapper">
+                            <table class="assignment-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            Asignación
+                                        </th>
+
+                                        <th scope="col">
+                                            Estado
+                                        </th>
+
+                                        <th scope="col">
+                                            Descripción
+                                        </th>
+
+                                        <th scope="col">
+                                            Archivos
+                                        </th>
+
+                                        <th scope="col">
+                                            Actualización
+                                        </th>
+
+                                        <th scope="col">
+                                            Acciones
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for assignment in page_obj.object_list %}
+                                        <tr>
+                                            <td>
+                                                <div class="assignment-table__title">
+                                                    <strong>
+                                                        {{ assignment.title }}
+                                                    </strong>
+
+                                                    <span>
+                                                        Creada el
+                                                        {{ assignment.created_at|date:"d/m/Y" }}
+                                                    </span>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                {% if assignment.status == "PENDING" %}
+                                                    <span class="badge badge--warning">
+                                                        {{ assignment.get_status_display }}
+                                                    </span>
+
+                                                {% elif assignment.status == "IN_PROGRESS" %}
+                                                    <span class="badge badge--neutral">
+                                                        {{ assignment.get_status_display }}
+                                                    </span>
+
+                                                {% elif assignment.status == "COMPLETED" %}
+                                                    <span class="badge badge--success">
+                                                        {{ assignment.get_status_display }}
+                                                    </span>
+
+                                                {% else %}
+                                                    <span class="badge badge--neutral">
+                                                        {{ assignment.get_status_display }}
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+
+                                            <td>
+                                                <p class="assignment-table__description">
+                                                    {{ assignment.description|truncatechars:120 }}
+                                                </p>
+                                            </td>
+
+                                            <td>
+                                                {% if assignment.attachments_count %}
+                                                    <span class="assignment-table__attachment-count">
+                                                        {{ assignment.attachments_count }}
+
+                                                        {% if assignment.attachments_count == 1 %}
+                                                            archivo
+                                                        {% else %}
+                                                            archivos
+                                                        {% endif %}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="assignment-table__empty-value">
+                                                        Sin archivos
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+
+                                            <td>
+                                                <div class="assignment-table__updated">
+                                                    <strong>
+                                                        {{ assignment.updated_at|date:"d/m/Y" }}
+                                                    </strong>
+
+                                                    <span>
+                                                        {{ assignment.updated_at|time:"h:i A" }}
+                                                    </span>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <div class="assignment-table__actions">
+                                                    <a
+                                                        href="{% url 'psychologist-assignment-edit' assignment.public_id %}"
+                                                        class="btn btn--primary btn--sm"
+                                                    >
+                                                        Editar
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {% if page_obj.paginator.num_pages > 1 %}
+                            <div class="assignment-pagination">
+                                <p class="assignment-pagination__summary">
+                                    Página {{ page_obj.number }}
+                                    de {{ page_obj.paginator.num_pages }}
+                                </p>
+
+                                <nav
+                                    class="assignment-pagination__navigation"
+                                    aria-label="Paginación de asignaciones"
+                                >
+                                    {% if page_obj.has_previous %}
+                                        <a
+                                            href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                            class="btn btn--secondary btn--sm"
+                                        >
+                                            Anterior
+                                        </a>
+                                    {% endif %}
+
+                                    {% for page_number in page_obj.paginator.page_range %}
+                                        {% if page_number == page_obj.number %}
+                                            <span
+                                                class="assignment-pagination__current"
+                                                aria-current="page"
+                                            >
+                                                {{ page_number }}
+                                            </span>
+
+                                        {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                                            <a
+                                                href="?page={{ page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                                class="assignment-pagination__page"
+                                            >
+                                                {{ page_number }}
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if page_obj.has_next %}
+                                        <a
+                                            href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                            class="btn btn--secondary btn--sm"
+                                        >
+                                            Siguiente
+                                        </a>
+                                    {% endif %}
+                                </nav>
+                            </div>
+                        {% endif %}
+
+                    {% else %}
+                        <div class="empty-state">
+                            {% if query or status_filter %}
+                                <h3 class="empty-state__title">
+                                    No se encontraron asignaciones
+                                </h3>
+
+                                <p class="empty-state__description">
+                                    No hay resultados que coincidan con los filtros seleccionados.
+                                </p>
+
+                                <a
+                                    href="{% url 'psychologist-assignment-list' session_note.public_id %}"
+                                    class="btn btn--secondary"
+                                >
+                                    Limpiar filtros
+                                </a>
+
+                            {% else %}
+                                <h3 class="empty-state__title">
+                                    No hay asignaciones
+                                </h3>
+
+                                <p class="empty-state__description">
+                                    Crea una actividad para dar seguimiento
+                                    al proceso terapéutico del paciente.
+                                </p>
+
+                                <a
+                                    href="{% url 'psychologist-assignment-create' session_note.public_id %}"
+                                    class="btn btn--primary"
+                                >
+                                    Crear primera asignación
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
+            </article>
 
         </div>
     </section>
