@@ -178,7 +178,7 @@
                         <a
                             href="{% url 'psychologist-patient-list' %}"
                             class="sidebar__menu-link
-                                {% if request.resolver_match.url_name == 'psychologist-patient-list' or request.resolver_match.url_name == 'psychologist-patient-detail' or request.resolver_match.url_name == 'psychologist-clinical-record-detail' or request.resolver_match.url_name == 'psychologist-clinical-record-edit' %}
+                                {% if request.resolver_match.url_name == 'psychologist-patient-list' or request.resolver_match.url_name == 'psychologist-patient-create' or request.resolver_match.url_name == 'psychologist-patient-created' or request.resolver_match.url_name == 'psychologist-patient-detail' or request.resolver_match.url_name == 'psychologist-clinical-record-detail' or request.resolver_match.url_name == 'psychologist-clinical-record-edit' or request.resolver_match.url_name == 'psychologist-patient-status-update' %}
                                     sidebar__menu-link--active
                                 {% endif %}
                             "
@@ -264,8 +264,12 @@
 
                     <li class="sidebar__menu-item">
                         <a
-                            href="#"
-                            class="sidebar__menu-link"
+                            href="{% url 'admin-psychologist-list' %}"
+                            class="sidebar__menu-link
+                                {% if request.resolver_match.url_name == 'admin-psychologist-list' or request.resolver_match.url_name == 'admin-psychologist-create' or request.resolver_match.url_name == 'admin-psychologist-created' or request.resolver_match.url_name == 'admin-psychologist-detail' or request.resolver_match.url_name == 'admin-psychologist-edit' or request.resolver_match.url_name == 'admin-psychologist-account-status-update' %}
+                                    sidebar__menu-link--active
+                                {% endif %}
+                            "
                         >
                             <span
                                 class="sidebar__menu-icon"

@@ -1,0 +1,256 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Nuevo psicólogo | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/admin_psychologist_create.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Nuevo psicólogo
+            </h2>
+
+            <p class="page-heading__description">
+                Registra la cuenta de acceso y la información profesional.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'admin-dashboard' %}"
+            class="btn btn--secondary"
+        >
+            Volver al panel
+        </a>
+    </section>
+
+    <section class="content-section">
+        <article class="card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Datos del psicólogo
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Al guardar se generará una contraseña temporal.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card__body">
+                <form
+                    method="post"
+                    class="admin-psychologist-form"
+                    novalidate
+                >
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div
+                            class="message message--danger"
+                            role="alert"
+                        >
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="content-grid content-grid--two-columns">
+                        <div class="form-group">
+                            <label
+                                for="{{ form.first_name.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.first_name.label }}
+                            </label>
+
+                            {{ form.first_name }}
+
+                            {% for error in form.first_name.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.last_name.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.last_name.label }}
+                            </label>
+
+                            {{ form.last_name }}
+
+                            {% for error in form.last_name.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.email.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.email.label }}
+                            </label>
+
+                            {{ form.email }}
+
+                            {% for error in form.email.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.gender.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.gender.label }}
+                            </label>
+
+                            {{ form.gender }}
+
+                            {% for error in form.gender.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.license_number.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.license_number.label }}
+                            </label>
+
+                            {{ form.license_number }}
+
+                            {% for error in form.license_number.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.specialty.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.specialty.label }}
+                            </label>
+
+                            {{ form.specialty }}
+
+                            {% for error in form.specialty.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.professional_phone.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.professional_phone.label }}
+                            </label>
+
+                            {{ form.professional_phone }}
+
+                            {% for error in form.professional_phone.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="{{ form.attention_mode.id_for_label }}"
+                                class="form-label"
+                            >
+                                {{ form.attention_mode.label }}
+                            </label>
+
+                            {{ form.attention_mode }}
+
+                            {% for error in form.attention_mode.errors %}
+                                <p class="form-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label
+                            for="{{ form.bio.id_for_label }}"
+                            class="form-label"
+                        >
+                            {{ form.bio.label }}
+                        </label>
+
+                        {{ form.bio }}
+
+                        {% for error in form.bio.errors %}
+                            <p class="form-error">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-checkbox-label">
+                            {{ form.is_available_for_appointments }}
+
+                            <span>
+                                {{ form.is_available_for_appointments.label }}
+                            </span>
+                        </label>
+
+                        {% for error in form.is_available_for_appointments.errors %}
+                            <p class="form-error">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-actions">
+                        <a
+                            href="{% url 'admin-dashboard' %}"
+                            class="btn btn--secondary"
+                        >
+                            Cancelar
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn--primary"
+                        >
+                            Registrar psicólogo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </article>
+    </section>
+{% endblock %}

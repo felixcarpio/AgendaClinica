@@ -1,0 +1,48 @@
+/* ==============================
+   Formulario de nuevo psicólogo
+   ============================== */
+
+.admin-psychologist-form {
+    width: 100%;
+}
+
+/* ==============================
+   Selects personalizados
+   ============================== */
+
+.admin-psychologist-form select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    padding-right: 2.75rem;
+    cursor: pointer;
+
+    background-image:
+        linear-gradient(
+            45deg,
+            transparent 50%,
+            currentColor 50%
+        ),
+        linear-gradient(
+            135deg,
+            currentColor 50%,
+            transparent 50%
+        );
+
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+
+    background-size:
+        5px 5px,
+        5px 5px;
+
+    background-repeat: no-repeat;
+}
+
+/* Evita que Internet Explorer muestre su flecha nativa */
+
+.admin-psychologist-form select.form-control::-ms-expand {
+    display: none;
+}

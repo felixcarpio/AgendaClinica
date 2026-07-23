@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 import uuid
-
+from django.apps import apps
 from apps.patients.models import Patient
 from apps.psychologists.models import Psychologist
 
@@ -333,18 +333,31 @@ class Appointment(models.Model):
         # Una cita que ya posee notas clínicas no puede cancelarse,
         # porque la sesión ya fue documentada en el expediente.
         if self.pk and self.status == self.Status.CANCELLED:
-            previous_appointment = Appointment.objects.filter(
-                pk=self.pk
-            ).only(
-                "status"
-            ).first()
+            previous_appointment = (
+                Appointment.objects
+                .filter(pk=self.pk)
+                .only("status")
+                .first()
+            )
 
-            # Solo se valida cuando realmente se está intentando
-            # cambiar el estado hacia CANCELLED.
+            # Obtiene el modelo de notas desde el registro interno
+            # de Django. Esto evita una importación circular entre
+            # appointments y clinical_records.
+            SessionNote = apps.get_model(
+                "clinical_records",
+                "SessionNote",
+            )
+
+            has_session_notes = SessionNote.objects.filter(
+                appointment_id=self.pk,
+            ).exists()
+
+            # La restricción solo se ejecuta cuando la cita cambia
+            # por primera vez hacia el estado cancelado.
             if (
                 previous_appointment
                 and previous_appointment.status != self.Status.CANCELLED
-                and self.session_notes.exists()
+                and has_session_notes
             ):
                 raise ValidationError(
                     {

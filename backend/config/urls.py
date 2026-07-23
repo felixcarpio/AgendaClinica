@@ -5,8 +5,9 @@ URL configuration for config project.
 from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
+from django.contrib.auth.views import LoginView
 from django.conf.urls.static import static
-
+from apps.accounts.forms import AccountAuthenticationForm
 from apps.accounts.views import (
     admin_dashboard,
     dashboard_redirect,
@@ -53,16 +54,30 @@ from apps.clinical_records.views import (
     psychologist_session_note_list,
     psychologist_session_note_manage,
 )
-
-
+from apps.psychologists.views import (
+    admin_psychologist_account_status_update,
+    admin_psychologist_create,
+    admin_psychologist_created,
+    admin_psychologist_detail,
+    admin_psychologist_edit,
+    admin_psychologist_list,
+)
 urlpatterns = [
-    # Administración de Django.
+    # Autenticación.
+    #
+    # Se declara primero la ruta personalizada de inicio de sesión
+    # para utilizar el formulario que distingue las cuentas inactivas.
     path(
-        "admin/",
-        admin.site.urls,
+        "accounts/login/",
+        LoginView.as_view(
+            template_name="registration/login.html",
+            authentication_form=AccountAuthenticationForm,
+        ),
+        name="login",
     ),
 
-    # Autenticación.
+    # Se conservan las demás rutas de autenticación de Django:
+    # logout, cambio de contraseña y recuperación de contraseña.
     path(
         "accounts/",
         include("django.contrib.auth.urls"),
@@ -88,6 +103,38 @@ urlpatterns = [
         "dashboard/paciente/",
         patient_dashboard,
         name="patient-dashboard",
+    ),
+    
+    # Gestión de psicólogos por el administrador.
+    path(
+        "administracion/psicologos/nuevo/",
+        admin_psychologist_create,
+        name="admin-psychologist-create",
+    ),
+    path(
+        "administracion/psicologos/registrado/",
+        admin_psychologist_created,
+        name="admin-psychologist-created",
+    ),
+    path(
+        "administracion/psicologos/",
+        admin_psychologist_list,
+        name="admin-psychologist-list",
+    ),
+    path(
+        "administracion/psicologos/<int:psychologist_id>/editar/",
+        admin_psychologist_edit,
+        name="admin-psychologist-edit",
+    ),
+    path(
+        "administracion/psicologos/<int:psychologist_id>/",
+        admin_psychologist_detail,
+        name="admin-psychologist-detail",
+    ),
+    path(
+        "administracion/psicologos/<int:psychologist_id>/estado-cuenta/",
+        admin_psychologist_account_status_update,
+        name="admin-psychologist-account-status-update",
     ),
 
     # Perfil.

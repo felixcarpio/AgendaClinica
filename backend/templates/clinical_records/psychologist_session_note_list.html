@@ -207,8 +207,8 @@
                                                 href="{% url 'psychologist-assignment-list' note.public_id %}"
                                                 class="session-note-table__assignments-link"
                                             >
-                                                {{ note.assignments.count }}
-                                                {% if note.assignments.count == 1 %}
+                                                {{ note.assignments_count }}
+                                                {% if note.assignments_count == 1 %}
                                                     asignación
                                                 {% else %}
                                                     asignaciones
@@ -255,7 +255,7 @@
                         <div class="pagination">
                             {% if page_obj.has_previous %}
                                 <a
-                                    href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                    href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
                                     class="pagination__link"
                                 >
                                     Anterior
@@ -268,7 +268,7 @@
 
                             {% if page_obj.has_next %}
                                 <a
-                                    href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                    href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
                                     class="pagination__link"
                                 >
                                     Siguiente

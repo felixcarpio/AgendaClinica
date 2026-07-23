@@ -4,6 +4,7 @@ from django.utils import timezone
 from apps.appointments.models import Appointment
 from apps.assignments.models import Assignment
 from apps.patients.models import Patient
+from apps.psychologists.models import Psychologist
 
 @login_required
 def dashboard_redirect(request):
@@ -57,6 +58,19 @@ def psychologist_dashboard(request):
 
     if request.user.role != "PSYCHOLOGIST":
         return redirect("dashboard-redirect")
+
+    psychologist = (
+        Psychologist.objects
+        .select_related("account")
+        .get(account=request.user)
+    )
+    
+    if psychologist.gender == Psychologist.Gender.FEMALE:
+        welcome_text = "Bienvenida"
+    elif psychologist.gender == Psychologist.Gender.MALE:
+        welcome_text = "Bienvenido"
+    else:
+        welcome_text = "Te damos la bienvenida"
 
     now = timezone.now()
     today = timezone.localdate()
@@ -148,6 +162,8 @@ def psychologist_dashboard(request):
     context = {
         "page_title": "Panel del psicólogo",
         "next_appointment": next_appointment,
+        "psychologist": psychologist,
+        "welcome_text": welcome_text,
         "today_appointments": today_appointments,
         "today_appointments_count": today_appointments.count(),
         "attended_patients_count": attended_patients_count,

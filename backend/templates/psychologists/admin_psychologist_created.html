@@ -1,0 +1,161 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Psicólogo registrado | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/admin_psychologist_created.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Psicólogo registrado
+            </h2>
+
+            <p class="page-heading__description">
+                La cuenta y el perfil profesional fueron creados correctamente.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'admin-dashboard' %}"
+            class="btn btn--secondary"
+        >
+            Volver al panel
+        </a>
+    </section>
+
+    <section class="content-section">
+        <article class="card admin-psychologist-created">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Credenciales temporales
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Guarda esta información antes de salir de la pantalla.
+                    </p>
+                </div>
+
+                <span class="badge badge--success">
+                    Registro completado
+                </span>
+            </div>
+
+            <div class="card__body">
+                <div
+                    class="message message--warning"
+                    role="alert"
+                >
+                    Estas credenciales se mostrarán una sola vez.
+                    El psicólogo deberá cambiar la contraseña después de iniciar sesión.
+                </div>
+
+                <div class="admin-psychologist-created__summary">
+                    <div class="admin-psychologist-created__field">
+                        <span class="admin-psychologist-created__label">
+                            Psicólogo
+                        </span>
+
+                        <strong>
+                            {{ credentials.psychologist_name }}
+                        </strong>
+                    </div>
+
+                    <div class="admin-psychologist-created__field">
+                        <span class="admin-psychologist-created__label">
+                            Correo electrónico
+                        </span>
+
+                        <div class="admin-psychologist-created__credential">
+                            <code id="psychologist-email">
+                                {{ credentials.email }}
+                            </code>
+
+                            <button
+                                type="button"
+                                class="btn btn--secondary btn--sm"
+                                data-copy-target="psychologist-email"
+                            >
+                                Copiar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="admin-psychologist-created__field">
+                        <span class="admin-psychologist-created__label">
+                            Contraseña temporal
+                        </span>
+
+                        <div class="admin-psychologist-created__credential">
+                            <code id="psychologist-password">
+                                {{ credentials.temporary_password }}
+                            </code>
+
+                            <button
+                                type="button"
+                                class="btn btn--secondary btn--sm"
+                                data-copy-target="psychologist-password"
+                            >
+                                Copiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card__footer">
+                <a
+                    href="{% url 'admin-psychologist-create' %}"
+                    class="btn btn--secondary"
+                >
+                    Registrar otro psicólogo
+                </a>
+
+                <a
+                    href="{% url 'admin-dashboard' %}"
+                    class="btn btn--primary"
+                >
+                    Finalizar
+                </a>
+            </div>
+        </article>
+    </section>
+
+    <script>
+        document.querySelectorAll("[data-copy-target]").forEach((button) => {
+            button.addEventListener("click", async () => {
+                const targetId = button.dataset.copyTarget;
+                const target = document.getElementById(targetId);
+
+                if (!target) {
+                    return;
+                }
+
+                const originalText = button.textContent;
+
+                try {
+                    await navigator.clipboard.writeText(
+                        target.textContent.trim()
+                    );
+
+                    button.textContent = "Copiado";
+                } catch (error) {
+                    button.textContent = "No se pudo copiar";
+                }
+
+                window.setTimeout(() => {
+                    button.textContent = originalText;
+                }, 1600);
+            });
+        });
+    </script>
+{% endblock %}

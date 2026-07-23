@@ -1,0 +1,170 @@
+.admin-psychologist-detail {
+    width: 100%;
+}
+
+.page-heading__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.admin-psychologist-detail__section {
+    padding-block: var(--spacing-5);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-psychologist-detail__section:first-child {
+    padding-top: 0;
+}
+
+.admin-psychologist-detail__section:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.admin-psychologist-detail__section-heading {
+    margin-bottom: var(--spacing-4);
+}
+
+.admin-psychologist-detail__section-heading h4 {
+    margin: 0 0 var(--spacing-1);
+    font-size: var(--font-size-lg);
+}
+
+.admin-psychologist-detail__section-heading p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.admin-psychologist-detail__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-4);
+}
+
+.admin-psychologist-detail__field {
+    display: grid;
+    gap: var(--spacing-2);
+    min-width: 0;
+    padding: var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+}
+
+.admin-psychologist-detail__label {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.admin-psychologist-detail__field span,
+.admin-psychologist-detail__field strong {
+    overflow-wrap: anywhere;
+}
+
+.admin-psychologist-detail__bio {
+    padding: var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+    line-height: 1.7;
+}
+
+.admin-psychologist-detail__bio p {
+    margin-top: 0;
+}
+
+.admin-psychologist-detail__bio p:last-child {
+    margin-bottom: 0;
+}
+
+.admin-psychologist-detail__empty {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.admin-psychologist-detail .card__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+}
+
+.admin-psychologist-detail__status-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+}
+
+.admin-psychologist-detail__account-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-5);
+    padding: var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+}
+
+.admin-psychologist-detail__account-control strong {
+    display: block;
+    margin-bottom: var(--spacing-1);
+}
+
+.admin-psychologist-detail__account-control p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+}
+
+.admin-psychologist-detail__status-form {
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .page-heading__actions {
+        align-items: stretch;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .page-heading__actions .btn {
+        width: 100%;
+    }
+
+    .admin-psychologist-detail__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-psychologist-detail .card__footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-psychologist-detail .card__footer .btn {
+        width: 100%;
+    }
+
+    .admin-psychologist-detail__status-group {
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .admin-psychologist-detail__account-control {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-psychologist-detail__status-form,
+    .admin-psychologist-detail__status-form .btn {
+        width: 100%;
+    }
+}

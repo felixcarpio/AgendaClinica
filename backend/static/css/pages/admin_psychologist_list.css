@@ -1,0 +1,225 @@
+.admin-psychologist-list-card {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Filtros */
+
+.admin-psychologist-filters {
+    margin-bottom: var(--spacing-6);
+}
+
+.admin-psychologist-filters__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-4);
+}
+
+.admin-psychologist-filters__field {
+    min-width: 0;
+}
+
+.admin-psychologist-filters__field--full {
+    grid-column: 1 / -1;
+}
+
+.admin-psychologist-filters__search {
+    position: relative;
+}
+
+.admin-psychologist-filters__search-icon {
+    position: absolute;
+    top: 50%;
+    left: var(--spacing-3);
+    z-index: 1;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.admin-psychologist-filters__search .form-control {
+    padding-left: 2.5rem;
+}
+
+.admin-psychologist-filters select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2.75rem;
+    cursor: pointer;
+    background-image:
+        linear-gradient(
+            45deg,
+            transparent 50%,
+            currentColor 50%
+        ),
+        linear-gradient(
+            135deg,
+            currentColor 50%,
+            transparent 50%
+        );
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+    background-size:
+        5px 5px,
+        5px 5px;
+    background-repeat: no-repeat;
+}
+
+.admin-psychologist-filters select.form-control::-ms-expand {
+    display: none;
+}
+
+.admin-psychologist-filters__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-4);
+}
+
+/* Tabla */
+
+.admin-psychologist-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-psychologist-table {
+    width: 100%;
+    min-width: 940px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.admin-psychologist-table th,
+.admin-psychologist-table td {
+    padding: var(--spacing-4) 1rem;
+    vertical-align: middle;
+    text-align: left;
+}
+
+.admin-psychologist-table thead {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-psychologist-table th {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.admin-psychologist-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-psychologist-table tbody tr:last-child {
+    border-bottom: 0;
+}
+
+.admin-psychologist-table tbody tr:hover {
+    background: var(--surface-soft);
+}
+
+.admin-psychologist-table__person strong {
+    overflow-wrap: anywhere;
+}
+
+.admin-psychologist-table__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--spacing-2);
+}
+
+/* Paginación */
+
+.admin-psychologist-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    margin-top: var(--spacing-5);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+}
+
+.admin-psychologist-pagination__summary {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.admin-psychologist-pagination__navigation {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.admin-psychologist-pagination__page,
+.admin-psychologist-pagination__current {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+}
+
+.admin-psychologist-pagination__page {
+    color: var(--text-color);
+}
+
+.admin-psychologist-pagination__page:hover {
+    background: var(--surface-soft);
+}
+
+.admin-psychologist-pagination__current {
+    background: var(--primary-color);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.empty-state__actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-4);
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .admin-psychologist-filters__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-psychologist-filters__field--full {
+        grid-column: auto;
+    }
+
+    .admin-psychologist-filters__actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-psychologist-filters__actions .btn {
+        width: 100%;
+    }
+
+    .admin-psychologist-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .empty-state__actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .empty-state__actions .btn {
+        width: 100%;
+    }
+}

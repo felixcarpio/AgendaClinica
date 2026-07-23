@@ -1,0 +1,390 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Psicólogos | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/admin_psychologist_list.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Psicólogos
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta y administra los profesionales registrados
+                en la clínica.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'admin-psychologist-create' %}"
+            class="btn btn--primary"
+        >
+            Nuevo psicólogo
+        </a>
+    </section>
+
+    <section class="content-section">
+        <article class="card admin-psychologist-list-card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Listado de psicólogos
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Busca por nombre, correo, licencia o especialidad.
+                    </p>
+                </div>
+
+                <span class="badge badge--neutral">
+                    {{ filtered_psychologists_count }}
+
+                    {% if filtered_psychologists_count == 1 %}
+                        psicólogo
+                    {% else %}
+                        psicólogos
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="card__body">
+                <form
+                    method="get"
+                    class="admin-psychologist-filters"
+                >
+                    <div class="admin-psychologist-filters__grid">
+                        <div class="form-group admin-psychologist-filters__field admin-psychologist-filters__field--full">
+                            <label
+                                for="id_q"
+                                class="form-label"
+                            >
+                                Búsqueda
+                            </label>
+
+                            <div class="admin-psychologist-filters__search">
+                                <span
+                                    class="admin-psychologist-filters__search-icon"
+                                    aria-hidden="true"
+                                >
+                                    🔎
+                                </span>
+
+                                <input
+                                    type="search"
+                                    name="q"
+                                    id="id_q"
+                                    class="form-control"
+                                    value="{{ query }}"
+                                    placeholder="Buscar por nombre, correo, licencia o especialidad"
+                                    autocomplete="off"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group admin-psychologist-filters__field">
+                            <label
+                                for="id_availability"
+                                class="form-label"
+                            >
+                                Disponibilidad
+                            </label>
+
+                            <select
+                                name="availability"
+                                id="id_availability"
+                                class="form-control"
+                            >
+                                <option
+                                    value=""
+                                    {% if not availability_filter %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Todos
+                                </option>
+
+                                <option
+                                    value="available"
+                                    {% if availability_filter == "available" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Disponibles
+                                </option>
+
+                                <option
+                                    value="unavailable"
+                                    {% if availability_filter == "unavailable" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    No disponibles
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group admin-psychologist-filters__field">
+                            <label
+                                for="id_ordering"
+                                class="form-label"
+                            >
+                                Orden
+                            </label>
+
+                            <select
+                                name="ordering"
+                                id="id_ordering"
+                                class="form-control"
+                            >
+                                <option
+                                    value="name"
+                                    {% if ordering == "name" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Nombre
+                                </option>
+
+                                <option
+                                    value="newest"
+                                    {% if ordering == "newest" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Más recientes
+                                </option>
+
+                                <option
+                                    value="oldest"
+                                    {% if ordering == "oldest" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Más antiguos
+                                </option>
+
+                                <option
+                                    value="specialty"
+                                    {% if ordering == "specialty" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Especialidad
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="admin-psychologist-filters__actions">
+                        <button
+                            type="submit"
+                            class="btn btn--primary"
+                        >
+                            Aplicar filtros
+                        </button>
+
+                        {% if query or availability_filter or ordering != "name" %}
+                            <a
+                                href="{% url 'admin-psychologist-list' %}"
+                                class="btn btn--secondary"
+                            >
+                                Limpiar
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+
+                {% if page_obj.object_list %}
+                    <div class="admin-psychologist-table-wrapper">
+                        <table class="admin-psychologist-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        Psicólogo
+                                    </th>
+
+                                    <th scope="col">
+                                        Licencia
+                                    </th>
+
+                                    <th scope="col">
+                                        Especialidad
+                                    </th>
+
+                                    <th scope="col">
+                                        Modalidad
+                                    </th>
+
+                                    <th scope="col">
+                                        Disponibilidad
+                                    </th>
+
+                                    <th scope="col">
+                                        Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for psychologist in page_obj.object_list %}
+                                    <tr>
+                                        <td>
+                                            <div class="admin-psychologist-table__person">
+                                                <strong>
+                                                    {{ psychologist.account.first_name }}
+                                                    {{ psychologist.account.last_name }}
+                                                </strong>
+
+                                                <span>
+                                                    {{ psychologist.account.email }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <strong>
+                                                {{ psychologist.license_number }}
+                                            </strong>
+                                        </td>
+
+                                        <td>
+                                            {% if psychologist.specialty %}
+                                                {{ psychologist.specialty }}
+                                            {% else %}
+                                                <span class="admin-psychologist-table__empty">
+                                                    Sin especialidad
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {{ psychologist.get_attention_mode_display }}
+                                        </td>
+
+                                        <td>
+                                            {% if psychologist.is_available_for_appointments %}
+                                                <span class="badge badge--success">
+                                                    Disponible
+                                                </span>
+                                            {% else %}
+                                                <span class="badge badge--neutral">
+                                                    No disponible
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            <div class="admin-psychologist-table__actions">
+                                                <a
+                                                    href="{% url 'admin-psychologist-detail' psychologist.id %}"
+                                                    class="btn btn--secondary btn--sm"
+                                                >
+                                                    Ver
+                                                </a>
+
+                                                <a
+                                                    href="{% url 'admin-psychologist-edit' psychologist.id %}"
+                                                    class="btn btn--primary btn--sm"
+                                                >
+                                                    Editar
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if page_obj.paginator.num_pages > 1 %}
+                        <div class="admin-psychologist-pagination">
+                            <p class="admin-psychologist-pagination__summary">
+                                Página {{ page_obj.number }}
+                                de {{ page_obj.paginator.num_pages }}
+                            </p>
+
+                            <nav
+                                class="admin-psychologist-pagination__navigation"
+                                aria-label="Paginación de psicólogos"
+                            >
+                                {% if page_obj.has_previous %}
+                                    <a
+                                        href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if availability_filter %}&availability={{ availability_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                        class="btn btn--secondary btn--sm"
+                                    >
+                                        Anterior
+                                    </a>
+                                {% endif %}
+
+                                {% for page_number in page_obj.paginator.page_range %}
+                                    {% if page_number == page_obj.number %}
+                                        <span
+                                            class="admin-psychologist-pagination__current"
+                                            aria-current="page"
+                                        >
+                                            {{ page_number }}
+                                        </span>
+
+                                    {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                                        <a
+                                            href="?page={{ page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if availability_filter %}&availability={{ availability_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                            class="admin-psychologist-pagination__page"
+                                        >
+                                            {{ page_number }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <a
+                                        href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if availability_filter %}&availability={{ availability_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                        class="btn btn--secondary btn--sm"
+                                    >
+                                        Siguiente
+                                    </a>
+                                {% endif %}
+                            </nav>
+                        </div>
+                    {% endif %}
+
+                {% else %}
+                    <div class="empty-state">
+                        <h3 class="empty-state__title">
+                            No se encontraron psicólogos
+                        </h3>
+
+                        <p class="empty-state__description">
+                            No hay resultados que coincidan con los filtros seleccionados.
+                        </p>
+
+                        <div class="empty-state__actions">
+                            <a
+                                href="{% url 'admin-psychologist-list' %}"
+                                class="btn btn--secondary"
+                            >
+                                Limpiar filtros
+                            </a>
+
+                            <a
+                                href="{% url 'admin-psychologist-create' %}"
+                                class="btn btn--primary"
+                            >
+                                Nuevo psicólogo
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+{% endblock %}

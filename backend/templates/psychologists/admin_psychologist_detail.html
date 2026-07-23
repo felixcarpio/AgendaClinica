@@ -1,0 +1,362 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Detalle del psicólogo | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/admin_psychologist_detail.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Detalle del psicólogo
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta la información personal y profesional registrada.
+            </p>
+        </div>
+
+        <div class="page-heading__actions">
+            <a
+                href="{% url 'admin-psychologist-list' %}"
+                class="btn btn--secondary"
+            >
+                Volver al listado
+            </a>
+
+            <a
+                href="{% url 'admin-psychologist-edit' psychologist.id %}"
+                class="btn btn--primary"
+            >
+                Editar psicólogo
+            </a>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <article class="card admin-psychologist-detail">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        {{ psychologist.account.first_name }}
+                        {{ psychologist.account.last_name }}
+                    </h3>
+
+                    <p class="card__subtitle">
+                        {{ psychologist.account.email }}
+                    </p>
+                </div>
+
+                <div class="admin-psychologist-detail__status-group">
+                    {% if psychologist.account.is_active %}
+                        <span class="badge badge--success">
+                            Cuenta activa
+                        </span>
+                    {% else %}
+                        <span class="badge badge--neutral">
+                            Cuenta inactiva
+                        </span>
+                    {% endif %}
+
+                    {% if psychologist.is_available_for_appointments %}
+                        <span class="badge badge--success">
+                            Disponible para citas
+                        </span>
+                    {% else %}
+                        <span class="badge badge--neutral">
+                            No disponible para citas
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card__body">
+                <section class="admin-psychologist-detail__section">
+                    <div class="admin-psychologist-detail__section-heading">
+                        <h4>
+                            Información personal
+                        </h4>
+
+                        <p>
+                            Datos generales asociados a la cuenta.
+                        </p>
+                    </div>
+
+                    <div class="admin-psychologist-detail__grid">
+                        <div class="admin-psychologist-detail__field">
+                            <span class="admin-psychologist-detail__label">
+                                Nombre completo
+                            </span>
+
+                            <strong>
+                                {{ psychologist.account.first_name }}
+                                {{ psychologist.account.last_name }}
+                            </strong>
+                        </div>
+
+                        <div class="admin-psychologist-detail__field">
+                            <span class="admin-psychologist-detail__label">
+                                Correo electrónico
+                            </span>
+
+                            <span>
+                                {{ psychologist.account.email }}
+                            </span>
+                        </div>
+
+                        <div class="admin-psychologist-detail__field">
+                            <span class="admin-psychologist-detail__label">
+                                Género
+                            </span>
+
+                            <span>
+                                {% if psychologist.gender %}
+                                    {{ psychologist.get_gender_display }}
+                                {% else %}
+                                    No indicado
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="admin-psychologist-detail__field">
+                            <span class="admin-psychologist-detail__label">
+                                Estado de la cuenta
+                            </span>
+
+                            {% if psychologist.account.is_active %}
+                                <span class="badge badge--success">
+                                    Activa
+                                </span>
+                            {% else %}
+                                <span class="badge badge--neutral">
+                                    Inactiva
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="admin-psychologist-detail__section">
+                    <div class="admin-psychologist-detail__section-heading">
+                        <h4>
+                            Información profesional
+                        </h4>
+
+                        <p>
+                            Datos relacionados con su ejercicio profesional.
+                        </p>
+                    </div>
+
+                    <div class="admin-psychologist-detail__grid">
+                        <div class="admin-psychologist-detail__field">
+                            <span class="admin-psychologist-detail__label">
+                                Número de licencia
+                            </span>
+
+                            <strong>
+                                {{ psychologist.license_number }}
+                            </strong>
+                        </div>
+
+                        <div class="admin-psychologist-detail__field">
+                            <span class="admin-psychologist-detail__label">
+                                Especialidad
+                            </span>
+
+                            <span>
+                                {% if psychologist.specialty %}
+                                    {{ psychologist.specialty }}
+                                {% else %}
+                                    No indicada
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="admin-psychologist-detail__field">
+                            <span class="admin-psychologist-detail__label">
+                                Teléfono profesional
+                            </span>
+
+                            <span>
+                                {% if psychologist.professional_phone %}
+                                    {{ psychologist.professional_phone }}
+                                {% else %}
+                                    No indicado
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="admin-psychologist-detail__field">
+                            <span class="admin-psychologist-detail__label">
+                                Modalidad de atención
+                            </span>
+
+                            <span>
+                                {{ psychologist.get_attention_mode_display }}
+                            </span>
+                        </div>
+
+                        <div class="admin-psychologist-detail__field">
+                            <span class="admin-psychologist-detail__label">
+                                Disponibilidad para citas
+                            </span>
+
+                            {% if psychologist.is_available_for_appointments %}
+                                <span class="badge badge--success">
+                                    Disponible
+                                </span>
+                            {% else %}
+                                <span class="badge badge--neutral">
+                                    No disponible
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="admin-psychologist-detail__section">
+                    <div class="admin-psychologist-detail__section-heading">
+                        <h4>
+                            Perfil profesional
+                        </h4>
+
+                        <p>
+                            Descripción, experiencia o enfoque de atención.
+                        </p>
+                    </div>
+
+                    <div class="admin-psychologist-detail__bio">
+                        {% if psychologist.bio %}
+                            {{ psychologist.bio|linebreaks }}
+                        {% else %}
+                            <p class="admin-psychologist-detail__empty">
+                                No se ha registrado una biografía profesional.
+                            </p>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="admin-psychologist-detail__section">
+                    <div class="admin-psychologist-detail__section-heading">
+                        <h4>
+                            Acceso al sistema
+                        </h4>
+
+                        <p>
+                            Controla si el psicólogo puede iniciar sesión
+                            en la plataforma.
+                        </p>
+                    </div>
+
+                    <div class="admin-psychologist-detail__account-control">
+                        <div>
+                            <strong>
+                                {% if psychologist.account.is_active %}
+                                    La cuenta está activa
+                                {% else %}
+                                    La cuenta está inactiva
+                                {% endif %}
+                            </strong>
+
+                            <p>
+                                {% if psychologist.account.is_active %}
+                                    El psicólogo puede iniciar sesión y utilizar
+                                    las funciones asignadas a su rol.
+                                {% else %}
+                                    El psicólogo no puede iniciar sesión mientras
+                                    la cuenta permanezca inactiva.
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <form
+                            method="post"
+                            action="{% url 'admin-psychologist-account-status-update' psychologist.id %}"
+                            class="admin-psychologist-detail__status-form"
+                            data-account-status-form
+                        >
+                            {% csrf_token %}
+
+                            {% if psychologist.account.is_active %}
+                                <input
+                                    type="hidden"
+                                    name="status"
+                                    value="deactivate"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn--danger"
+                                    data-confirm-message="¿Confirmas que deseas desactivar esta cuenta? El psicólogo no podrá iniciar sesión."
+                                >
+                                    Desactivar cuenta
+                                </button>
+                            {% else %}
+                                <input
+                                    type="hidden"
+                                    name="status"
+                                    value="activate"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn--primary"
+                                    data-confirm-message="¿Confirmas que deseas activar esta cuenta? El psicólogo podrá iniciar sesión nuevamente."
+                                >
+                                    Activar cuenta
+                                </button>
+                            {% endif %}
+                        </form>
+                    </div>
+                </section>
+            </div>
+
+            <div class="card__footer">
+                <a
+                    href="{% url 'admin-psychologist-list' %}"
+                    class="btn btn--secondary"
+                >
+                    Volver
+                </a>
+
+                <a
+                    href="{% url 'admin-psychologist-edit' psychologist.id %}"
+                    class="btn btn--primary"
+                >
+                    Editar psicólogo
+                </a>
+            </div>
+        </article>
+    </section>
+
+    <script>
+        document
+            .querySelectorAll("[data-account-status-form]")
+            .forEach((form) => {
+                form.addEventListener("submit", (event) => {
+                    const button = form.querySelector(
+                        "[data-confirm-message]"
+                    );
+
+                    if (!button) {
+                        return;
+                    }
+
+                    const confirmationMessage =
+                        button.dataset.confirmMessage;
+
+                    if (!window.confirm(confirmationMessage)) {
+                        event.preventDefault();
+                    }
+                });
+            });
+    </script>
+{% endblock %}

@@ -1,4 +1,5 @@
 import calendar
+from .services import complete_finished_confirmed_appointments
 from datetime import date, timedelta
 from django.utils import timezone
 from django.db import transaction
@@ -34,6 +35,9 @@ def patient_appointment_list(request):
 
     if request.user.role != "PATIENT":
         return redirect("dashboard-redirect")
+
+    # Actualiza las citas confirmadas cuya hora de finalización ya pasó.
+    complete_finished_confirmed_appointments()
 
     now = timezone.now()
 
@@ -97,6 +101,9 @@ def patient_appointment_detail(request, public_id):
     if request.user.role != "PATIENT":
         return redirect("dashboard-redirect")
 
+    # Actualiza las citas confirmadas cuya hora de finalización ya pasó.
+    complete_finished_confirmed_appointments()
+
     appointment = get_object_or_404(
         Appointment.objects.select_related(
             "patient",
@@ -127,16 +134,19 @@ def patient_appointment_booking(request):
     - navegar entre meses;
     - seleccionar una fecha;
     - filtrar por psicólogo;
-    - consultar slots disponibles.
+    - consultar cupos disponibles;
+    - identificar visualmente los días que tienen disponibilidad.
     """
 
     if request.user.role != "PATIENT":
         return redirect("dashboard-redirect")
 
-    today = date.today()
+    today = timezone.localdate()
+    now = timezone.now()
 
     # Fecha seleccionada desde la URL.
     selected_date_param = request.GET.get("date")
+
     selected_date = (
         parse_date(selected_date_param)
         if selected_date_param
@@ -149,10 +159,17 @@ def patient_appointment_booking(request):
     # Mes mostrado en el calendario.
     try:
         displayed_year = int(
-            request.GET.get("year", selected_date.year)
+            request.GET.get(
+                "year",
+                selected_date.year,
+            )
         )
+
         displayed_month = int(
-            request.GET.get("month", selected_date.month)
+            request.GET.get(
+                "month",
+                selected_date.month,
+            )
         )
 
         if displayed_month < 1 or displayed_month > 12:
@@ -162,7 +179,9 @@ def patient_appointment_booking(request):
         displayed_year = today.year
         displayed_month = today.month
 
-    selected_psychologist_id = request.GET.get("psychologist")
+    selected_psychologist_id = request.GET.get(
+        "psychologist"
+    )
 
     psychologists = (
         Psychologist.objects
@@ -174,34 +193,62 @@ def patient_appointment_booking(request):
         )
     )
 
-    slots = AvailabilitySlot.objects.none()
+    # Consulta base para todos los cupos disponibles futuros.
+    available_slots_queryset = (
+        AvailabilitySlot.objects
+        .select_related(
+            "psychologist",
+            "psychologist__account",
+        )
+        .filter(
+            status=AvailabilitySlot.Status.AVAILABLE,
+            start_time__gt=now,
+        )
+    )
 
-    if selected_date:
-        slots = (
-            AvailabilitySlot.objects
-            .select_related(
-                "psychologist",
-                "psychologist__account",
-            )
-            .filter(
-                start_time__date=selected_date,
-                start_time__gt=timezone.now(),
-                status=AvailabilitySlot.Status.AVAILABLE,
-            )
-            .order_by(
-                "psychologist__account__first_name",
-                "start_time",
+    # Si se seleccionó un psicólogo, tanto los horarios
+    # del día como los días resaltados deben corresponder
+    # únicamente a ese profesional.
+    if selected_psychologist_id:
+        available_slots_queryset = (
+            available_slots_queryset.filter(
+                psychologist_id=selected_psychologist_id,
             )
         )
 
-        if selected_psychologist_id:
-            slots = slots.filter(
-                psychologist_id=selected_psychologist_id
-            )
+    # Cupos correspondientes al día seleccionado.
+    slots = (
+        available_slots_queryset
+        .filter(
+            start_time__date=selected_date,
+        )
+        .order_by(
+            "psychologist__account__first_name",
+            "psychologist__account__last_name",
+            "start_time",
+        )
+    )
+
+    # Fechas del mes que contienen al menos un cupo disponible.
+    #
+    # Se utilizan posteriormente para aplicar el fondo amarillo
+    # dentro del calendario.
+    available_dates = set(
+        available_slots_queryset
+        .filter(
+            start_time__year=displayed_year,
+            start_time__month=displayed_month,
+        )
+        .values_list(
+            "start_time__date",
+            flat=True,
+        )
+        .distinct()
+    )
 
     # Construye las semanas del calendario.
     month_calendar = calendar.Calendar(
-        firstweekday=calendar.MONDAY
+        firstweekday=calendar.MONDAY,
     )
 
     calendar_weeks = month_calendar.monthdatescalendar(
@@ -244,15 +291,20 @@ def patient_appointment_booking(request):
         "page_title": "Agendar nueva cita",
         "today": today,
         "selected_date": selected_date,
-        "selected_psychologist_id": selected_psychologist_id,
+        "selected_psychologist_id": (
+            selected_psychologist_id
+        ),
         "psychologists": psychologists,
         "slots": slots,
 
-        # Información del calendario.
+        # Calendario.
         "calendar_weeks": calendar_weeks,
+        "available_dates": available_dates,
         "displayed_month": displayed_month,
         "displayed_year": displayed_year,
-        "displayed_month_name": month_names[displayed_month],
+        "displayed_month_name": month_names[
+            displayed_month
+        ],
 
         # Navegación mensual.
         "previous_month": previous_month,
@@ -451,6 +503,9 @@ def patient_appointment_reschedule(request, public_id):
     Permite al paciente seleccionar una nueva fecha,
     un psicólogo y un cupo disponible para reprogramar
     una cita propia pendiente o confirmada.
+
+    También identifica los días del mes que poseen
+    al menos un cupo disponible.
     """
 
     if request.user.role != "PATIENT":
@@ -484,63 +539,107 @@ def patient_appointment_reschedule(request, public_id):
         )
 
     today = timezone.localdate()
+    now = timezone.now()
 
     selected_date_value = request.GET.get("date")
-    selected_date = parse_date(selected_date_value or "")
+
+    selected_date = parse_date(
+        selected_date_value or ""
+    )
 
     if not selected_date:
         selected_date = today
 
     try:
         displayed_year = int(
-            request.GET.get("year", selected_date.year)
+            request.GET.get(
+                "year",
+                selected_date.year,
+            )
         )
+
         displayed_month = int(
-            request.GET.get("month", selected_date.month)
+            request.GET.get(
+                "month",
+                selected_date.month,
+            )
         )
+
     except (TypeError, ValueError):
         displayed_year = selected_date.year
         displayed_month = selected_date.month
 
-    # Evita valores de mes inválidos.
     if displayed_month < 1 or displayed_month > 12:
         displayed_year = today.year
         displayed_month = today.month
 
-    selected_psychologist_id = request.GET.get("psychologist")
+    selected_psychologist_id = request.GET.get(
+        "psychologist"
+    )
 
-    # La primera vez se selecciona automáticamente
+    # Al abrir la pantalla se selecciona automáticamente
     # el psicólogo actual de la cita.
     if not selected_psychologist_id:
         selected_psychologist_id = str(
             appointment.psychologist_id
         )
 
-    psychologists = Psychologist.objects.select_related(
-        "account"
-    ).order_by(
-        "account__first_name",
-        "account__last_name",
+    psychologists = (
+        Psychologist.objects
+        .select_related("account")
+        .order_by(
+            "account__first_name",
+            "account__last_name",
+        )
     )
 
-    available_slots = AvailabilitySlot.objects.filter(
-        start_time__date=selected_date,
-        status=AvailabilitySlot.Status.AVAILABLE,
-        start_time__gte=timezone.now(),
-    ).select_related(
-        "psychologist",
-        "psychologist__account",
-    ).order_by(
-        "start_time"
+    # Consulta base de cupos futuros disponibles.
+    available_slots_queryset = (
+        AvailabilitySlot.objects
+        .select_related(
+            "psychologist",
+            "psychologist__account",
+        )
+        .filter(
+            status=AvailabilitySlot.Status.AVAILABLE,
+            start_time__gt=now,
+        )
     )
 
     if selected_psychologist_id:
-        available_slots = available_slots.filter(
-            psychologist_id=selected_psychologist_id
+        available_slots_queryset = (
+            available_slots_queryset.filter(
+                psychologist_id=selected_psychologist_id,
+            )
         )
 
+    # Cupos del día actualmente seleccionado.
+    available_slots = (
+        available_slots_queryset
+        .filter(
+            start_time__date=selected_date,
+        )
+        .order_by(
+            "start_time",
+        )
+    )
+
+    # Fechas del mes que poseen cupos disponibles.
+    available_dates = set(
+        available_slots_queryset
+        .filter(
+            start_time__year=displayed_year,
+            start_time__month=displayed_month,
+        )
+        .values_list(
+            "start_time__date",
+            flat=True,
+        )
+        .distinct()
+    )
+
     month_calendar = calendar.Calendar(
-        firstweekday=0
+        firstweekday=calendar.MONDAY,
     )
 
     calendar_weeks = month_calendar.monthdatescalendar(
@@ -588,12 +687,17 @@ def patient_appointment_reschedule(request, public_id):
         ),
         "selected_date": selected_date,
         "available_slots": available_slots,
+
+        # Calendario.
         "calendar_weeks": calendar_weeks,
+        "available_dates": available_dates,
         "displayed_year": displayed_year,
         "displayed_month": displayed_month,
         "displayed_month_name": month_names[
             displayed_month
         ],
+
+        # Navegación.
         "previous_month": previous_month,
         "previous_year": previous_year,
         "next_month": next_month,
@@ -816,6 +920,9 @@ def psychologist_appointment_list(request):
     if request.user.role != "PSYCHOLOGIST":
         return redirect("dashboard-redirect")
 
+    # Actualiza las citas confirmadas cuya hora de finalización ya pasó.
+    complete_finished_confirmed_appointments()
+
     now = timezone.now()
     today = timezone.localdate()
 
@@ -989,6 +1096,9 @@ def psychologist_appointment_detail(request, public_id):
 
     if request.user.role != "PSYCHOLOGIST":
         return redirect("dashboard-redirect")
+    
+    # Actualiza las citas confirmadas cuya hora de finalización ya pasó.
+    complete_finished_confirmed_appointments()
 
     appointment = get_object_or_404(
         Appointment.objects.select_related(

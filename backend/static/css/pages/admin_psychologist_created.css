@@ -1,0 +1,76 @@
+/* ==============================
+   Credenciales del psicólogo
+   ============================== */
+
+.admin-psychologist-created {
+    width: min(100%, 820px);
+    margin-inline: auto;
+}
+
+.admin-psychologist-created__summary {
+    display: grid;
+    gap: var(--spacing-4);
+    margin-top: var(--spacing-5);
+}
+
+.admin-psychologist-created__field {
+    display: grid;
+    gap: var(--spacing-2);
+    padding: var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+}
+
+.admin-psychologist-created__label {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.admin-psychologist-created__credential {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+}
+
+.admin-psychologist-created__credential code {
+    display: block;
+    min-width: 0;
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--radius-sm);
+    background: #ffffff;
+    color: var(--text-color);
+    font-family: monospace;
+    font-size: var(--font-size-base);
+    overflow-wrap: anywhere;
+}
+
+.admin-psychologist-created .card__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+}
+
+@media (max-width: 600px) {
+    .admin-psychologist-created__credential {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-psychologist-created__credential .btn {
+        width: 100%;
+    }
+
+    .admin-psychologist-created .card__footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-psychologist-created .card__footer .btn {
+        width: 100%;
+    }
+}

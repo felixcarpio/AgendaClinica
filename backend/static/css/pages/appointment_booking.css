@@ -1,80 +1,107 @@
+/* ==============================
+   Distribución principal
+   ============================== */
+
 .booking-layout {
     display: grid;
-    grid-template-columns: minmax(260px, 320px) 1fr;
-    gap: var(--spacing-6);
+    grid-template-columns: minmax(250px, 290px) minmax(0, 1fr);
+    gap: var(--spacing-5);
     align-items: start;
 }
 
 .booking-panel {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-4);
+    min-width: 0;
 }
 
 .booking-panel__title {
-    margin-bottom: 0;
-    font-size: var(--font-size-md);
+    margin: 0 0 var(--spacing-3);
+    font-size: var(--font-size-lg);
 }
 
+.booking-main {
+    display: grid;
+    gap: var(--spacing-5);
+    min-width: 0;
+}
+
+/* ==============================
+   Lista de psicólogos
+   ============================== */
+
 .psychologist-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: var(--spacing-4);
 }
 
 .psychologist-card {
+    display: grid;
+    gap: var(--spacing-2);
     padding: var(--spacing-4);
-
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
+    background: #ffffff;
     box-shadow: var(--shadow-sm);
 }
 
 .psychologist-card--active {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px var(--color-primary-soft);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(164, 92, 120, 0.1);
 }
 
 .psychologist-card__name {
-    margin-bottom: var(--spacing-1);
+    margin: 0;
     font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
 }
 
 .psychologist-card__specialty {
-    margin-bottom: var(--spacing-4);
-    color: var(--color-text-muted);
+    margin: 0 0 var(--spacing-2);
+    color: var(--text-muted);
     font-size: var(--font-size-xs);
+    line-height: 1.5;
 }
 
-.booking-main {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-6);
-}
+/* ==============================
+   Calendario
+   ============================== */
 
 .calendar-card,
 .slots-card {
-    padding: var(--spacing-6);
-
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
+    padding: var(--spacing-5);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
+    background: #ffffff;
     box-shadow: var(--shadow-sm);
 }
 
 .calendar-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: var(--spacing-4);
     margin-bottom: var(--spacing-5);
 }
 
 .calendar-header__title {
-    margin-bottom: 0;
-    font-size: var(--font-size-md);
+    margin: 0;
+    font-size: var(--font-size-lg);
+}
+
+.calendar-header__legend {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    margin: var(--spacing-2) 0 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+}
+
+.calendar-header__legend-color {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    border: 1px solid #e3cb79;
+    border-radius: 4px;
+    background: #fff5cc;
 }
 
 .calendar-nav {
@@ -86,18 +113,25 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    width: 38px;
-    height: 38px;
-
-    color: var(--color-primary-dark);
-    background-color: var(--color-primary-soft);
-    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
 .calendar-nav__link:hover {
-    color: var(--color-text-on-primary);
-    background-color: var(--color-primary);
+    background: var(--primary-color);
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
 .calendar-grid {
@@ -108,177 +142,254 @@
 
 .calendar-weekday {
     padding: var(--spacing-2);
-
-    color: var(--color-text-muted);
+    color: var(--text-muted);
     font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
+    font-weight: 700;
     text-align: center;
     text-transform: uppercase;
 }
 
 .calendar-day {
-    min-height: 44px;
+    min-width: 0;
 }
 
 .calendar-day__link,
 .calendar-day__disabled {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-
     width: 100%;
     min-height: 44px;
-
-    border-radius: var(--radius-sm);
+    padding: var(--spacing-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    text-align: center;
 }
 
 .calendar-day__link {
-    color: var(--color-text-primary);
-    background-color: var(--color-surface-soft);
-    border: 1px solid transparent;
+    background: var(--surface-soft);
+    color: var(--text-color);
+    text-decoration: none;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .calendar-day__link:hover {
-    color: var(--color-primary-dark);
-    background-color: var(--color-primary-soft);
-    border-color: var(--color-primary-light);
+    border-color: var(--primary-light);
+    background: var(--primary-soft);
+    color: var(--primary-color);
+    transform: translateY(-1px);
 }
 
-.calendar-day__link--selected {
-    color: var(--color-text-on-primary);
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
+/* Día que contiene uno o varios cupos disponibles */
+
+.calendar-day__link--available {
+    border-color: #e5cf82;
+    background: #fff6d5;
+    color: #665317;
+    font-weight: 700;
 }
 
-.calendar-day__link--selected:hover {
-    color: var(--color-text-on-primary);
-    background-color: var(--color-primary-dark);
+.calendar-day__link--available:hover {
+    border-color: #d7bb5c;
+    background: #faedb8;
+    color: #59470e;
+    box-shadow: 0 3px 8px rgba(123, 96, 16, 0.12);
 }
+
+/* Punto discreto que refuerza la disponibilidad */
+
+.calendar-day__availability-dot {
+    position: absolute;
+    right: 7px;
+    bottom: 6px;
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: #a48620;
+}
+
+/* Día actual */
 
 .calendar-day__link--today {
-    border-color: var(--color-secondary);
+    box-shadow: inset 0 0 0 1px var(--primary-color);
+}
+
+/*
+La selección tiene prioridad sobre disponibilidad
+y sobre el día actual.
+*/
+
+.calendar-day__link.calendar-day__link--selected,
+.calendar-day__link.calendar-day__link--selected:hover {
+    border-color: #8f3f62;
+    background: #a84f75;
+    color: #ffffff;
+    font-weight: 800;
+    box-shadow: 0 4px 10px rgba(143, 63, 98, 0.24);
+    transform: none;
+}
+
+.calendar-day__link.calendar-day__link--selected
+.calendar-day__availability-dot {
+    background: #ffffff;
 }
 
 .calendar-day__disabled {
-    color: var(--color-text-muted);
-    opacity: 0.45;
+    color: #cbc5c8;
+    background: transparent;
+}
+
+/* ==============================
+   Horarios disponibles
+   ============================== */
+
+.slots-card {
+    min-height: 145px;
 }
 
 .slots-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--spacing-4);
-    margin-bottom: var(--spacing-5);
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-4);
 }
 
 .slots-header__title {
-    margin-bottom: 0;
-    font-size: var(--font-size-md);
+    margin: 0;
+    font-size: var(--font-size-lg);
 }
 
 .slots-date {
-    color: var(--color-text-muted);
+    color: var(--text-muted);
     font-size: var(--font-size-sm);
-}
-
-.slot-groups {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-5);
-}
-
-.slot-group__title {
-    margin-bottom: var(--spacing-3);
-
-    color: var(--color-text-muted);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
 }
 
 .slot-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(190px, 220px)
+    );
     gap: var(--spacing-3);
 }
 
 .slot-button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-1);
-
-    min-height: 62px;
-    padding: var(--spacing-3);
-
-    color: var(--color-success);
-    background-color: var(--color-success-light);
-    border: 1px solid var(--color-success);
+    display: grid;
+    gap: var(--spacing-2);
+    min-height: 64px;
+    padding: var(--spacing-3) var(--spacing-4);
+    border: 1px solid #a8cfb2;
     border-radius: var(--radius-md);
+    background: #f1f9f3;
+    color: #2f6540;
+    text-align: center;
+    text-decoration: none;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .slot-button:hover {
-    color: var(--color-text-on-primary);
-    background-color: var(--color-success);
+    border-color: #7eb48c;
+    background: #e7f4ea;
+    color: #234f31;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(47, 101, 64, 0.12);
 }
 
 .slot-button__time {
+    color: inherit;
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
+    font-weight: 700;
 }
 
 .slot-button__psychologist {
+    color: #4f8160;
     font-size: var(--font-size-xs);
 }
 
-.booking-empty {
-    padding: var(--spacing-6);
-
-    color: var(--color-text-muted);
-    text-align: center;
-
-    background-color: var(--color-surface-soft);
-    border: 1px dashed var(--color-border-strong);
-    border-radius: var(--radius-md);
+.slot-button:hover .slot-button__psychologist {
+    color: #356444;
 }
 
-@media (max-width: 1024px) {
+/* ==============================
+   Estados vacíos
+   ============================== */
+
+.booking-empty {
+    padding: var(--spacing-5);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* ==============================
+   Diseño adaptable
+   ============================== */
+
+@media (max-width: 980px) {
     .booking-layout {
         grid-template-columns: 1fr;
     }
 
     .psychologist-list {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 680px) {
     .calendar-card,
     .slots-card {
         padding: var(--spacing-4);
     }
 
-    .slot-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .calendar-header {
+        align-items: stretch;
+        flex-direction: column;
     }
-}
 
-@media (max-width: 560px) {
-    .psychologist-list,
-    .slot-grid {
-        grid-template-columns: 1fr;
+    .calendar-nav {
+        justify-content: flex-end;
     }
 
     .calendar-grid {
-        gap: var(--spacing-1);
+        gap: 5px;
+    }
+
+    .calendar-weekday {
+        padding-inline: 2px;
+        font-size: 0.65rem;
     }
 
     .calendar-day__link,
     .calendar-day__disabled {
-        min-height: 38px;
+        min-height: 39px;
+        padding: 4px;
+    }
+
+    .slots-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .slot-grid {
+        grid-template-columns: 1fr;
     }
 }

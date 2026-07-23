@@ -38,8 +38,11 @@
                 </div>
 
                 <div class="card__footer">
-                    <a href="#" class="btn btn--primary btn--sm">
-                        Ver usuarios
+                    <a
+                        href="{% url 'admin-psychologist-list' %}"
+                        class="btn btn--secondary btn--sm"
+                    >
+                        Ver psicólogos
                     </a>
                 </div>
             </article>
@@ -53,13 +56,17 @@
 
                 <div class="card__body">
                     <p>
-                        Gestiona los profesionales registrados en la clínica.
+                        Registra y administra los profesionales
+                        que brindan atención en la clínica.
                     </p>
                 </div>
 
                 <div class="card__footer">
-                    <a href="#" class="btn btn--secondary btn--sm">
-                        Ver psicólogos
+                    <a
+                        href="{% url 'admin-psychologist-create' %}"
+                        class="btn btn--secondary btn--sm"
+                    >
+                        Registrar psicólogo
                     </a>
                 </div>
             </article>
@@ -78,7 +85,10 @@
                 </div>
 
                 <div class="card__footer">
-                    <a href="#" class="btn btn--outline btn--sm">
+                    <a
+                        href="#"
+                        class="btn btn--outline btn--sm"
+                    >
                         Ver pacientes
                     </a>
                 </div>

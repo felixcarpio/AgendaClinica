@@ -14,6 +14,21 @@ class Psychologist(models.Model):
         on_delete=models.CASCADE,
         related_name="psychologist_profile"
     )
+    
+    class Gender(models.TextChoices):
+        MALE = "MALE", "Masculino"
+        FEMALE = "FEMALE", "Femenino"
+        OTHER = "OTHER", "Otro"
+        PREFER_NOT_TO_SAY = (
+            "PREFER_NOT_TO_SAY",
+            "Prefiero no indicarlo",
+        )
+
+    gender = models.CharField(
+        max_length=30,
+        choices=Gender.choices,
+        blank=True,
+    )
 
     license_number = models.CharField(max_length=50, unique=True)
     specialty = models.CharField(max_length=150, blank=True)

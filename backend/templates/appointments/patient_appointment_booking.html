@@ -43,11 +43,7 @@
                 <div class="psychologist-list">
                     {% for psychologist in psychologists %}
                         <article
-                            class="psychologist-card
-                                {% if selected_psychologist_id == psychologist.id|stringformat:'s' %}
-                                    psychologist-card--active
-                                {% endif %}
-                            "
+                            class="psychologist-card{% if selected_psychologist_id == psychologist.id|stringformat:'s' %} psychologist-card--active{% endif %}"
                         >
                             <h4 class="psychologist-card__name">
                                 {{ psychologist }}
@@ -73,12 +69,18 @@
             </aside>
 
             <div class="booking-main">
-
                 <section class="calendar-card">
                     <div class="calendar-header">
-                        <h3 class="calendar-header__title">
-                            {{ displayed_month_name }} {{ displayed_year }}
-                        </h3>
+                        <div>
+                            <h3 class="calendar-header__title">
+                                {{ displayed_month_name }} {{ displayed_year }}
+                            </h3>
+
+                            <p class="calendar-header__legend">
+                                <span class="calendar-header__legend-color"></span>
+                                Días con horarios disponibles
+                            </p>
+                        </div>
 
                         <div class="calendar-nav">
                             <a
@@ -114,16 +116,30 @@
                                     {% if day.month == displayed_month %}
                                         <a
                                             href="?date={{ day|date:'Y-m-d' }}&year={{ displayed_year }}&month={{ displayed_month }}{% if selected_psychologist_id %}&psychologist={{ selected_psychologist_id }}{% endif %}"
-                                            class="calendar-day__link
-                                                {% if day == selected_date %}
-                                                    calendar-day__link--selected
+                                            class="
+                                                calendar-day__link
+                                                {% if day in available_dates %}
+                                                    calendar-day__link--available
                                                 {% endif %}
                                                 {% if day == today %}
                                                     calendar-day__link--today
                                                 {% endif %}
+                                                {% if day == selected_date %}
+                                                    calendar-day__link--selected
+                                                {% endif %}
                                             "
+                                            {% if day in available_dates %}
+                                                title="Hay horarios disponibles"
+                                            {% endif %}
                                         >
                                             {{ day.day }}
+
+                                            {% if day in available_dates and day != selected_date %}
+                                                <span
+                                                    class="calendar-day__availability-dot"
+                                                    aria-hidden="true"
+                                                ></span>
+                                            {% endif %}
                                         </a>
                                     {% else %}
                                         <span class="calendar-day__disabled">
@@ -172,7 +188,6 @@
                         </div>
                     {% endif %}
                 </section>
-
             </div>
         </div>
     </section>
