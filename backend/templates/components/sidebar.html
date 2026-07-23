@@ -246,8 +246,12 @@
 
                     <li class="sidebar__menu-item">
                         <a
-                            href="#"
-                            class="sidebar__menu-link"
+                            href="{% url 'admin-user-list' %}"
+                            class="sidebar__menu-link
+                                {% if request.resolver_match.url_name == 'admin-user-list' %}
+                                    sidebar__menu-link--active
+                                {% endif %}
+                            "
                         >
                             <span
                                 class="sidebar__menu-icon"
@@ -286,8 +290,12 @@
 
                     <li class="sidebar__menu-item">
                         <a
-                            href="#"
-                            class="sidebar__menu-link"
+                            href="{% url 'admin-patient-list' %}"
+                            class="sidebar__menu-link
+                                {% if request.resolver_match.url_name == 'admin-patient-list' or request.resolver_match.url_name == 'admin-patient-detail' or request.resolver_match.url_name == 'admin-patient-edit' or request.resolver_match.url_name == 'admin-patient-account-status-update' %}
+                                    sidebar__menu-link--active
+                                {% endif %}
+                            "
                         >
                             <span
                                 class="sidebar__menu-icon"
@@ -304,8 +312,12 @@
 
                     <li class="sidebar__menu-item">
                         <a
-                            href="#"
-                            class="sidebar__menu-link"
+                            href="{% url 'admin-report-dashboard' %}"
+                            class="sidebar__menu-link
+                                {% if request.resolver_match.url_name == 'admin-report-dashboard' %}
+                                    sidebar__menu-link--active
+                                {% endif %}
+                            "
                         >
                             <span
                                 class="sidebar__menu-icon"

@@ -1,0 +1,423 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Reportes | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/admin_report_dashboard.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Reportes
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta indicadores generales sobre usuarios,
+                profesionales, pacientes y citas.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'admin-dashboard' %}"
+            class="btn btn--secondary"
+        >
+            Volver al panel
+        </a>
+    </section>
+
+    <section class="content-section">
+        <article class="card report-filter-card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Filtrar citas por fecha
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Los indicadores de psicólogos y pacientes permanecen
+                        como totales generales.
+                    </p>
+                </div>
+
+                {% if appointments_are_filtered and not date_filter_error %}
+                    <span class="badge badge--primary">
+                        Período aplicado
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="card__body">
+                {% if date_filter_error %}
+                    <div
+                        class="message message--error"
+                        role="alert"
+                    >
+                        {{ date_filter_error }}
+                    </div>
+                {% endif %}
+
+                <div class="report-quick-filters">
+                    <a
+                        href="?period=today"
+                        class="report-quick-filter{% if period_filter == 'today' %} report-quick-filter--active{% endif %}"
+                    >
+                        Hoy
+                    </a>
+
+                    <a
+                        href="?period=last_7_days"
+                        class="report-quick-filter{% if period_filter == 'last_7_days' %} report-quick-filter--active{% endif %}"
+                    >
+                        Últimos 7 días
+                    </a>
+
+                    <a
+                        href="?period=this_month"
+                        class="report-quick-filter{% if period_filter == 'this_month' %} report-quick-filter--active{% endif %}"
+                    >
+                        Este mes
+                    </a>
+
+                    <a
+                        href="{% url 'admin-report-dashboard' %}"
+                        class="report-quick-filter{% if not appointments_are_filtered %} report-quick-filter--active{% endif %}"
+                    >
+                        Historial completo
+                    </a>
+                </div>
+
+                <form
+                    method="get"
+                    class="report-date-filter"
+                >
+                    <div class="report-date-filter__fields">
+                        <div class="form-group">
+                            <label
+                                for="id_start_date"
+                                class="form-label"
+                            >
+                                Fecha inicial
+                            </label>
+
+                            <input
+                                type="date"
+                                name="start_date"
+                                id="id_start_date"
+                                class="form-control"
+                                value="{{ start_date }}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="id_end_date"
+                                class="form-label"
+                            >
+                                Fecha final
+                            </label>
+
+                            <input
+                                type="date"
+                                name="end_date"
+                                id="id_end_date"
+                                class="form-control"
+                                value="{{ end_date }}"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="report-date-filter__actions">
+                        <button
+                            type="submit"
+                            class="btn btn--primary"
+                        >
+                            Aplicar período
+                        </button>
+
+                        {% if appointments_are_filtered %}
+                            <a
+                                href="{% url 'admin-report-dashboard' %}"
+                                class="btn btn--secondary"
+                            >
+                                Mostrar historial completo
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </article>
+    </section>
+
+    <section class="content-section">
+        <div class="report-summary">
+            <article class="report-summary__item">
+                <div
+                    class="report-summary__icon"
+                    aria-hidden="true"
+                >
+                    🧠
+                </div>
+
+                <div class="report-summary__content">
+                    <span class="report-summary__label">
+                        Psicólogos registrados
+                    </span>
+
+                    <strong class="report-summary__value">
+                        {{ total_psychologists }}
+                    </strong>
+                </div>
+            </article>
+
+            <article class="report-summary__item">
+                <div
+                    class="report-summary__icon"
+                    aria-hidden="true"
+                >
+                    ✓
+                </div>
+
+                <div class="report-summary__content">
+                    <span class="report-summary__label">
+                        Psicólogos activos
+                    </span>
+
+                    <strong class="report-summary__value">
+                        {{ active_psychologist_accounts }}
+                    </strong>
+                </div>
+            </article>
+
+            <article class="report-summary__item">
+                <div
+                    class="report-summary__icon"
+                    aria-hidden="true"
+                >
+                    👥
+                </div>
+
+                <div class="report-summary__content">
+                    <span class="report-summary__label">
+                        Pacientes registrados
+                    </span>
+
+                    <strong class="report-summary__value">
+                        {{ total_patients }}
+                    </strong>
+                </div>
+            </article>
+
+            <article class="report-summary__item">
+                <div
+                    class="report-summary__icon"
+                    aria-hidden="true"
+                >
+                    ✓
+                </div>
+
+                <div class="report-summary__content">
+                    <span class="report-summary__label">
+                        Pacientes activos
+                    </span>
+
+                    <strong class="report-summary__value">
+                        {{ active_patient_accounts }}
+                    </strong>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="report-content-grid">
+            <article class="card report-accounts-card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Gestión de cuentas
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Accede a los perfiles registrados.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <div class="report-account-links">
+                        <a
+                            href="{% url 'admin-psychologist-list' %}"
+                            class="report-account-link"
+                        >
+                            <div>
+                                <strong>
+                                    Psicólogos
+                                </strong>
+
+                                <span>
+                                    {{ active_psychologist_accounts }}
+                                    de {{ total_psychologists }}
+                                    cuentas activas
+                                </span>
+                            </div>
+
+                            <span
+                                class="report-account-link__arrow"
+                                aria-hidden="true"
+                            >
+                                →
+                            </span>
+                        </a>
+
+                        <a
+                            href="{% url 'admin-patient-list' %}"
+                            class="report-account-link"
+                        >
+                            <div>
+                                <strong>
+                                    Pacientes
+                                </strong>
+
+                                <span>
+                                    {{ active_patient_accounts }}
+                                    de {{ total_patients }}
+                                    cuentas activas
+                                </span>
+                            </div>
+
+                            <span
+                                class="report-account-link__arrow"
+                                aria-hidden="true"
+                            >
+                                →
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card report-appointments-card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Estado de las citas
+                        </h3>
+
+                        <p class="card__subtitle">
+                            {% if appointments_are_filtered and not date_filter_error %}
+                                Citas correspondientes al período seleccionado.
+                            {% else %}
+                                Distribución histórica por estado.
+                            {% endif %}
+                        </p>
+
+                        <p class="report-period-summary">
+                            {{ period_summary }}
+                        </p>
+                    </div>
+
+                    <div class="report-appointments-card__badges">
+                        {% if appointments_are_filtered and not date_filter_error %}
+                            <span class="badge badge--primary">
+                                Período filtrado
+                            </span>
+                        {% else %}
+                            <span class="badge badge--neutral">
+                                Historial completo
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <div class="report-appointments-layout">
+                        <div class="report-appointments-total">
+                            <span class="report-appointments-total__label">
+                                Total de citas
+                            </span>
+
+                            <strong class="report-appointments-total__value">
+                                {{ total_appointments }}
+                            </strong>
+
+                            <span class="report-appointments-total__description">
+                                Registros correspondientes al período consultado
+                            </span>
+                        </div>
+
+                        <div class="report-appointments-statuses">
+                            <div class="report-status-row">
+                                <div class="report-status-row__info">
+                                    <span class="report-status-row__indicator report-status-row__indicator--confirmed"></span>
+
+                                    <div>
+                                        <strong>
+                                            Confirmadas
+                                        </strong>
+
+                                        <span>
+                                            Citas programadas y pendientes
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <span class="report-status-row__value">
+                                    {{ confirmed_appointments }}
+                                </span>
+                            </div>
+
+                            <div class="report-status-row">
+                                <div class="report-status-row__info">
+                                    <span class="report-status-row__indicator report-status-row__indicator--completed"></span>
+
+                                    <div>
+                                        <strong>
+                                            Completadas
+                                        </strong>
+
+                                        <span>
+                                            Sesiones que ya fueron atendidas
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <span class="report-status-row__value">
+                                    {{ completed_appointments }}
+                                </span>
+                            </div>
+
+                            <div class="report-status-row">
+                                <div class="report-status-row__info">
+                                    <span class="report-status-row__indicator report-status-row__indicator--cancelled"></span>
+
+                                    <div>
+                                        <strong>
+                                            Canceladas
+                                        </strong>
+
+                                        <span>
+                                            Citas anuladas por el paciente
+                                            o profesional
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <span class="report-status-row__value">
+                                    {{ cancelled_appointments }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+{% endblock %}

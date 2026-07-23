@@ -1,0 +1,335 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Detalle del paciente | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/admin_patient_detail.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Detalle del paciente
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta la información general y el estado de la cuenta.
+            </p>
+        </div>
+
+        <div class="page-heading__actions">
+            <a
+                href="{% url 'admin-patient-list' %}"
+                class="btn btn--secondary"
+            >
+                Volver al listado
+            </a>
+
+            <a
+                href="{% url 'admin-patient-edit' patient.id %}"
+                class="btn btn--primary"
+            >
+                Editar paciente
+            </a>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <article class="card admin-patient-detail">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        {{ patient.account.first_name }}
+                        {{ patient.account.last_name }}
+                    </h3>
+
+                    <p class="card__subtitle">
+                        {{ patient.account.email }}
+                    </p>
+                </div>
+
+                {% if patient.account.is_active %}
+                    <span class="badge badge--success">
+                        Cuenta activa
+                    </span>
+                {% else %}
+                    <span class="badge badge--neutral">
+                        Cuenta inactiva
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="card__body">
+                <section class="admin-patient-detail__section">
+                    <div class="admin-patient-detail__section-heading">
+                        <h4>
+                            Información personal
+                        </h4>
+
+                        <p>
+                            Datos generales asociados a la cuenta del paciente.
+                        </p>
+                    </div>
+
+                    <div class="admin-patient-detail__grid">
+                        <div class="admin-patient-detail__field">
+                            <span class="admin-patient-detail__label">
+                                Nombre completo
+                            </span>
+
+                            <strong>
+                                {{ patient.account.first_name }}
+                                {{ patient.account.last_name }}
+                            </strong>
+                        </div>
+
+                        <div class="admin-patient-detail__field">
+                            <span class="admin-patient-detail__label">
+                                Correo electrónico
+                            </span>
+
+                            <span>
+                                {{ patient.account.email }}
+                            </span>
+                        </div>
+
+                        <div class="admin-patient-detail__field">
+                            <span class="admin-patient-detail__label">
+                                Fecha de nacimiento
+                            </span>
+
+                            <span>
+                                {% if patient.birth_date %}
+                                    {{ patient.birth_date|date:"d/m/Y" }}
+                                {% else %}
+                                    No indicada
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="admin-patient-detail__field">
+                            <span class="admin-patient-detail__label">
+                                Género
+                            </span>
+
+                            <span>
+                                {% if patient.gender %}
+                                    {{ patient.get_gender_display }}
+                                {% else %}
+                                    No indicado
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="admin-patient-detail__field">
+                            <span class="admin-patient-detail__label">
+                                Teléfono
+                            </span>
+
+                            <span>
+                                {% if patient.phone %}
+                                    {{ patient.phone }}
+                                {% else %}
+                                    No indicado
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="admin-patient-detail__field">
+                            <span class="admin-patient-detail__label">
+                                Estado de la cuenta
+                            </span>
+
+                            {% if patient.account.is_active %}
+                                <span class="badge badge--success">
+                                    Activa
+                                </span>
+                            {% else %}
+                                <span class="badge badge--neutral">
+                                    Inactiva
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="admin-patient-detail__section">
+                    <div class="admin-patient-detail__section-heading">
+                        <h4>
+                            Información de contacto
+                        </h4>
+
+                        <p>
+                            Dirección y contacto de emergencia registrados.
+                        </p>
+                    </div>
+
+                    <div class="admin-patient-detail__grid">
+                        <div class="admin-patient-detail__field admin-patient-detail__field--full">
+                            <span class="admin-patient-detail__label">
+                                Dirección
+                            </span>
+
+                            <span>
+                                {% if patient.address %}
+                                    {{ patient.address }}
+                                {% else %}
+                                    No indicada
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="admin-patient-detail__field">
+                            <span class="admin-patient-detail__label">
+                                Contacto de emergencia
+                            </span>
+
+                            <span>
+                                {% if patient.emergency_contact_name %}
+                                    {{ patient.emergency_contact_name }}
+                                {% else %}
+                                    No indicado
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="admin-patient-detail__field">
+                            <span class="admin-patient-detail__label">
+                                Teléfono de emergencia
+                            </span>
+
+                            <span>
+                                {% if patient.emergency_contact_phone %}
+                                    {{ patient.emergency_contact_phone }}
+                                {% else %}
+                                    No indicado
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="admin-patient-detail__section">
+                    <div class="admin-patient-detail__section-heading">
+                        <h4>
+                            Acceso al sistema
+                        </h4>
+
+                        <p>
+                            Controla si el paciente puede iniciar sesión
+                            en la plataforma.
+                        </p>
+                    </div>
+
+                    <div class="admin-patient-detail__account-control">
+                        <div>
+                            <strong>
+                                {% if patient.account.is_active %}
+                                    La cuenta está activa
+                                {% else %}
+                                    La cuenta está inactiva
+                                {% endif %}
+                            </strong>
+
+                            <p>
+                                {% if patient.account.is_active %}
+                                    El paciente puede iniciar sesión y utilizar
+                                    las funciones disponibles para su rol.
+                                {% else %}
+                                    El paciente no puede iniciar sesión mientras
+                                    la cuenta permanezca inactiva.
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <form
+                            method="post"
+                            action="{% url 'admin-patient-account-status-update' patient.id %}"
+                            class="admin-patient-detail__status-form"
+                            data-account-status-form
+                        >
+                            {% csrf_token %}
+
+                            {% if patient.account.is_active %}
+                                <input
+                                    type="hidden"
+                                    name="status"
+                                    value="deactivate"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn--danger"
+                                    data-confirm-message="¿Confirmas que deseas desactivar esta cuenta? El paciente no podrá iniciar sesión."
+                                >
+                                    Desactivar cuenta
+                                </button>
+                            {% else %}
+                                <input
+                                    type="hidden"
+                                    name="status"
+                                    value="activate"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn--primary"
+                                    data-confirm-message="¿Confirmas que deseas activar esta cuenta? El paciente podrá iniciar sesión nuevamente."
+                                >
+                                    Activar cuenta
+                                </button>
+                            {% endif %}
+                        </form>
+                    </div>
+                </section>
+
+            </div>
+
+            <div class="card__footer">
+                <a
+                    href="{% url 'admin-patient-list' %}"
+                    class="btn btn--secondary"
+                >
+                    Volver
+                </a>
+
+                <a
+                    href="{% url 'admin-patient-edit' patient.id %}"
+                    class="btn btn--primary"
+                >
+                    Editar paciente
+                </a>
+            </div>
+        </article>
+    </section>
+
+    <script>
+        document
+            .querySelectorAll("[data-account-status-form]")
+            .forEach((form) => {
+                form.addEventListener("submit", (event) => {
+                    const button = form.querySelector(
+                        "[data-confirm-message]"
+                    );
+
+                    if (!button) {
+                        return;
+                    }
+
+                    const confirmationMessage =
+                        button.dataset.confirmMessage;
+
+                    if (!window.confirm(confirmationMessage)) {
+                        event.preventDefault();
+                    }
+                });
+            });
+    </script>
+{% endblock %}

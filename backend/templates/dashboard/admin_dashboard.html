@@ -12,28 +12,72 @@
             </h2>
 
             <p class="page-heading__description">
-                Gestiona los usuarios y la información general del sistema.
+                Consulta el estado general de las cuentas y accede
+                a los módulos administrativos.
             </p>
         </div>
     </section>
 
     <section class="content-section">
-        <div class="content-grid content-grid--three-columns">
+        <div class="content-grid content-grid--four-columns">
 
             <article class="card">
                 <div class="card__header">
-                    <h3 class="card__title">
-                        Usuarios
-                    </h3>
+                    <div>
+                        <h3 class="card__title">
+                            Usuarios
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Total de cuentas registradas
+                        </p>
+                    </div>
 
                     <span class="badge badge--primary">
-                        Administración
+                        Total
                     </span>
                 </div>
 
                 <div class="card__body">
+                    <p class="dashboard-stat">
+                        {{ total_users }}
+                    </p>
+
                     <p>
-                        Consulta y administra las cuentas registradas.
+                        Incluye administradores, psicólogos y pacientes.
+                    </p>
+                </div>
+
+                <div class="card__footer">
+                    <a
+                        href="{% url 'admin-user-list' %}"
+                        class="btn btn--primary btn--sm"
+                    >
+                        Ver usuarios
+                    </a>
+                </div>
+            </article>
+
+            <article class="card card--soft">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Psicólogos
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Cuentas activas
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card__body">
+                    <p class="dashboard-stat">
+                        {{ active_psychologists }}
+                    </p>
+
+                    <p>
+                        Profesionales que actualmente pueden ingresar al sistema.
                     </p>
                 </div>
 
@@ -47,49 +91,113 @@
                 </div>
             </article>
 
-            <article class="card card--soft">
+            <article class="card card--primary">
                 <div class="card__header">
-                    <h3 class="card__title">
-                        Psicólogos
-                    </h3>
+                    <div>
+                        <h3 class="card__title">
+                            Pacientes
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Cuentas activas
+                        </p>
+                    </div>
                 </div>
 
                 <div class="card__body">
+                    <p class="dashboard-stat">
+                        {{ active_patients }}
+                    </p>
+
                     <p>
-                        Registra y administra los profesionales
-                        que brindan atención en la clínica.
+                        Pacientes que actualmente pueden acceder a la plataforma.
                     </p>
                 </div>
 
                 <div class="card__footer">
                     <a
-                        href="{% url 'admin-psychologist-create' %}"
-                        class="btn btn--secondary btn--sm"
+                        href="{% url 'admin-patient-list' %}"
+                        class="btn btn--outline btn--sm"
                     >
-                        Registrar psicólogo
+                        Ver pacientes
                     </a>
                 </div>
             </article>
 
-            <article class="card card--primary">
+            <article class="card">
                 <div class="card__header">
-                    <h3 class="card__title">
-                        Pacientes
-                    </h3>
+                    <div>
+                        <h3 class="card__title">
+                            Cuentas inactivas
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Acceso deshabilitado
+                        </p>
+                    </div>
+
+                    {% if inactive_accounts %}
+                        <span class="badge badge--neutral">
+                            Revisión
+                        </span>
+                    {% endif %}
                 </div>
 
                 <div class="card__body">
+                    <p class="dashboard-stat">
+                        {{ inactive_accounts }}
+                    </p>
+
                     <p>
-                        Consulta y administra los pacientes del sistema.
+                        Cuentas que permanecen registradas, pero no pueden
+                        iniciar sesión.
                     </p>
                 </div>
 
                 <div class="card__footer">
                     <a
-                        href="#"
-                        class="btn btn--outline btn--sm"
+                        href="{% url 'admin-user-list' %}?account_status=inactive"
+                        class="btn btn--secondary btn--sm"
                     >
-                        Ver pacientes
+                        Ver cuentas inactivas
+                    </a>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card__header">
+                    <div>
+                        <h3 class="card__title">
+                            Reportes
+                        </h3>
+
+                        <p class="card__subtitle">
+                            Indicadores generales
+                        </p>
+                    </div>
+
+                    <span class="badge badge--primary">
+                        Resumen
+                    </span>
+                </div>
+
+                <div class="card__body">
+                    <p class="dashboard-stat">
+                        {{ total_appointments|default:0 }}
+                    </p>
+
+                    <p>
+                        Consulta indicadores generales de usuarios,
+                        profesionales, pacientes y citas.
+                    </p>
+                </div>
+
+                <div class="card__footer">
+                    <a
+                        href="{% url 'admin-report-dashboard' %}"
+                        class="btn btn--secondary btn--sm"
+                    >
+                        Ver reportes
                     </a>
                 </div>
             </article>

@@ -10,6 +10,8 @@ from django.conf.urls.static import static
 from apps.accounts.forms import AccountAuthenticationForm
 from apps.accounts.views import (
     admin_dashboard,
+    admin_report_dashboard,
+    admin_user_list,
     dashboard_redirect,
     patient_dashboard,
     profile_view,
@@ -42,6 +44,10 @@ from apps.assignments.views import (
     patient_assignment_attachment_delete,
 )
 from apps.patients.views import (
+    admin_patient_account_status_update,
+    admin_patient_detail,
+    admin_patient_edit,
+    admin_patient_list,
     psychologist_patient_create,
     psychologist_patient_created,
     psychologist_patient_detail,
@@ -105,6 +111,20 @@ urlpatterns = [
         name="patient-dashboard",
     ),
     
+    # Gestión general de usuarios por el administrador.
+    path(
+        "administracion/usuarios/",
+        admin_user_list,
+        name="admin-user-list",
+    ),
+    
+    # Reportes administrativos.
+    path(
+        "administracion/reportes/",
+        admin_report_dashboard,
+        name="admin-report-dashboard",
+    ),
+    
     # Gestión de psicólogos por el administrador.
     path(
         "administracion/psicologos/nuevo/",
@@ -135,6 +155,28 @@ urlpatterns = [
         "administracion/psicologos/<int:psychologist_id>/estado-cuenta/",
         admin_psychologist_account_status_update,
         name="admin-psychologist-account-status-update",
+    ),
+    
+    # Gestión de pacientes por el administrador.
+    path(
+        "administracion/pacientes/",
+        admin_patient_list,
+        name="admin-patient-list",
+    ),
+    path(
+        "administracion/pacientes/<int:patient_id>/",
+        admin_patient_detail,
+        name="admin-patient-detail",
+    ),
+    path(
+        "administracion/pacientes/<int:patient_id>/estado-cuenta/",
+        admin_patient_account_status_update,
+        name="admin-patient-account-status-update",
+    ),
+    path(
+        "administracion/pacientes/<int:patient_id>/editar/",
+        admin_patient_edit,
+        name="admin-patient-edit",
     ),
 
     # Perfil.
@@ -301,6 +343,7 @@ urlpatterns = [
         psychologist_patient_status_update,
         name="psychologist-patient-status-update",
     ),
+    
     
     # Notas de sesiones
     # Notas de sesión del psicólogo.

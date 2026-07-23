@@ -1,0 +1,369 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Usuarios | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/admin_user_list.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Usuarios
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta todas las cuentas registradas en el sistema.
+            </p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <article class="card admin-user-list-card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Listado de usuarios
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Busca por nombre o correo y filtra por rol o estado.
+                    </p>
+                </div>
+
+                <span class="badge badge--neutral">
+                    {{ filtered_users_count }}
+
+                    {% if filtered_users_count == 1 %}
+                        usuario
+                    {% else %}
+                        usuarios
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="card__body">
+                <form
+                    method="get"
+                    class="admin-user-filters"
+                >
+                    <div class="admin-user-filters__grid">
+                        <div class="form-group admin-user-filters__field admin-user-filters__field--full">
+                            <label
+                                for="id_q"
+                                class="form-label"
+                            >
+                                Búsqueda
+                            </label>
+
+                            <div class="admin-user-filters__search">
+                                <span
+                                    class="admin-user-filters__search-icon"
+                                    aria-hidden="true"
+                                >
+                                    🔎
+                                </span>
+
+                                <input
+                                    type="search"
+                                    name="q"
+                                    id="id_q"
+                                    class="form-control"
+                                    value="{{ query }}"
+                                    placeholder="Buscar por nombre, apellido o correo"
+                                    autocomplete="off"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group admin-user-filters__field">
+                            <label
+                                for="id_role"
+                                class="form-label"
+                            >
+                                Rol
+                            </label>
+
+                            <select
+                                name="role"
+                                id="id_role"
+                                class="form-control"
+                            >
+                                <option
+                                    value=""
+                                    {% if not role_filter %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Todos
+                                </option>
+
+                                {% for role_value, role_label in role_choices %}
+                                    <option
+                                        value="{{ role_value }}"
+                                        {% if role_filter == role_value %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ role_label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group admin-user-filters__field">
+                            <label
+                                for="id_account_status"
+                                class="form-label"
+                            >
+                                Estado de la cuenta
+                            </label>
+
+                            <select
+                                name="account_status"
+                                id="id_account_status"
+                                class="form-control"
+                            >
+                                <option
+                                    value=""
+                                    {% if not account_status %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Todos
+                                </option>
+
+                                <option
+                                    value="active"
+                                    {% if account_status == "active" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Activas
+                                </option>
+
+                                <option
+                                    value="inactive"
+                                    {% if account_status == "inactive" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Inactivas
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="admin-user-filters__actions">
+                        <button
+                            type="submit"
+                            class="btn btn--primary"
+                        >
+                            Aplicar filtros
+                        </button>
+
+                        {% if query or role_filter or account_status %}
+                            <a
+                                href="{% url 'admin-user-list' %}"
+                                class="btn btn--secondary"
+                            >
+                                Limpiar
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+
+                {% if page_obj.object_list %}
+                    <div class="admin-user-table-wrapper">
+                        <table class="admin-user-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        Usuario
+                                    </th>
+
+                                    <th scope="col">
+                                        Correo electrónico
+                                    </th>
+
+                                    <th scope="col">
+                                        Rol
+                                    </th>
+
+                                    <th scope="col">
+                                        Estado
+                                    </th>
+
+                                    <th scope="col">
+                                        Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for user in page_obj.object_list %}
+                                    <tr>
+                                        <td>
+                                            <div class="admin-user-table__person">
+                                                <strong>
+                                                    {% if user.first_name or user.last_name %}
+                                                        {{ user.first_name }}
+                                                        {{ user.last_name }}
+                                                    {% else %}
+                                                        Sin nombre registrado
+                                                    {% endif %}
+                                                </strong>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <span class="admin-user-table__email">
+                                                {{ user.email }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {% if user.role == "ADMIN" %}
+                                                <span class="badge badge--primary">
+                                                    {{ user.get_role_display }}
+                                                </span>
+
+                                            {% elif user.role == "PSYCHOLOGIST" %}
+                                                <span class="badge badge--neutral">
+                                                    {{ user.get_role_display }}
+                                                </span>
+
+                                            {% else %}
+                                                <span class="badge badge--success">
+                                                    {{ user.get_role_display }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if user.is_active %}
+                                                <span class="badge badge--success">
+                                                    Activa
+                                                </span>
+                                            {% else %}
+                                                <span class="badge badge--neutral">
+                                                    Inactiva
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            <div class="admin-user-table__actions">
+                                                {% if user.role == "PSYCHOLOGIST" and user.psychologist_profile %}
+                                                    <a
+                                                        href="{% url 'admin-psychologist-detail' user.psychologist_profile.id %}"
+                                                        class="btn btn--secondary btn--sm"
+                                                    >
+                                                        Ver perfil
+                                                    </a>
+
+                                                {% elif user.role == "PATIENT" and user.patient_profile %}
+                                                    <a
+                                                        href="{% url 'admin-patient-detail' user.patient_profile.id %}"
+                                                        class="btn btn--secondary btn--sm"
+                                                    >
+                                                        Ver perfil
+                                                    </a>
+
+                                                {% else %}
+                                                    <span class="admin-user-table__empty">
+                                                        Sin acciones
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if page_obj.paginator.num_pages > 1 %}
+                        <div class="admin-user-pagination">
+                            <p class="admin-user-pagination__summary">
+                                Página {{ page_obj.number }}
+                                de {{ page_obj.paginator.num_pages }}
+                            </p>
+
+                            <nav
+                                class="admin-user-pagination__navigation"
+                                aria-label="Paginación de usuarios"
+                            >
+                                {% if page_obj.has_previous %}
+                                    <a
+                                        href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if account_status %}&account_status={{ account_status }}{% endif %}"
+                                        class="btn btn--secondary btn--sm"
+                                    >
+                                        Anterior
+                                    </a>
+                                {% endif %}
+
+                                {% for page_number in page_obj.paginator.page_range %}
+                                    {% if page_number == page_obj.number %}
+                                        <span
+                                            class="admin-user-pagination__current"
+                                            aria-current="page"
+                                        >
+                                            {{ page_number }}
+                                        </span>
+
+                                    {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                                        <a
+                                            href="?page={{ page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if account_status %}&account_status={{ account_status }}{% endif %}"
+                                            class="admin-user-pagination__page"
+                                        >
+                                            {{ page_number }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <a
+                                        href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if account_status %}&account_status={{ account_status }}{% endif %}"
+                                        class="btn btn--secondary btn--sm"
+                                    >
+                                        Siguiente
+                                    </a>
+                                {% endif %}
+                            </nav>
+                        </div>
+                    {% endif %}
+
+                {% else %}
+                    <div class="empty-state">
+                        <h3 class="empty-state__title">
+                            No se encontraron usuarios
+                        </h3>
+
+                        <p class="empty-state__description">
+                            No hay cuentas que coincidan con los filtros seleccionados.
+                        </p>
+
+                        {% if query or role_filter or account_status %}
+                            <div class="empty-state__actions">
+                                <a
+                                    href="{% url 'admin-user-list' %}"
+                                    class="btn btn--secondary"
+                                >
+                                    Limpiar filtros
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+{% endblock %}

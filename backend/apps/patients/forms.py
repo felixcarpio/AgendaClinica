@@ -338,3 +338,294 @@ class PsychologistPatientStatusForm(forms.Form):
             )
 
         return status
+    
+class AdminPatientUpdateForm(forms.ModelForm):
+    """
+    Formulario utilizado por el administrador para actualizar
+    la información general de un paciente.
+
+    Los nombres y apellidos pertenecen a Account.
+    Los demás datos pertenecen al perfil Patient.
+
+    Este formulario no permite modificar:
+    - correo electrónico;
+    - contraseña;
+    - rol;
+    - estado global de la cuenta;
+    - estado clínico del paciente;
+    - relación con sus psicólogos.
+    """
+
+    first_name = forms.CharField(
+        label="Nombre",
+        max_length=20,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Ingresa el nombre",
+                "autocomplete": "given-name",
+            }
+        ),
+    )
+
+    last_name = forms.CharField(
+        label="Apellido",
+        max_length=20,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Ingresa el apellido",
+                "autocomplete": "family-name",
+            }
+        ),
+    )
+
+    class Meta:
+        model = Patient
+
+        fields = (
+            "first_name",
+            "last_name",
+            "phone",
+            "birth_date",
+            "gender",
+            "address",
+            "emergency_contact_name",
+            "emergency_contact_phone",
+        )
+
+        widgets = {
+            "phone": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Número de teléfono",
+                    "autocomplete": "tel",
+                }
+            ),
+            "birth_date": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date",
+                },
+                format="%Y-%m-%d",
+            ),
+            "gender": forms.Select(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "address": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Dirección del paciente",
+                    "rows": 3,
+                }
+            ),
+            "emergency_contact_name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Nombre completo",
+                }
+            ),
+            "emergency_contact_phone": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Número de teléfono",
+                    "autocomplete": "tel",
+                }
+            ),
+        }
+
+        labels = {
+            "phone": "Teléfono",
+            "birth_date": "Fecha de nacimiento",
+            "gender": "Género",
+            "address": "Dirección",
+            "emergency_contact_name": (
+                "Nombre del contacto de emergencia"
+            ),
+            "emergency_contact_phone": (
+                "Teléfono del contacto de emergencia"
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        """
+        Carga los nombres almacenados en la cuenta asociada
+        y configura el valor inicial de la fecha.
+        """
+
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.pk:
+            self.fields["first_name"].initial = (
+                self.instance.account.first_name
+            )
+
+            self.fields["last_name"].initial = (
+                self.instance.account.last_name
+            )
+
+            if self.instance.birth_date:
+                self.initial["birth_date"] = (
+                    self.instance.birth_date.strftime("%Y-%m-%d")
+                )
+
+    def clean_first_name(self):
+        """
+        Elimina espacios innecesarios y evita nombres vacíos.
+        """
+
+        first_name = self.cleaned_data["first_name"].strip()
+
+        if not first_name:
+            raise forms.ValidationError(
+                "Debes ingresar el nombre del paciente."
+            )
+
+        return first_name
+
+    def clean_last_name(self):
+        """
+        Elimina espacios innecesarios y evita apellidos vacíos.
+        """
+
+        last_name = self.cleaned_data["last_name"].strip()
+
+        if not last_name:
+            raise forms.ValidationError(
+                "Debes ingresar el apellido del paciente."
+            )
+
+        return last_name
+
+    def clean_phone(self):
+        """
+        Elimina espacios innecesarios del teléfono.
+        """
+
+        return self.cleaned_data.get(
+            "phone",
+            "",
+        ).strip()
+
+    def clean_birth_date(self):
+        """
+        Evita registrar fechas de nacimiento futuras.
+        """
+
+        birth_date = self.cleaned_data.get(
+            "birth_date",
+        )
+
+        if (
+            birth_date
+            and birth_date > timezone.localdate()
+        ):
+            raise forms.ValidationError(
+                "La fecha de nacimiento no puede estar en el futuro."
+            )
+
+        return birth_date
+
+    def clean_address(self):
+        """
+        Elimina espacios innecesarios de la dirección.
+        """
+
+        return self.cleaned_data.get(
+            "address",
+            "",
+        ).strip()
+
+    def clean_emergency_contact_name(self):
+        """
+        Limpia el nombre del contacto de emergencia.
+        """
+
+        return self.cleaned_data.get(
+            "emergency_contact_name",
+            "",
+        ).strip()
+
+    def clean_emergency_contact_phone(self):
+        """
+        Limpia el teléfono del contacto de emergencia.
+        """
+
+        return self.cleaned_data.get(
+            "emergency_contact_phone",
+            "",
+        ).strip()
+
+    def clean(self):
+        """
+        Valida que el contacto de emergencia tenga
+        nombre y teléfono de forma coherente.
+        """
+
+        cleaned_data = super().clean()
+
+        emergency_contact_name = cleaned_data.get(
+            "emergency_contact_name",
+            "",
+        )
+
+        emergency_contact_phone = cleaned_data.get(
+            "emergency_contact_phone",
+            "",
+        )
+
+        if (
+            emergency_contact_name
+            and not emergency_contact_phone
+        ):
+            self.add_error(
+                "emergency_contact_phone",
+                (
+                    "Debes ingresar el teléfono del "
+                    "contacto de emergencia."
+                ),
+            )
+
+        if (
+            emergency_contact_phone
+            and not emergency_contact_name
+        ):
+            self.add_error(
+                "emergency_contact_name",
+                (
+                    "Debes ingresar el nombre del "
+                    "contacto de emergencia."
+                ),
+            )
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        """
+        Actualiza el perfil del paciente y los nombres
+        almacenados en la cuenta asociada.
+        """
+
+        patient = super().save(
+            commit=False,
+        )
+
+        account = patient.account
+        account.first_name = self.cleaned_data["first_name"]
+        account.last_name = self.cleaned_data["last_name"]
+
+        if commit:
+            account.full_clean()
+
+            account.save(
+                update_fields=[
+                    "first_name",
+                    "last_name",
+                ]
+            )
+
+            patient.save()
+
+        return patient

@@ -7,11 +7,12 @@ from django.core.paginator import Paginator
 from django.db.models import OuterRef, Prefetch, Q, Subquery
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-
+from django.views.decorators.http import require_POST
 from apps.appointments.models import Appointment
 from apps.accounts.models import Account
 from apps.clinical_records.models import ClinicalRecord
 from apps.patients.forms import (
+    AdminPatientUpdateForm,
     PsychologistPatientCreateForm,
     PsychologistPatientStatusForm,
 )
@@ -665,4 +666,318 @@ def psychologist_patient_status_update(request, public_id):
     return redirect(
         "psychologist-patient-detail",
         public_id=relationship.patient.public_id,
+    )
+    
+@login_required
+def admin_patient_list(request):
+    """
+    Muestra los pacientes registrados en el sistema.
+
+    El administrador puede:
+    - buscar por nombre, apellido, correo o teléfono;
+    - filtrar según el estado de la cuenta;
+    - ordenar los resultados;
+    - consultar el listado mediante paginación.
+    """
+
+    if request.user.role != Account.Role.ADMIN:
+        return redirect("dashboard-redirect")
+
+    query = request.GET.get(
+        "q",
+        "",
+    ).strip()
+
+    account_status = request.GET.get(
+        "account_status",
+        "",
+    ).strip().lower()
+
+    ordering = request.GET.get(
+        "ordering",
+        "name",
+    ).strip().lower()
+
+    patients = Patient.objects.select_related(
+        "account",
+    )
+
+    if query:
+        patients = patients.filter(
+            Q(account__first_name__icontains=query)
+            | Q(account__last_name__icontains=query)
+            | Q(account__email__icontains=query)
+            | Q(phone__icontains=query)
+            | Q(emergency_contact_name__icontains=query)
+        )
+
+    if account_status == "active":
+        patients = patients.filter(
+            account__is_active=True,
+        )
+
+    elif account_status == "inactive":
+        patients = patients.filter(
+            account__is_active=False,
+        )
+
+    else:
+        account_status = ""
+
+    if ordering == "newest":
+        patients = patients.order_by(
+            "-created_at",
+        )
+
+    elif ordering == "oldest":
+        patients = patients.order_by(
+            "created_at",
+        )
+
+    else:
+        ordering = "name"
+
+        patients = patients.order_by(
+            "account__first_name",
+            "account__last_name",
+        )
+
+    filtered_patients_count = patients.count()
+
+    paginator = Paginator(
+        patients,
+        10,
+    )
+
+    page_obj = paginator.get_page(
+        request.GET.get("page"),
+    )
+
+    context = {
+        "page_title": "Pacientes",
+        "page_obj": page_obj,
+        "query": query,
+        "account_status": account_status,
+        "ordering": ordering,
+        "filtered_patients_count": filtered_patients_count,
+    }
+
+    return render(
+        request,
+        "patients/admin_patient_list.html",
+        context,
+    )
+    
+@login_required
+def admin_patient_detail(request, patient_id):
+    """
+    Muestra la información general de un paciente para que
+    el administrador pueda consultar su cuenta y perfil.
+
+    Esta vista no muestra ni modifica información clínica sensible,
+    como expedientes, diagnósticos o notas de sesión.
+    """
+
+    if request.user.role != Account.Role.ADMIN:
+        return redirect("dashboard-redirect")
+
+    patient = get_object_or_404(
+        Patient.objects.select_related(
+            "account",
+        ),
+        id=patient_id,
+    )
+
+    context = {
+        "page_title": "Detalle del paciente",
+        "patient": patient,
+    }
+
+    return render(
+        request,
+        "patients/admin_patient_detail.html",
+        context,
+    )
+    
+@login_required
+@require_POST
+def admin_patient_account_status_update(
+    request,
+    patient_id,
+):
+    """
+    Activa o desactiva la cuenta asociada a un paciente.
+
+    Esta acción controla únicamente el acceso general al sistema.
+    No modifica la relación clínica entre el paciente y sus psicólogos.
+    """
+
+    if request.user.role != Account.Role.ADMIN:
+        return redirect("dashboard-redirect")
+
+    patient = get_object_or_404(
+        Patient.objects.select_related(
+            "account",
+        ),
+        id=patient_id,
+    )
+
+    requested_status = request.POST.get(
+        "status",
+        "",
+    ).strip().lower()
+
+    if requested_status not in {
+        "activate",
+        "deactivate",
+    }:
+        messages.error(
+            request,
+            "La acción solicitada no es válida.",
+        )
+
+        return redirect(
+            "admin-patient-detail",
+            patient_id=patient.id,
+        )
+
+    account = patient.account
+    should_be_active = requested_status == "activate"
+
+    if account.is_active == should_be_active:
+        if should_be_active:
+            messages.info(
+                request,
+                "La cuenta del paciente ya se encuentra activa.",
+            )
+        else:
+            messages.info(
+                request,
+                "La cuenta del paciente ya se encuentra inactiva.",
+            )
+
+        return redirect(
+            "admin-patient-detail",
+            patient_id=patient.id,
+        )
+
+    try:
+        with transaction.atomic():
+            account.is_active = should_be_active
+
+            account.save(
+                update_fields=[
+                    "is_active",
+                ]
+            )
+
+    except Exception:
+        logger.exception(
+            (
+                "Error al actualizar el estado de la cuenta "
+                "de un paciente."
+            )
+        )
+
+        messages.error(
+            request,
+            (
+                "No fue posible actualizar el estado de la cuenta. "
+                "Inténtalo nuevamente."
+            ),
+        )
+
+    else:
+        if should_be_active:
+            messages.success(
+                request,
+                "La cuenta del paciente fue activada correctamente.",
+            )
+        else:
+            messages.success(
+                request,
+                "La cuenta del paciente fue desactivada correctamente.",
+            )
+
+    return redirect(
+        "admin-patient-detail",
+        patient_id=patient.id,
+    )
+    
+@login_required
+def admin_patient_edit(request, patient_id):
+    """
+    Permite al administrador actualizar los datos generales
+    de un paciente.
+
+    No modifica información clínica, correo, contraseña,
+    rol ni estado de la cuenta.
+    """
+
+    if request.user.role != Account.Role.ADMIN:
+        return redirect("dashboard-redirect")
+
+    patient = get_object_or_404(
+        Patient.objects.select_related(
+            "account",
+        ),
+        id=patient_id,
+    )
+
+    if request.method == "POST":
+        form = AdminPatientUpdateForm(
+            request.POST,
+            instance=patient,
+        )
+
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    form.save()
+
+            except Exception:
+                logger.exception(
+                    (
+                        "Error al actualizar un paciente "
+                        "desde el portal del administrador."
+                    )
+                )
+
+                form.add_error(
+                    None,
+                    (
+                        "No fue posible actualizar al paciente. "
+                        "Verifica los datos e inténtalo nuevamente."
+                    ),
+                )
+
+            else:
+                messages.success(
+                    request,
+                    (
+                        "La información del paciente fue "
+                        "actualizada correctamente."
+                    ),
+                )
+
+                return redirect(
+                    "admin-patient-detail",
+                    patient_id=patient.id,
+                )
+
+    else:
+        form = AdminPatientUpdateForm(
+            instance=patient,
+        )
+
+    context = {
+        "page_title": "Editar paciente",
+        "patient": patient,
+        "form": form,
+    }
+
+    return render(
+        request,
+        "patients/admin_patient_edit.html",
+        context,
     )

@@ -1,0 +1,371 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Pacientes | Agenda Clínica
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/admin_patient_list.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section class="page-heading">
+        <div>
+            <h2 class="page-heading__title">
+                Pacientes
+            </h2>
+
+            <p class="page-heading__description">
+                Consulta y administra los pacientes registrados
+                en el sistema.
+            </p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <article class="card admin-patient-list-card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Listado de pacientes
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Busca por nombre, correo, teléfono o contacto de emergencia.
+                    </p>
+                </div>
+
+                <span class="badge badge--neutral">
+                    {{ filtered_patients_count }}
+
+                    {% if filtered_patients_count == 1 %}
+                        paciente
+                    {% else %}
+                        pacientes
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="card__body">
+                <form
+                    method="get"
+                    class="admin-patient-filters"
+                >
+                    <div class="admin-patient-filters__grid">
+                        <div class="form-group admin-patient-filters__field admin-patient-filters__field--full">
+                            <label
+                                for="id_q"
+                                class="form-label"
+                            >
+                                Búsqueda
+                            </label>
+
+                            <div class="admin-patient-filters__search">
+                                <span
+                                    class="admin-patient-filters__search-icon"
+                                    aria-hidden="true"
+                                >
+                                    🔎
+                                </span>
+
+                                <input
+                                    type="search"
+                                    name="q"
+                                    id="id_q"
+                                    class="form-control"
+                                    value="{{ query }}"
+                                    placeholder="Buscar por nombre, correo, teléfono o contacto"
+                                    autocomplete="off"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group admin-patient-filters__field">
+                            <label
+                                for="id_account_status"
+                                class="form-label"
+                            >
+                                Estado de la cuenta
+                            </label>
+
+                            <select
+                                name="account_status"
+                                id="id_account_status"
+                                class="form-control"
+                            >
+                                <option
+                                    value=""
+                                    {% if not account_status %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Todos
+                                </option>
+
+                                <option
+                                    value="active"
+                                    {% if account_status == "active" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Activas
+                                </option>
+
+                                <option
+                                    value="inactive"
+                                    {% if account_status == "inactive" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Inactivas
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group admin-patient-filters__field">
+                            <label
+                                for="id_ordering"
+                                class="form-label"
+                            >
+                                Orden
+                            </label>
+
+                            <select
+                                name="ordering"
+                                id="id_ordering"
+                                class="form-control"
+                            >
+                                <option
+                                    value="name"
+                                    {% if ordering == "name" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Nombre
+                                </option>
+
+                                <option
+                                    value="newest"
+                                    {% if ordering == "newest" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Más recientes
+                                </option>
+
+                                <option
+                                    value="oldest"
+                                    {% if ordering == "oldest" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Más antiguos
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="admin-patient-filters__actions">
+                        <button
+                            type="submit"
+                            class="btn btn--primary"
+                        >
+                            Aplicar filtros
+                        </button>
+
+                        {% if query or account_status or ordering != "name" %}
+                            <a
+                                href="{% url 'admin-patient-list' %}"
+                                class="btn btn--secondary"
+                            >
+                                Limpiar
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+
+                {% if page_obj.object_list %}
+                    <div class="admin-patient-table-wrapper">
+                        <table class="admin-patient-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        Paciente
+                                    </th>
+
+                                    <th scope="col">
+                                        Teléfono
+                                    </th>
+
+                                    <th scope="col">
+                                        Fecha de nacimiento
+                                    </th>
+
+                                    <th scope="col">
+                                        Género
+                                    </th>
+
+                                    <th scope="col">
+                                        Estado de cuenta
+                                    </th>
+                                    <th scope="col">
+                                        Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for patient in page_obj.object_list %}
+                                    <tr>
+                                        <td>
+                                            <div class="admin-patient-table__person">
+                                                <strong>
+                                                    {{ patient.account.first_name }}
+                                                    {{ patient.account.last_name }}
+                                                </strong>
+
+                                                <span>
+                                                    {{ patient.account.email }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            {% if patient.phone %}
+                                                {{ patient.phone }}
+                                            {% else %}
+                                                <span class="admin-patient-table__empty">
+                                                    No indicado
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if patient.birth_date %}
+                                                {{ patient.birth_date|date:"d/m/Y" }}
+                                            {% else %}
+                                                <span class="admin-patient-table__empty">
+                                                    No indicada
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if patient.gender %}
+                                                {{ patient.get_gender_display }}
+                                            {% else %}
+                                                <span class="admin-patient-table__empty">
+                                                    No indicado
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if patient.account.is_active %}
+                                                <span class="badge badge--success">
+                                                    Activa
+                                                </span>
+                                            {% else %}
+                                                <span class="badge badge--neutral">
+                                                    Inactiva
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            <div class="admin-patient-table__actions">
+                                                <a
+                                                    href="{% url 'admin-patient-detail' patient.id %}"
+                                                    class="btn btn--primary btn--sm"
+                                                >
+                                                    Ver paciente
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if page_obj.paginator.num_pages > 1 %}
+                        <div class="admin-patient-pagination">
+                            <p class="admin-patient-pagination__summary">
+                                Página {{ page_obj.number }}
+                                de {{ page_obj.paginator.num_pages }}
+                            </p>
+
+                            <nav
+                                class="admin-patient-pagination__navigation"
+                                aria-label="Paginación de pacientes"
+                            >
+                                {% if page_obj.has_previous %}
+                                    <a
+                                        href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if account_status %}&account_status={{ account_status }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                        class="btn btn--secondary btn--sm"
+                                    >
+                                        Anterior
+                                    </a>
+                                {% endif %}
+
+                                {% for page_number in page_obj.paginator.page_range %}
+                                    {% if page_number == page_obj.number %}
+                                        <span
+                                            class="admin-patient-pagination__current"
+                                            aria-current="page"
+                                        >
+                                            {{ page_number }}
+                                        </span>
+
+                                    {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                                        <a
+                                            href="?page={{ page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if account_status %}&account_status={{ account_status }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                            class="admin-patient-pagination__page"
+                                        >
+                                            {{ page_number }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <a
+                                        href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if account_status %}&account_status={{ account_status }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}"
+                                        class="btn btn--secondary btn--sm"
+                                    >
+                                        Siguiente
+                                    </a>
+                                {% endif %}
+                            </nav>
+                        </div>
+                    {% endif %}
+
+                {% else %}
+                    <div class="empty-state">
+                        <h3 class="empty-state__title">
+                            No se encontraron pacientes
+                        </h3>
+
+                        <p class="empty-state__description">
+                            No hay resultados que coincidan con los filtros seleccionados.
+                        </p>
+
+                        {% if query or account_status or ordering != "name" %}
+                            <div class="empty-state__actions">
+                                <a
+                                    href="{% url 'admin-patient-list' %}"
+                                    class="btn btn--secondary"
+                                >
+                                    Limpiar filtros
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+{% endblock %}

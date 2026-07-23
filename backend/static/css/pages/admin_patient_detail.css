@@ -1,0 +1,148 @@
+.admin-patient-detail {
+    width: 100%;
+}
+
+.admin-patient-detail__section {
+    padding-block: var(--spacing-5);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-patient-detail__section:first-child {
+    padding-top: 0;
+}
+
+.admin-patient-detail__section:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.admin-patient-detail__section-heading {
+    margin-bottom: var(--spacing-4);
+}
+
+.admin-patient-detail__section-heading h4 {
+    margin: 0 0 var(--spacing-1);
+    font-size: var(--font-size-lg);
+}
+
+.admin-patient-detail__section-heading p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.admin-patient-detail__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-4);
+}
+
+.admin-patient-detail__field {
+    display: grid;
+    gap: var(--spacing-2);
+    min-width: 0;
+    padding: var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+}
+
+.admin-patient-detail__field--full {
+    grid-column: 1 / -1;
+}
+
+.admin-patient-detail__label {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.admin-patient-detail__field span,
+.admin-patient-detail__field strong {
+    overflow-wrap: anywhere;
+}
+
+.admin-patient-detail .card__footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.admin-patient-detail__account-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-5);
+    padding: var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-soft);
+}
+
+.admin-patient-detail__account-control strong {
+    display: block;
+    margin-bottom: var(--spacing-1);
+}
+
+.admin-patient-detail__account-control p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+}
+
+.admin-patient-detail__status-form {
+    flex-shrink: 0;
+}
+
+.page-heading__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.admin-patient-detail .card__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+}
+
+@media (max-width: 768px) {
+    .admin-patient-detail__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-patient-detail__field--full {
+        grid-column: auto;
+    }
+
+    .admin-patient-detail .card__footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-patient-detail .card__footer .btn {
+        width: 100%;
+    }
+
+    .admin-patient-detail__account-control {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-patient-detail__status-form,
+    .admin-patient-detail__status-form .btn {
+        width: 100%;
+    }
+
+    .page-heading__actions {
+        align-items: stretch;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .page-heading__actions .btn {
+        width: 100%;
+    }
+}

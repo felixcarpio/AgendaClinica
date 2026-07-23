@@ -134,12 +134,24 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.content-grid--four-columns {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.dashboard-stat {
+    margin: 0 0 var(--spacing-2);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1;
+}
+
 /* ==============================
    Diseño adaptable
    ============================== */
 
 @media (max-width: 1024px) {
-    .content-grid--three-columns {
+    .content-grid--three-columns,
+    .content-grid--four-columns {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
@@ -172,7 +184,8 @@
     }
 
     .content-grid--two-columns,
-    .content-grid--three-columns {
+    .content-grid--three-columns,
+    .content-grid--four-columns {
         grid-template-columns: 1fr;
     }
 
