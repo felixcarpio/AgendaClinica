@@ -11,6 +11,8 @@ from apps.accounts.forms import AccountAuthenticationForm
 from apps.accounts.views import (
     admin_dashboard,
     admin_report_dashboard,
+    admin_report_appointments_csv,
+    admin_report_psychologists_csv,
     admin_user_list,
     dashboard_redirect,
     patient_dashboard,
@@ -69,6 +71,12 @@ from apps.psychologists.views import (
     admin_psychologist_list,
 )
 urlpatterns = [
+    # Administrador interno de Django.
+    path(
+        "admin/",
+        admin.site.urls,
+    ),
+
     # Autenticación.
     #
     # Se declara primero la ruta personalizada de inicio de sesión
@@ -82,8 +90,6 @@ urlpatterns = [
         name="login",
     ),
 
-    # Se conservan las demás rutas de autenticación de Django:
-    # logout, cambio de contraseña y recuperación de contraseña.
     path(
         "accounts/",
         include("django.contrib.auth.urls"),
@@ -123,6 +129,16 @@ urlpatterns = [
         "administracion/reportes/",
         admin_report_dashboard,
         name="admin-report-dashboard",
+    ),
+    path(
+        "administracion/reportes/citas/exportar/",
+        admin_report_appointments_csv,
+        name="admin-report-appointments-csv",
+    ),
+    path(
+        "administracion/reportes/psicologos/exportar/",
+        admin_report_psychologists_csv,
+        name="admin-report-psychologists-csv",
     ),
     
     # Gestión de psicólogos por el administrador.

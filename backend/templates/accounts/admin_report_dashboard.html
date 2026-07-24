@@ -334,6 +334,13 @@
                                 Historial completo
                             </span>
                         {% endif %}
+
+                        <a
+                            href="{% url 'admin-report-appointments-csv' %}?{% if period_filter %}period={{ period_filter }}{% else %}{% if start_date %}start_date={{ start_date }}{% endif %}{% if start_date and end_date %}&{% endif %}{% if end_date %}end_date={{ end_date }}{% endif %}{% endif %}"
+                            class="btn btn--secondary report-export-button"
+                        >
+                            Exportar CSV
+                        </a>
                     </div>
                 </div>
 
@@ -356,6 +363,32 @@
                         <div class="report-appointments-statuses">
                             <div class="report-status-row">
                                 <div class="report-status-row__info">
+                                    <span class="report-status-row__indicator report-status-row__indicator--pending"></span>
+
+                                    <div>
+                                        <strong>
+                                            Pendientes
+                                        </strong>
+
+                                        <span>
+                                            Citas creadas que aún no han sido confirmadas
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="report-status-row__result">
+                                    <span class="report-status-row__value">
+                                        {{ pending_appointments }}
+                                    </span>
+
+                                    <span class="report-status-row__percentage">
+                                        {{ pending_percentage }}%
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="report-status-row">
+                                <div class="report-status-row__info">
                                     <span class="report-status-row__indicator report-status-row__indicator--confirmed"></span>
 
                                     <div>
@@ -364,14 +397,16 @@
                                         </strong>
 
                                         <span>
-                                            Citas programadas y pendientes
+                                            Citas programadas y confirmadas
                                         </span>
                                     </div>
                                 </div>
 
-                                <span class="report-status-row__value">
-                                    {{ confirmed_appointments }}
-                                </span>
+                                <div class="report-status-row__result">
+                                    <span class="report-status-row__value">
+                                        {{ confirmed_appointments }}
+                                    </span>
+                                </div>
                             </div>
 
                             <div class="report-status-row">
@@ -389,9 +424,15 @@
                                     </div>
                                 </div>
 
-                                <span class="report-status-row__value">
-                                    {{ completed_appointments }}
-                                </span>
+                                <div class="report-status-row__result">
+                                    <span class="report-status-row__value">
+                                        {{ completed_appointments }}
+                                    </span>
+
+                                    <span class="report-status-row__percentage">
+                                        {{ completed_percentage }}%
+                                    </span>
+                                </div>
                             </div>
 
                             <div class="report-status-row">
@@ -410,9 +451,15 @@
                                     </div>
                                 </div>
 
-                                <span class="report-status-row__value">
-                                    {{ cancelled_appointments }}
-                                </span>
+                                <div class="report-status-row__result">
+                                    <span class="report-status-row__value">
+                                        {{ cancelled_appointments }}
+                                    </span>
+
+                                    <span class="report-status-row__percentage">
+                                        {{ cancelled_percentage }}%
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -420,4 +467,346 @@
             </article>
         </div>
     </section>
+
+    <section class="content-section">
+        <article class="card report-chart-card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Citas por fecha
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Evolución de las citas dentro del período consultado.
+                    </p>
+                </div>
+
+                <span class="badge badge--neutral">
+                    {{ period_summary }}
+                </span>
+            </div>
+
+            <div class="card__body">
+                {% if total_appointments > 0 %}
+                    <div class="report-chart-container">
+                        <canvas
+                            id="appointmentsByDateChart"
+                            aria-label="Gráfica de citas agrupadas por fecha"
+                            role="img"
+                        ></canvas>
+                    </div>
+                {% else %}
+                    <div class="report-chart-empty">
+                        <strong>
+                            No hay citas para mostrar
+                        </strong>
+
+                        <span>
+                            Selecciona otro período para visualizar
+                            la actividad.
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+
+    <section class="content-section">
+        <article class="card report-psychologists-card">
+            <div class="card__header">
+                <div>
+                    <h3 class="card__title">
+                        Actividad por psicólogo
+                    </h3>
+
+                    <p class="card__subtitle">
+                        Distribución de citas y pacientes atendidos
+                        dentro del período consultado.
+                    </p>
+                </div>
+
+                <div class="report-psychologists-card__actions">
+                    <span class="badge badge--neutral">
+                        {{ period_summary }}
+                    </span>
+
+                    <a
+                        href="{% url 'admin-report-psychologists-csv' %}?{% if period_filter %}period={{ period_filter }}{% else %}{% if start_date %}start_date={{ start_date }}{% endif %}{% if start_date and end_date %}&{% endif %}{% if end_date %}end_date={{ end_date }}{% endif %}{% endif %}"
+                        class="btn btn--secondary report-export-button"
+                    >
+                        Exportar resumen CSV
+                    </a>
+                </div>
+            </div>
+
+            <div class="card__body">
+                {% if psychologists_report %}
+                    <div class="report-table-wrapper">
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        Psicólogo
+                                    </th>
+
+                                    <th scope="col">
+                                        Total
+                                    </th>
+
+                                    <th scope="col">
+                                        Pendientes
+                                    </th>
+
+                                    <th scope="col">
+                                        Confirmadas
+                                    </th>
+
+                                    <th scope="col">
+                                        Completadas
+                                    </th>
+
+                                    <th scope="col">
+                                        Canceladas
+                                    </th>
+
+                                    <th scope="col">
+                                        Pacientes atendidos
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for psychologist in psychologists_report %}
+                                    <tr>
+                                        <td>
+                                            <div class="report-psychologist">
+                                                <div
+                                                    class="report-psychologist__avatar"
+                                                    aria-hidden="true"
+                                                >
+                                                    {{ psychologist.account.first_name|first|upper }}{{ psychologist.account.last_name|first|upper }}
+                                                </div>
+
+                                                <div class="report-psychologist__info">
+                                                    <strong>
+                                                        {{ psychologist.account.get_full_name }}
+                                                    </strong>
+
+                                                    <span>
+                                                        {{ psychologist.account.email }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <span class="report-table__total">
+                                                {{ psychologist.total_appointments_report }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {{ psychologist.pending_appointments_report }}
+                                        </td>
+
+                                        <td>
+                                            {{ psychologist.confirmed_appointments_report }}
+                                        </td>
+
+                                        <td>
+                                            {{ psychologist.completed_appointments_report }}
+                                        </td>
+
+                                        <td>
+                                            {{ psychologist.cancelled_appointments_report }}
+                                        </td>
+
+                                        <td>
+                                            {{ psychologist.patients_attended_report }}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td
+                                            colspan="7"
+                                            class="report-table__empty"
+                                        >
+                                            No hay psicólogos registrados.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="report-chart-empty">
+                        <strong>
+                            No hay información disponible
+                        </strong>
+
+                        <span>
+                            Todavía no existen psicólogos registrados
+                            para mostrar en el reporte.
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+
+    {{ chart_labels|json_script:"appointments-chart-labels" }}
+    {{ chart_values|json_script:"appointments-chart-values" }}
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const chartCanvas = document.getElementById(
+                "appointmentsByDateChart"
+            );
+
+            if (!chartCanvas) {
+                return;
+            }
+
+            if (typeof Chart === "undefined") {
+                console.error(
+                    "No se pudo cargar la biblioteca Chart.js."
+                );
+                return;
+            }
+
+            const labelsElement = document.getElementById(
+                "appointments-chart-labels"
+            );
+
+            const valuesElement = document.getElementById(
+                "appointments-chart-values"
+            );
+
+            if (!labelsElement || !valuesElement) {
+                return;
+            }
+
+            const chartLabels = JSON.parse(
+                labelsElement.textContent
+            );
+
+            const chartValues = JSON.parse(
+                valuesElement.textContent
+            );
+
+            const documentStyles = getComputedStyle(
+                document.documentElement
+            );
+
+            const primaryColor = (
+                documentStyles
+                    .getPropertyValue("--primary-color")
+                    .trim()
+                || "#a45c78"
+            );
+
+            const textMuted = (
+                documentStyles
+                    .getPropertyValue("--text-muted")
+                    .trim()
+                || "#6f6870"
+            );
+
+            const borderColor = (
+                documentStyles
+                    .getPropertyValue("--border-color")
+                    .trim()
+                || "#ded8dc"
+            );
+
+            new Chart(chartCanvas, {
+                type: "line",
+
+                data: {
+                    labels: chartLabels,
+
+                    datasets: [
+                        {
+                            label: "Citas",
+                            data: chartValues,
+                            borderColor: primaryColor,
+                            backgroundColor: primaryColor,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: primaryColor,
+                            pointBorderColor: primaryColor,
+                            tension: 0.3,
+                            fill: false,
+                        },
+                    ],
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        intersect: false,
+                        mode: "index",
+                    },
+
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const value = context.parsed.y;
+
+                                    return (
+                                        value
+                                        + (
+                                            value === 1
+                                            ? " cita"
+                                            : " citas"
+                                        )
+                                    );
+                                },
+                            },
+                        },
+                    },
+
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                            },
+
+                            ticks: {
+                                color: textMuted,
+                                maxRotation: 45,
+                                minRotation: 0,
+                            },
+                        },
+
+                        y: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                color: textMuted,
+                                precision: 0,
+                                stepSize: 1,
+                            },
+
+                            grid: {
+                                color: borderColor,
+                            },
+                        },
+                    },
+                },
+            });
+        });
+    </script>
 {% endblock %}
